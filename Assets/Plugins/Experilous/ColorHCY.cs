@@ -76,6 +76,16 @@ namespace Experilous
 			return hcy;
 		}
 
+		public static ColorHCY FromHSY(float h, float s, float y)
+		{
+			return FromHSY(h, s, y, 1f);
+		}
+
+		public static ColorHCY FromHSY(float h, float s, float y, float a)
+		{
+			return new ColorHCY(h, s * GetMaxChroma(h, y), y, a);
+		}
+
 		public Color ToRGB()
 		{
 			Color rgb = new Color(0f, 0f, 0f, a);
@@ -115,9 +125,9 @@ namespace Experilous
 			}
 
 			float min = y - (rgb.r * _redLumaFactor + rgb.g * _greenLumaFactor + rgb.b * _blueLumaFactor);
-			rgb.r += min;
-			rgb.g += min;
-			rgb.b += min;
+			rgb.r = Mathf.Clamp01(rgb.r + min);
+			rgb.g = Mathf.Clamp01(rgb.g + min);
+			rgb.b = Mathf.Clamp01(rgb.b + min);
 			return rgb;
 		}
 
@@ -286,13 +296,21 @@ namespace Experilous
 			return string.Format("HCYA({0}, {1}, {2}, {3})", h.ToString(format), c.ToString(format), y.ToString(format), a.ToString(format));
 		}
 
-		public static float LumaAtMaxChroma(float hue)
+		public bool canConvertToRGB
+		{
+			get
+			{
+				return c <= GetMaxChroma(h, y);
+			}
+		}
+
+		public static float GetLumaAtMaxChroma(float h)
 		{
 			float r = 0f;
 			float g = 0f;
 			float b = 0f;
 
-			float scaledHue = hue * 6f;
+			float scaledHue = h * 6f;
 			if (scaledHue < 1f)
 			{
 				r = 1f;
@@ -325,6 +343,19 @@ namespace Experilous
 			}
 
 			return r * _redLumaFactor + g * _greenLumaFactor + b * _blueLumaFactor;
+		}
+
+		public static void GetMinMaxLuma(float h, float c, out float yMin, out float yMax)
+		{
+			float yMid = GetLumaAtMaxChroma(h);
+			yMin = c * yMid;
+			yMax = (1f - c) * (1f - yMid) + yMid;
+		}
+
+		public static float GetMaxChroma(float h, float y)
+		{
+			float yMid = GetLumaAtMaxChroma(h);
+			return (y <= yMid) ? y / yMid : (1f - y) / (1f - yMid);
 		}
 	}
 }
