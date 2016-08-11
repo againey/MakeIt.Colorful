@@ -163,15 +163,15 @@ namespace Experilous
 			float hueDelta = Mathf.Abs(hueB - hueA);
 			return new ColorHSV(
 				hueDelta <= 0.5f
-					? MathUtility.LerpUnclamped(hueA, hueB, t)
+					? MathTools.LerpUnclamped(hueA, hueB, t)
 					: Mathf.Repeat(
 						hueA < hueB
-							? MathUtility.LerpUnclamped(hueA + 1f, hueB, t)
-							: MathUtility.LerpUnclamped(hueA, hueB + 1f, t),
+							? MathTools.LerpUnclamped(hueA + 1f, hueB, t)
+							: MathTools.LerpUnclamped(hueA, hueB + 1f, t),
 						1f),
-				MathUtility.LerpUnclamped(a.s, b.s, t),
-				MathUtility.LerpUnclamped(a.v, b.v, t),
-				MathUtility.LerpUnclamped(a.a, b.a, t));
+				MathTools.LerpUnclamped(a.s, b.s, t),
+				MathTools.LerpUnclamped(a.v, b.v, t),
+				MathTools.LerpUnclamped(a.a, b.a, t));
 		}
 
 		public static ColorHSV LerpForward(ColorHSV a, ColorHSV b, float t)
@@ -185,11 +185,11 @@ namespace Experilous
 			float hueB = Mathf.Repeat(b.h, 1f);
 			return new ColorHSV(
 				hueA <= hueB
-					? MathUtility.LerpUnclamped(hueA, hueB, t)
-					: Mathf.Repeat(MathUtility.LerpUnclamped(hueA, hueB + 1f, t), 1f),
-				MathUtility.LerpUnclamped(a.s, b.s, t),
-				MathUtility.LerpUnclamped(a.v, b.v, t),
-				MathUtility.LerpUnclamped(a.a, b.a, t));
+					? MathTools.LerpUnclamped(hueA, hueB, t)
+					: Mathf.Repeat(MathTools.LerpUnclamped(hueA, hueB + 1f, t), 1f),
+				MathTools.LerpUnclamped(a.s, b.s, t),
+				MathTools.LerpUnclamped(a.v, b.v, t),
+				MathTools.LerpUnclamped(a.a, b.a, t));
 		}
 
 		public static ColorHSV LerpBackward(ColorHSV a, ColorHSV b, float t)
@@ -203,11 +203,11 @@ namespace Experilous
 			float hueB = Mathf.Repeat(b.h, 1f);
 			return new ColorHSV(
 				hueA >= hueB
-					? MathUtility.LerpUnclamped(hueA, hueB, t)
-					: Mathf.Repeat(MathUtility.LerpUnclamped(hueA + 1f, hueB, t), 1f),
-				MathUtility.LerpUnclamped(a.s, b.s, t),
-				MathUtility.LerpUnclamped(a.v, b.v, t),
-				MathUtility.LerpUnclamped(a.a, b.a, t));
+					? MathTools.LerpUnclamped(hueA, hueB, t)
+					: Mathf.Repeat(MathTools.LerpUnclamped(hueA + 1f, hueB, t), 1f),
+				MathTools.LerpUnclamped(a.s, b.s, t),
+				MathTools.LerpUnclamped(a.v, b.v, t),
+				MathTools.LerpUnclamped(a.a, b.a, t));
 		}
 
 		public static ColorHSV operator +(ColorHSV a, ColorHSV b)
