@@ -4,8 +4,9 @@
 
 using UnityEngine;
 using System;
+using Experilous.Numerics;
 
-namespace Experilous.MakeIt.Utilities
+namespace Experilous.Colors
 {
 	[Serializable]
 	public struct ColorHSL
@@ -167,15 +168,15 @@ namespace Experilous.MakeIt.Utilities
 			float hueDelta = Mathf.Abs(hueB - hueA);
 			return new ColorHSL(
 				hueDelta <= 0.5f
-					? MIMath.LerpUnclamped(hueA, hueB, t)
+					? Numerics.Math.LerpUnclamped(hueA, hueB, t)
 					: Mathf.Repeat(
 						hueA < hueB
-							? MIMath.LerpUnclamped(hueA + 1f, hueB, t)
-							: MIMath.LerpUnclamped(hueA, hueB + 1f, t),
+							? Numerics.Math.LerpUnclamped(hueA + 1f, hueB, t)
+							: Numerics.Math.LerpUnclamped(hueA, hueB + 1f, t),
 						1f),
-				MIMath.LerpUnclamped(a.s, b.s, t),
-				MIMath.LerpUnclamped(a.l, b.l, t),
-				MIMath.LerpUnclamped(a.a, b.a, t));
+				Numerics.Math.LerpUnclamped(a.s, b.s, t),
+				Numerics.Math.LerpUnclamped(a.l, b.l, t),
+				Numerics.Math.LerpUnclamped(a.a, b.a, t));
 		}
 
 		public static ColorHSL LerpForward(ColorHSL a, ColorHSL b, float t)
@@ -189,11 +190,11 @@ namespace Experilous.MakeIt.Utilities
 			float hueB = Mathf.Repeat(b.h, 1f);
 			return new ColorHSL(
 				hueA <= hueB
-					? MIMath.LerpUnclamped(hueA, hueB, t)
-					: Mathf.Repeat(MIMath.LerpUnclamped(hueA, hueB + 1f, t), 1f),
-				MIMath.LerpUnclamped(a.s, b.s, t),
-				MIMath.LerpUnclamped(a.l, b.l, t),
-				MIMath.LerpUnclamped(a.a, b.a, t));
+					? Numerics.Math.LerpUnclamped(hueA, hueB, t)
+					: Mathf.Repeat(Numerics.Math.LerpUnclamped(hueA, hueB + 1f, t), 1f),
+				Numerics.Math.LerpUnclamped(a.s, b.s, t),
+				Numerics.Math.LerpUnclamped(a.l, b.l, t),
+				Numerics.Math.LerpUnclamped(a.a, b.a, t));
 		}
 
 		public static ColorHSL LerpBackward(ColorHSL a, ColorHSL b, float t)
@@ -207,11 +208,11 @@ namespace Experilous.MakeIt.Utilities
 			float hueB = Mathf.Repeat(b.h, 1f);
 			return new ColorHSL(
 				hueA >= hueB
-					? MIMath.LerpUnclamped(hueA, hueB, t)
-					: Mathf.Repeat(MIMath.LerpUnclamped(hueA + 1f, hueB, t), 1f),
-				MIMath.LerpUnclamped(a.s, b.s, t),
-				MIMath.LerpUnclamped(a.l, b.l, t),
-				MIMath.LerpUnclamped(a.a, b.a, t));
+					? Numerics.Math.LerpUnclamped(hueA, hueB, t)
+					: Mathf.Repeat(Numerics.Math.LerpUnclamped(hueA + 1f, hueB, t), 1f),
+				Numerics.Math.LerpUnclamped(a.s, b.s, t),
+				Numerics.Math.LerpUnclamped(a.l, b.l, t),
+				Numerics.Math.LerpUnclamped(a.a, b.a, t));
 		}
 
 		public static ColorHSL operator +(ColorHSL a, ColorHSL b)
