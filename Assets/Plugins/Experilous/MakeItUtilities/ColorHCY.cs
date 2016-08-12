@@ -5,7 +5,7 @@
 using UnityEngine;
 using System;
 
-namespace Experilous
+namespace Experilous.MakeIt.Utilities
 {
 	[Serializable]
 	public struct ColorHCY
