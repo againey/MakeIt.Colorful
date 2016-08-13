@@ -4,7 +4,6 @@
 
 using UnityEngine;
 using System;
-using Experilous.Numerics;
 
 namespace Experilous.Colors
 {
