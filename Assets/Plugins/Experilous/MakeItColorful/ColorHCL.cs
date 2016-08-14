@@ -314,6 +314,17 @@ namespace Experilous.MakeItColorful
 			}
 		}
 
+		public static float GetLightnessAtMaxChroma()
+		{
+			return 0.5f;
+		}
+
+		public static void GetMinMaxLightness(float c, out float yMin, out float yMax)
+		{
+			yMin = c * 0.5f;
+			yMax = 1f - yMin;
+		}
+
 		public static float GetMaxChroma(float l)
 		{
 			return 1f - Mathf.Abs(2f * l - 1f);
