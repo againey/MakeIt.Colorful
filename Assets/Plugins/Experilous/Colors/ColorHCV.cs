@@ -300,5 +300,18 @@ namespace Experilous.Colors
 		{
 			return string.Format("HCVA({0}, {1}, {2}, {3})", h.ToString(format), c.ToString(format), v.ToString(format), a.ToString(format));
 		}
+
+		public bool canConvertToRGB
+		{
+			get
+			{
+				return c <= GetMaxChroma(v);
+			}
+		}
+
+		public static float GetMaxChroma(float v)
+		{
+			return v;
+		}
 	}
 }

@@ -128,14 +128,13 @@ namespace Experilous.Colors
 
 		public ColorHSY ToHSY()
 		{
-			float maxChroma = GetMaxChroma(h, y);
-			if (maxChroma != 0f)
+			if (y != 0f)
 			{
-				return new ColorHSY(h, c / maxChroma, y, a);
+				return new ColorHSY(h, c / GetMaxChroma(h, y), y, a);
 			}
 			else
 			{
-				return new ColorHSY(h, 0f, y, a);
+				return new ColorHSY(h, 0f, 0f, a);
 			}
 		}
 
