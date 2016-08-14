@@ -119,9 +119,24 @@ namespace Experilous.Colors
 			return rgb;
 		}
 
+		public static ColorHSL FromHCL(ColorHCL hcl)
+		{
+			return hcl.ToHSL();
+		}
+
+		public ColorHCL ToHCL()
+		{
+			return new ColorHCL(h, (1f - Mathf.Abs(2f * l - 1f)) * s, l, a);
+		}
+
 		public static explicit operator Color(ColorHSL hsl)
 		{
 			return hsl.ToRGB();
+		}
+
+		public static explicit operator ColorHCL(ColorHSL hsl)
+		{
+			return hsl.ToHCL();
 		}
 
 		public static explicit operator ColorHSL(Color rgb)

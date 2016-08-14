@@ -8,10 +8,10 @@ using System;
 namespace Experilous.Colors
 {
 	[Serializable]
-	public struct ColorHCY
+	public struct ColorHSY
 	{
 		public float h;
-		public float c;
+		public float s;
 		public float y;
 		public float a;
 
@@ -19,98 +19,98 @@ namespace Experilous.Colors
 		private const float _greenLumaFactor = 0.59f;
 		private const float _blueLumaFactor = 0.11f;
 
-		public ColorHCY(float h, float c, float y)
+		public ColorHSY(float h, float s, float y)
 		{
 			this.h = h;
-			this.c = c;
+			this.s = s;
 			this.y = y;
 			a = 1f;
 		}
 
-		public ColorHCY(float h, float c, float y, float a)
+		public ColorHSY(float h, float s, float y, float a)
 		{
 			this.h = h;
-			this.c = c;
+			this.s = s;
 			this.y = y;
 			this.a = a;
 		}
 
-		public ColorHCY(Color rgb)
+		public ColorHSY(Color rgb)
 		{
 			this = FromRGB(rgb);
 		}
 
-		public static ColorHCY FromRGB(Color rgb)
+		public static ColorHSY FromRGB(Color rgb)
 		{
-			ColorHCY hcy;
+			ColorHSY hsy;
 			float min = Mathf.Min(Mathf.Min(rgb.r, rgb.g), rgb.b);
 			float max = Mathf.Max(Mathf.Max(rgb.r, rgb.g), rgb.b);
 
-			hcy.c = max - min;
+			hsy.s = max - min;
 
-			if (hcy.c > 0f)
+			if (hsy.s > 0f)
 			{
 				if (rgb.r == max)
 				{
-					hcy.h = Mathf.Repeat((rgb.g - rgb.b) / hcy.c, 6f) / 6f;
+					hsy.h = Mathf.Repeat((rgb.g - rgb.b) / hsy.s, 6f) / 6f;
 				}
 				else if (rgb.g == max)
 				{
-					hcy.h = ((rgb.b - rgb.r) / hcy.c + 2f) / 6f;
+					hsy.h = ((rgb.b - rgb.r) / hsy.s + 2f) / 6f;
 				}
 				else
 				{
-					hcy.h = ((rgb.r - rgb.g) / hcy.c + 4f) / 6f;
+					hsy.h = ((rgb.r - rgb.g) / hsy.s + 4f) / 6f;
 				}
 
-				hcy.y = rgb.r * _redLumaFactor + rgb.g * _greenLumaFactor + rgb.b * _blueLumaFactor;
+				hsy.y = rgb.r * _redLumaFactor + rgb.g * _greenLumaFactor + rgb.b * _blueLumaFactor;
 			}
 			else
 			{
-				hcy.h = 0f;
-				hcy.y = rgb.r * _redLumaFactor + rgb.g * _greenLumaFactor + rgb.b * _blueLumaFactor;
+				hsy.h = 0f;
+				hsy.y = rgb.r * _redLumaFactor + rgb.g * _greenLumaFactor + rgb.b * _blueLumaFactor;
 			}
 
-			hcy.a = rgb.a;
+			hsy.a = rgb.a;
 
-			return hcy;
+			return hsy;
 		}
 
 		public Color ToRGB()
 		{
 			Color rgb = new Color(0f, 0f, 0f, a);
-			if (c > 0f)
+			if (s > 0f)
 			{
 				float scaledHue = h * 6f;
 				if (scaledHue < 1f)
 				{
-					rgb.r = c;
-					rgb.g = c * scaledHue;
+					rgb.r = s;
+					rgb.g = s * scaledHue;
 				}
 				else if (scaledHue < 2f)
 				{
-					rgb.g = c;
-					rgb.r = c * (2f - scaledHue);
+					rgb.g = s;
+					rgb.r = s * (2f - scaledHue);
 				}
 				else if (scaledHue < 3f)
 				{
-					rgb.g = c;
-					rgb.b = c * (scaledHue - 2f);
+					rgb.g = s;
+					rgb.b = s * (scaledHue - 2f);
 				}
 				else if (scaledHue < 4f)
 				{
-					rgb.b = c;
-					rgb.g = c * (4f - scaledHue);
+					rgb.b = s;
+					rgb.g = s * (4f - scaledHue);
 				}
 				else if (scaledHue < 5f)
 				{
-					rgb.b = c;
-					rgb.r = c * (scaledHue - 4f);
+					rgb.b = s;
+					rgb.r = s * (scaledHue - 4f);
 				}
 				else
 				{
-					rgb.r = c;
-					rgb.b = c * (6f - scaledHue);
+					rgb.r = s;
+					rgb.b = s * (6f - scaledHue);
 				}
 			}
 
@@ -121,35 +121,27 @@ namespace Experilous.Colors
 			return rgb;
 		}
 
-		public static ColorHCY FromHSY(ColorHSY hsy)
-		{
-			return hsy.ToHCY();
-		}
-
-		public ColorHSY ToHSY()
-		{
-			float maxChroma = GetMaxChroma(h, y);
-			if (maxChroma != 0f)
-			{
-				return new ColorHSY(h, c / maxChroma, y, a);
-			}
-			else
-			{
-				return new ColorHSY(h, 0f, y, a);
-			}
-		}
-
-		public static explicit operator Color(ColorHCY hcy)
-		{
-			return hcy.ToRGB();
-		}
-
-		public static explicit operator ColorHSY(ColorHCY hcy)
+		public static ColorHSY FromHCY(ColorHCY hcy)
 		{
 			return hcy.ToHSY();
 		}
 
-		public static explicit operator ColorHCY(Color rgb)
+		public ColorHCY ToHCY()
+		{
+			return new ColorHCY(h, s * GetMaxChroma(h, y), y, a);
+		}
+
+		public static explicit operator Color(ColorHSY hsy)
+		{
+			return hsy.ToRGB();
+		}
+
+		public static explicit operator ColorHCY(ColorHSY hsy)
+		{
+			return hsy.ToHCY();
+		}
+
+		public static explicit operator ColorHSY(Color rgb)
 		{
 			return FromRGB(rgb);
 		}
@@ -161,7 +153,7 @@ namespace Experilous.Colors
 				switch (index)
 				{
 					case 0: return h;
-					case 1: return c;
+					case 1: return s;
 					case 2: return y;
 					case 3: return a;
 					default: throw new ArgumentOutOfRangeException();
@@ -172,7 +164,7 @@ namespace Experilous.Colors
 				switch (index)
 				{
 					case 0: h = value; break;
-					case 1: c = value; break;
+					case 1: s = value; break;
 					case 2: y = value; break;
 					case 3: a = value; break;
 					default: throw new ArgumentOutOfRangeException();
@@ -180,17 +172,17 @@ namespace Experilous.Colors
 			}
 		}
 
-		public static ColorHCY Lerp(ColorHCY a, ColorHCY b, float t)
+		public static ColorHSY Lerp(ColorHSY a, ColorHSY b, float t)
 		{
 			return LerpUnclamped(a, b, Mathf.Clamp01(t));
 		}
 
-		public static ColorHCY LerpUnclamped(ColorHCY a, ColorHCY b, float t)
+		public static ColorHSY LerpUnclamped(ColorHSY a, ColorHSY b, float t)
 		{
 			float hueA = Mathf.Repeat(a.h, 1f);
 			float hueB = Mathf.Repeat(b.h, 1f);
 			float hueDelta = Mathf.Abs(hueB - hueA);
-			return new ColorHCY(
+			return new ColorHSY(
 				hueDelta <= 0.5f
 					? Numerics.Math.LerpUnclamped(hueA, hueB, t)
 					: Mathf.Repeat(
@@ -198,122 +190,122 @@ namespace Experilous.Colors
 							? Numerics.Math.LerpUnclamped(hueA + 1f, hueB, t)
 							: Numerics.Math.LerpUnclamped(hueA, hueB + 1f, t),
 						1f),
-				Numerics.Math.LerpUnclamped(a.c, b.c, t),
+				Numerics.Math.LerpUnclamped(a.s, b.s, t),
 				Numerics.Math.LerpUnclamped(a.y, b.y, t),
 				Numerics.Math.LerpUnclamped(a.a, b.a, t));
 		}
 
-		public static ColorHCY LerpForward(ColorHCY a, ColorHCY b, float t)
+		public static ColorHSY LerpForward(ColorHSY a, ColorHSY b, float t)
 		{
 			return LerpForwardUnclamped(a, b, t);
 		}
 
-		public static ColorHCY LerpForwardUnclamped(ColorHCY a, ColorHCY b, float t)
+		public static ColorHSY LerpForwardUnclamped(ColorHSY a, ColorHSY b, float t)
 		{
 			float hueA = Mathf.Repeat(a.h, 1f);
 			float hueB = Mathf.Repeat(b.h, 1f);
-			return new ColorHCY(
+			return new ColorHSY(
 				hueA <= hueB
 					? Numerics.Math.LerpUnclamped(hueA, hueB, t)
 					: Mathf.Repeat(Numerics.Math.LerpUnclamped(hueA, hueB + 1f, t), 1f),
-				Numerics.Math.LerpUnclamped(a.c, b.c, t),
+				Numerics.Math.LerpUnclamped(a.s, b.s, t),
 				Numerics.Math.LerpUnclamped(a.y, b.y, t),
 				Numerics.Math.LerpUnclamped(a.a, b.a, t));
 		}
 
-		public static ColorHCY LerpBackward(ColorHCY a, ColorHCY b, float t)
+		public static ColorHSY LerpBackward(ColorHSY a, ColorHSY b, float t)
 		{
 			return LerpBackwardUnclamped(a, b, t);
 		}
 
-		public static ColorHCY LerpBackwardUnclamped(ColorHCY a, ColorHCY b, float t)
+		public static ColorHSY LerpBackwardUnclamped(ColorHSY a, ColorHSY b, float t)
 		{
 			float hueA = Mathf.Repeat(a.h, 1f);
 			float hueB = Mathf.Repeat(b.h, 1f);
-			return new ColorHCY(
+			return new ColorHSY(
 				hueA >= hueB
 					? Numerics.Math.LerpUnclamped(hueA, hueB, t)
 					: Mathf.Repeat(Numerics.Math.LerpUnclamped(hueA + 1f, hueB, t), 1f),
-				Numerics.Math.LerpUnclamped(a.c, b.c, t),
+				Numerics.Math.LerpUnclamped(a.s, b.s, t),
 				Numerics.Math.LerpUnclamped(a.y, b.y, t),
 				Numerics.Math.LerpUnclamped(a.a, b.a, t));
 		}
 
-		public static ColorHCY operator +(ColorHCY a, ColorHCY b)
+		public static ColorHSY operator +(ColorHSY a, ColorHSY b)
 		{
-			return new ColorHCY(a.h + b.h, a.c + b.c, a.y + b.y, a.a + b.a);
+			return new ColorHSY(a.h + b.h, a.s + b.s, a.y + b.y, a.a + b.a);
 		}
 
-		public static ColorHCY operator -(ColorHCY a, ColorHCY b)
+		public static ColorHSY operator -(ColorHSY a, ColorHSY b)
 		{
-			return new ColorHCY(a.h - b.h, a.c - b.c, a.y - b.y, a.a - b.a);
+			return new ColorHSY(a.h - b.h, a.s - b.s, a.y - b.y, a.a - b.a);
 		}
 
-		public static ColorHCY operator *(float b, ColorHCY a)
+		public static ColorHSY operator *(float b, ColorHSY a)
 		{
-			return new ColorHCY(a.h * b, a.c * b, a.y * b, a.a * b);
+			return new ColorHSY(a.h * b, a.s * b, a.y * b, a.a * b);
 		}
 
-		public static ColorHCY operator *(ColorHCY a, float b)
+		public static ColorHSY operator *(ColorHSY a, float b)
 		{
-			return new ColorHCY(a.h * b, a.c * b, a.y * b, a.a * b);
+			return new ColorHSY(a.h * b, a.s * b, a.y * b, a.a * b);
 		}
 
-		public static ColorHCY operator *(ColorHCY a, ColorHCY b)
+		public static ColorHSY operator *(ColorHSY a, ColorHSY b)
 		{
-			return new ColorHCY(a.h * b.h, a.c * b.c, a.y * b.y, a.a * b.a);
+			return new ColorHSY(a.h * b.h, a.s * b.s, a.y * b.y, a.a * b.a);
 		}
 
-		public static ColorHCY operator /(ColorHCY a, float b)
+		public static ColorHSY operator /(ColorHSY a, float b)
 		{
-			return new ColorHCY(a.h / b, a.c / b, a.y / b, a.a / b);
+			return new ColorHSY(a.h / b, a.s / b, a.y / b, a.a / b);
 		}
 
 		public override bool Equals(object other)
 		{
-			return other is ColorHCY && this == (ColorHCY)other;
+			return other is ColorHSY && this == (ColorHSY)other;
 		}
 
 		public override int GetHashCode()
 		{
-			return h.GetHashCode() ^ c.GetHashCode() ^ y.GetHashCode() ^ a.GetHashCode();
+			return h.GetHashCode() ^ s.GetHashCode() ^ y.GetHashCode() ^ a.GetHashCode();
 		}
 
-		public static bool operator ==(ColorHCY lhs, ColorHCY rhs)
+		public static bool operator ==(ColorHSY lhs, ColorHSY rhs)
 		{
-			return lhs.h == rhs.h && lhs.c == rhs.c && lhs.y == rhs.y && lhs.a == rhs.a;
+			return lhs.h == rhs.h && lhs.s == rhs.s && lhs.y == rhs.y && lhs.a == rhs.a;
 		}
 
-		public static bool operator !=(ColorHCY lhs, ColorHCY rhs)
+		public static bool operator !=(ColorHSY lhs, ColorHSY rhs)
 		{
-			return lhs.h != rhs.h || lhs.c != rhs.c || lhs.y != rhs.y || lhs.a != rhs.a;
+			return lhs.h != rhs.h || lhs.s != rhs.s || lhs.y != rhs.y || lhs.a != rhs.a;
 		}
 
-		public static implicit operator Vector4(ColorHCY hcy)
+		public static implicit operator Vector4(ColorHSY hsy)
 		{
-			return new Vector4(hcy.h, hcy.c, hcy.y, hcy.a);
+			return new Vector4(hsy.h, hsy.s, hsy.y, hsy.a);
 		}
 
-		public static implicit operator ColorHCY(Vector4 v)
+		public static implicit operator ColorHSY(Vector4 v)
 		{
-			return new ColorHCY(v.x, v.y, v.z, v.w);
+			return new ColorHSY(v.x, v.y, v.z, v.w);
 		}
 
 		public override string ToString()
 		{
-			return string.Format("HCYA({0:F3}, {1:F3}, {2:F3}, {3:F3})", h, c, y, a);
+			return string.Format("HSYA({0:F3}, {1:F3}, {2:F3}, {3:F3})", h, s, y, a);
 		}
 
 		public string ToString(string format)
 		{
-			return string.Format("HCYA({0}, {1}, {2}, {3})", h.ToString(format), c.ToString(format), y.ToString(format), a.ToString(format));
+			return string.Format("HSYA({0}, {1}, {2}, {3})", h.ToString(format), s.ToString(format), y.ToString(format), a.ToString(format));
 		}
 
 		public bool canConvertToRGB
 		{
 			get
 			{
-				return c <= GetMaxChroma(h, y);
+				return s <= GetMaxChroma(h, y);
 			}
 		}
 
@@ -358,11 +350,11 @@ namespace Experilous.Colors
 			return r * _redLumaFactor + g * _greenLumaFactor + b * _blueLumaFactor;
 		}
 
-		public static void GetMinMaxLuma(float h, float c, out float yMin, out float yMax)
+		public static void GetMinMaxLuma(float h, float s, out float yMin, out float yMax)
 		{
 			float yMid = GetLumaAtMaxChroma(h);
-			yMin = c * yMid;
-			yMax = (1f - c) * (1f - yMid) + yMid;
+			yMin = s * yMid;
+			yMax = (1f - s) * (1f - yMid) + yMid;
 		}
 
 		public static float GetMaxChroma(float h, float y)

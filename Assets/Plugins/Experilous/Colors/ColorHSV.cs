@@ -115,6 +115,16 @@ namespace Experilous.Colors
 			return rgb;
 		}
 
+		public static ColorHSV FromHCV(ColorHCV hcv)
+		{
+			return hcv.ToHSV();
+		}
+
+		public ColorHCV ToHCV()
+		{
+			return new ColorHCV(h, s * v, v, a);
+		}
+
 		public static explicit operator Color(ColorHSV hsv)
 		{
 			return hsv.ToRGB();
@@ -123,6 +133,11 @@ namespace Experilous.Colors
 		public static explicit operator ColorHSV(Color rgb)
 		{
 			return FromRGB(rgb);
+		}
+
+		public static explicit operator ColorHCV(ColorHSV hsv)
+		{
+			return hsv.ToHCV();
 		}
 
 		public float this[int index]
