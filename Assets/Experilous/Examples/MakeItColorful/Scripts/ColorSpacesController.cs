@@ -4,7 +4,7 @@
 
 using UnityEngine;
 using UnityEngine.UI;
-using Experilous.Colors;
+using Experilous.MakeItColorful;
 
 namespace Experilous.Examples.MakeItColorful
 {

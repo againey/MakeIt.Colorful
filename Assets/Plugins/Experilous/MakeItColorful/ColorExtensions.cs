@@ -5,7 +5,7 @@
 using UnityEngine;
 using System;
 
-namespace Experilous.Colors
+namespace Experilous.MakeItColorful
 {
 	public static class ColorExtensions
 	{
