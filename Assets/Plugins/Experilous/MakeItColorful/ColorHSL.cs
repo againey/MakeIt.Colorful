@@ -231,32 +231,32 @@ namespace Experilous.MakeItColorful
 
 		public static ColorHSL operator +(ColorHSL a, ColorHSL b)
 		{
-			return new ColorHSL(a.h + b.h, a.s + b.s, a.l + b.l, a.a + b.a);
+			return new ColorHSL(Mathf.Repeat(a.h + b.h, 1f), a.s + b.s, a.l + b.l, a.a + b.a);
 		}
 
 		public static ColorHSL operator -(ColorHSL a, ColorHSL b)
 		{
-			return new ColorHSL(a.h - b.h, a.s - b.s, a.l - b.l, a.a - b.a);
+			return new ColorHSL(Mathf.Repeat(a.h - b.h, 1f), a.s - b.s, a.l - b.l, a.a - b.a);
 		}
 
 		public static ColorHSL operator *(float b, ColorHSL a)
 		{
-			return new ColorHSL(a.h * b, a.s * b, a.l * b, a.a * b);
+			return new ColorHSL(Mathf.Repeat(a.h * b, 1f), a.s * b, a.l * b, a.a * b);
 		}
 
 		public static ColorHSL operator *(ColorHSL a, float b)
 		{
-			return new ColorHSL(a.h * b, a.s * b, a.l * b, a.a * b);
+			return new ColorHSL(Mathf.Repeat(a.h * b, 1f), a.s * b, a.l * b, a.a * b);
 		}
 
 		public static ColorHSL operator *(ColorHSL a, ColorHSL b)
 		{
-			return new ColorHSL(a.h * b.h, a.s * b.s, a.l * b.l, a.a * b.a);
+			return new ColorHSL(Mathf.Repeat(a.h * b.h, 1f), a.s * b.s, a.l * b.l, a.a * b.a);
 		}
 
 		public static ColorHSL operator /(ColorHSL a, float b)
 		{
-			return new ColorHSL(a.h / b, a.s / b, a.l / b, a.a / b);
+			return new ColorHSL(Mathf.Repeat(a.h / b, 1f), a.s / b, a.l / b, a.a / b);
 		}
 
 		public override bool Equals(object other)
