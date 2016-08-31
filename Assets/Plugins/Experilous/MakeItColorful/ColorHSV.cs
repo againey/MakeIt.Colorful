@@ -227,32 +227,32 @@ namespace Experilous.MakeItColorful
 
 		public static ColorHSV operator +(ColorHSV a, ColorHSV b)
 		{
-			return new ColorHSV(a.h + b.h, a.s + b.s, a.v + b.v, a.a + b.a);
+			return new ColorHSV(Mathf.Repeat(a.h + b.h, 1f), a.s + b.s, a.v + b.v, a.a + b.a);
 		}
 
 		public static ColorHSV operator -(ColorHSV a, ColorHSV b)
 		{
-			return new ColorHSV(a.h - b.h, a.s - b.s, a.v - b.v, a.a - b.a);
+			return new ColorHSV(Mathf.Repeat(a.h - b.h, 1f), a.s - b.s, a.v - b.v, a.a - b.a);
 		}
 
 		public static ColorHSV operator *(float b, ColorHSV a)
 		{
-			return new ColorHSV(a.h * b, a.s * b, a.v * b, a.a * b);
+			return new ColorHSV(Mathf.Repeat(a.h * b, 1f), a.s * b, a.v * b, a.a * b);
 		}
 
 		public static ColorHSV operator *(ColorHSV a, float b)
 		{
-			return new ColorHSV(a.h * b, a.s * b, a.v * b, a.a * b);
+			return new ColorHSV(Mathf.Repeat(a.h * b, 1f), a.s * b, a.v * b, a.a * b);
 		}
 
 		public static ColorHSV operator *(ColorHSV a, ColorHSV b)
 		{
-			return new ColorHSV(a.h * b.h, a.s * b.s, a.v * b.v, a.a * b.a);
+			return new ColorHSV(Mathf.Repeat(a.h * b.h, 1f), a.s * b.s, a.v * b.v, a.a * b.a);
 		}
 
 		public static ColorHSV operator /(ColorHSV a, float b)
 		{
-			return new ColorHSV(a.h / b, a.s / b, a.v / b, a.a / b);
+			return new ColorHSV(Mathf.Repeat(a.h / b, 1f), a.s / b, a.v / b, a.a / b);
 		}
 
 		public override bool Equals(object other)

@@ -38,5 +38,15 @@ namespace Experilous.MakeItColorful
 		{
 			return ColorHCY.FromRGB(rgb);
 		}
+
+		public static ColorCMY ToCMY(this Color rgb)
+		{
+			return ColorCMY.FromRGB(rgb);
+		}
+
+		public static ColorCMYK ToCMYK(this Color rgb)
+		{
+			return ColorCMYK.FromRGB(rgb);
+		}
 	}
 }

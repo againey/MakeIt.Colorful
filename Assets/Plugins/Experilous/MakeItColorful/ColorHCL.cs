@@ -42,29 +42,26 @@ namespace Experilous.MakeItColorful
 			float min = Mathf.Min(Mathf.Min(rgb.r, rgb.g), rgb.b);
 			float max = Mathf.Max(Mathf.Max(rgb.r, rgb.g), rgb.b);
 
-			float chroma = max - min;
+			hcl.c = max - min;
 
-			if (chroma > 0f)
+			if (hcl.c > 0f)
 			{
 				if (rgb.r == max)
 				{
-					hcl.h = Mathf.Repeat((rgb.g - rgb.b) / chroma, 6f) / 6f;
+					hcl.h = Mathf.Repeat((rgb.g - rgb.b) / hcl.c, 6f) / 6f;
 				}
 				else if (rgb.g == max)
 				{
-					hcl.h = ((rgb.b - rgb.r) / chroma + 2f) / 6f;
+					hcl.h = ((rgb.b - rgb.r) / hcl.c + 2f) / 6f;
 				}
 				else
 				{
-					hcl.h = ((rgb.r - rgb.g) / chroma + 4f) / 6f;
+					hcl.h = ((rgb.r - rgb.g) / hcl.c + 4f) / 6f;
 				}
-
-				hcl.c = chroma / max;
 			}
 			else
 			{
 				hcl.h = 0f;
-				hcl.c = 0f;
 			}
 
 			hcl.l = (max + min) * 0.5f;
@@ -238,32 +235,32 @@ namespace Experilous.MakeItColorful
 
 		public static ColorHCL operator +(ColorHCL a, ColorHCL b)
 		{
-			return new ColorHCL(a.h + b.h, a.c + b.c, a.l + b.l, a.a + b.a);
+			return new ColorHCL(Mathf.Repeat(a.h + b.h, 1f), a.c + b.c, a.l + b.l, a.a + b.a);
 		}
 
 		public static ColorHCL operator -(ColorHCL a, ColorHCL b)
 		{
-			return new ColorHCL(a.h - b.h, a.c - b.c, a.l - b.l, a.a - b.a);
+			return new ColorHCL(Mathf.Repeat(a.h - b.h, 1f), a.c - b.c, a.l - b.l, a.a - b.a);
 		}
 
 		public static ColorHCL operator *(float b, ColorHCL a)
 		{
-			return new ColorHCL(a.h * b, a.c * b, a.l * b, a.a * b);
+			return new ColorHCL(Mathf.Repeat(a.h * b, 1f), a.c * b, a.l * b, a.a * b);
 		}
 
 		public static ColorHCL operator *(ColorHCL a, float b)
 		{
-			return new ColorHCL(a.h * b, a.c * b, a.l * b, a.a * b);
+			return new ColorHCL(Mathf.Repeat(a.h * b, 1f), a.c * b, a.l * b, a.a * b);
 		}
 
 		public static ColorHCL operator *(ColorHCL a, ColorHCL b)
 		{
-			return new ColorHCL(a.h * b.h, a.c * b.c, a.l * b.l, a.a * b.a);
+			return new ColorHCL(Mathf.Repeat(a.h * b.h, 1f), a.c * b.c, a.l * b.l, a.a * b.a);
 		}
 
 		public static ColorHCL operator /(ColorHCL a, float b)
 		{
-			return new ColorHCL(a.h / b, a.c / b, a.l / b, a.a / b);
+			return new ColorHCL(Mathf.Repeat(a.h / b, 1f), a.c / b, a.l / b, a.a / b);
 		}
 
 		public override bool Equals(object other)
@@ -319,10 +316,10 @@ namespace Experilous.MakeItColorful
 			return 0.5f;
 		}
 
-		public static void GetMinMaxLightness(float c, out float yMin, out float yMax)
+		public static void GetMinMaxLightness(float c, out float lMin, out float lMax)
 		{
-			yMin = c * 0.5f;
-			yMax = 1f - yMin;
+			lMin = c * 0.5f;
+			lMax = 1f - lMin;
 		}
 
 		public static float GetMaxChroma(float l)

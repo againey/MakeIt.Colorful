@@ -233,32 +233,32 @@ namespace Experilous.MakeItColorful
 
 		public static ColorHCV operator +(ColorHCV a, ColorHCV b)
 		{
-			return new ColorHCV(a.h + b.h, a.c + b.c, a.v + b.v, a.a + b.a);
+			return new ColorHCV(Mathf.Repeat(a.h + b.h, 1f), a.c + b.c, a.v + b.v, a.a + b.a);
 		}
 
 		public static ColorHCV operator -(ColorHCV a, ColorHCV b)
 		{
-			return new ColorHCV(a.h - b.h, a.c - b.c, a.v - b.v, a.a - b.a);
+			return new ColorHCV(Mathf.Repeat(a.h - b.h, 1f), a.c - b.c, a.v - b.v, a.a - b.a);
 		}
 
 		public static ColorHCV operator *(float b, ColorHCV a)
 		{
-			return new ColorHCV(a.h * b, a.c * b, a.v * b, a.a * b);
+			return new ColorHCV(Mathf.Repeat(a.h * b, 1f), a.c * b, a.v * b, a.a * b);
 		}
 
 		public static ColorHCV operator *(ColorHCV a, float b)
 		{
-			return new ColorHCV(a.h * b, a.c * b, a.v * b, a.a * b);
+			return new ColorHCV(Mathf.Repeat(a.h * b, 1f), a.c * b, a.v * b, a.a * b);
 		}
 
 		public static ColorHCV operator *(ColorHCV a, ColorHCV b)
 		{
-			return new ColorHCV(a.h * b.h, a.c * b.c, a.v * b.v, a.a * b.a);
+			return new ColorHCV(Mathf.Repeat(a.h * b.h, 1f), a.c * b.c, a.v * b.v, a.a * b.a);
 		}
 
 		public static ColorHCV operator /(ColorHCV a, float b)
 		{
-			return new ColorHCV(a.h / b, a.c / b, a.v / b, a.a / b);
+			return new ColorHCV(Mathf.Repeat(a.h / b, 1f), a.c / b, a.v / b, a.a / b);
 		}
 
 		public override bool Equals(object other)
@@ -314,10 +314,10 @@ namespace Experilous.MakeItColorful
 			return 1f;
 		}
 
-		public static void GetMinMaxValue(float c, out float yMin, out float yMax)
+		public static void GetMinMaxValue(float c, out float vMin, out float vMax)
 		{
-			yMin = c;
-			yMax = 1f;
+			vMin = c;
+			vMax = 1f;
 		}
 
 		public static float GetMaxChroma(float v)
