@@ -12,6 +12,8 @@ namespace Experilous.MakeItColorful
 	/// </summary>
 	[Serializable] public struct ColorHSV
 	{
+		#region Fields and Direct Constructors
+
 		/// <summary>
 		/// The color's hue, in the range [0, 1).
 		/// </summary>
@@ -63,130 +65,17 @@ namespace Experilous.MakeItColorful
 			this.a = a;
 		}
 
+		#endregion
+
+		#region Conversion to/from RGB
+
 		/// <summary>
 		/// Initializes a color by converting the given RGB color to the HSV color space.
 		/// </summary>
 		/// <param name="rgb">The RGB color to convert to HSV.</param>
 		public ColorHSV(Color rgb)
 		{
-			this = FromRGB(rgb);
-		}
-
-		/// <summary>
-		/// Converts the given RGB color to the HSV color space.
-		/// </summary>
-		/// <param name="rgb">The RGB color to convert to HSV.</param>
-		/// <returns>The HSV representation of the given color.</returns>
-		public static ColorHSV FromRGB(Color rgb)
-		{
-			ColorHSV hsv;
-			float min = Mathf.Min(Mathf.Min(rgb.r, rgb.g), rgb.b);
-			float max = Mathf.Max(Mathf.Max(rgb.r, rgb.g), rgb.b);
-
-			float chroma = max - min;
-
-			if (chroma > 0f)
-			{
-				if (rgb.r == max)
-				{
-					hsv.h = Mathf.Repeat((rgb.g - rgb.b) / chroma, 6f) / 6f;
-				}
-				else if (rgb.g == max)
-				{
-					hsv.h = ((rgb.b - rgb.r) / chroma + 2f) / 6f;
-				}
-				else
-				{
-					hsv.h = ((rgb.r - rgb.g) / chroma + 4f) / 6f;
-				}
-
-				hsv.s = chroma / max;
-			}
-			else
-			{
-				hsv.h = 0f;
-				hsv.s = 0f;
-			}
-
-			hsv.v = max;
-			hsv.a = rgb.a;
-
-			return hsv;
-		}
-
-		/// <summary>
-		/// Converts the HSV color to the RGB color space.
-		/// </summary>
-		/// <returns>The RGB representation of the color.</returns>
-		public Color ToRGB()
-		{
-			float chroma = v * s;
-			float min = v - chroma;
-			Color rgb = new Color(min, min, min, a);
-			if (chroma > 0f)
-			{
-				float scaledHue = h * 6f;
-				if (scaledHue < 1f)
-				{
-					rgb.r += chroma;
-					rgb.g += chroma * scaledHue;
-				}
-				else if (scaledHue < 2f)
-				{
-					rgb.g += chroma;
-					rgb.r += chroma * (2f - scaledHue);
-				}
-				else if (scaledHue < 3f)
-				{
-					rgb.g += chroma;
-					rgb.b += chroma * (scaledHue - 2f);
-				}
-				else if (scaledHue < 4f)
-				{
-					rgb.b += chroma;
-					rgb.g += chroma * (4f - scaledHue);
-				}
-				else if (scaledHue < 5f)
-				{
-					rgb.b += chroma;
-					rgb.r += chroma * (scaledHue - 4f);
-				}
-				else
-				{
-					rgb.r += chroma;
-					rgb.b += chroma * (6f - scaledHue);
-				}
-			}
-			return rgb;
-		}
-
-		/// <summary>
-		/// Converts the given HCV color to the HSV color space.
-		/// </summary>
-		/// <param name="hcv">The HCV color to convert to HSV.</param>
-		/// <returns>The HSV representation of the given color.</returns>
-		public static ColorHSV FromHCV(ColorHCV hcv)
-		{
-			return hcv.ToHSV();
-		}
-
-		/// <summary>
-		/// Converts the HSV color to the HCV color space.
-		/// </summary>
-		/// <returns>The HCV representation of the color.</returns>
-		public ColorHCV ToHCV()
-		{
-			return new ColorHCV(h, s * v, v, a);
-		}
-
-		/// <summary>
-		/// Converts the given HSV color to the RGB color space.
-		/// </summary>
-		/// <param name="hsv">The HSV color to convert to RGB.</param>
-		/// <returns>The color converted to the RGB color space.</returns>
-		public static explicit operator Color(ColorHSV hsv)
-		{
-			return hsv.ToRGB();
+			this = FromRGB(rgb.r, rgb.g, rgb.b, rgb.a);
 		}
 
 		/// <summary>
@@ -196,18 +85,660 @@ namespace Experilous.MakeItColorful
 		/// <returns>The color converted to the HSV color space.</returns>
 		public static explicit operator ColorHSV(Color rgb)
 		{
-			return FromRGB(rgb);
+			return FromRGB(rgb.r, rgb.g, rgb.b, rgb.a);
 		}
 
 		/// <summary>
-		/// Converts the given HSV color to the HCV color space.
+		/// Converts the given RGB color to the HSV color space.
 		/// </summary>
-		/// <param name="hsv">The HSV color to convert to HCV.</param>
-		/// <returns>The color converted to the HCV color space.</returns>
-		public static explicit operator ColorHCV(ColorHSV hsv)
+		/// <param name="r">The red component of the RGB color to convert to HSV.</param>
+		/// <param name="g">The green component of the RGB color to convert to HSV.</param>
+		/// <param name="b">The blue component of the RGB color to convert to HSV.</param>
+		/// <returns>The HSV representation of the given color.</returns>
+		public static ColorHSV FromRGB(float r, float g, float b)
 		{
-			return hsv.ToHCV();
+			return FromRGB(r, g, b, 1f);
 		}
+
+		/// <summary>
+		/// Converts the given RGB color to the HSV color space.
+		/// </summary>
+		/// <param name="r">The red component of the RGB color to convert to HSV.</param>
+		/// <param name="g">The green component of the RGB color to convert to HSV.</param>
+		/// <param name="b">The blue component of the RGB color to convert to HSV.</param>
+		/// <param name="a">The opacity of the color.</param>
+		/// <returns>The HSV representation of the given color.</returns>
+		public static ColorHSV FromRGB(float r, float g, float b, float a)
+		{
+			ColorHSV hsv;
+			float min = Mathf.Min(Mathf.Min(r, g), b);
+			float max = Mathf.Max(Mathf.Max(r, g), b);
+
+			float c = max - min;
+
+			if (c > 0f)
+			{
+				if (r == max)
+				{
+					hsv.h = Mathf.Repeat((g - b) / c, 6f) / 6f;
+				}
+				else if (g == max)
+				{
+					hsv.h = ((b - r) / c + 2f) / 6f;
+				}
+				else
+				{
+					hsv.h = ((r - g) / c + 4f) / 6f;
+				}
+
+				hsv.s = c / max;
+			}
+			else
+			{
+				hsv.h = 0f;
+				hsv.s = 0f;
+			}
+
+			hsv.v = max;
+			hsv.a = a;
+
+			return hsv;
+		}
+
+		/// <summary>
+		/// Converts the given HSV color to the RGB color space.
+		/// </summary>
+		/// <param name="hsv">The HSV color to convert to RGB.</param>
+		/// <returns>The color converted to the RGB color space.</returns>
+		public static explicit operator Color(ColorHSV hsv)
+		{
+			float c = hsv.v * hsv.s;
+			float min = hsv.v - c;
+			Color rgb = new Color(min, min, min, hsv.a);
+			if (c > 0f)
+			{
+				float scaledHue = hsv.h * 6f;
+				if (scaledHue < 1f)
+				{
+					rgb.r += c;
+					rgb.g += c * scaledHue;
+				}
+				else if (scaledHue < 2f)
+				{
+					rgb.g += c;
+					rgb.r += c * (2f - scaledHue);
+				}
+				else if (scaledHue < 3f)
+				{
+					rgb.g += c;
+					rgb.b += c * (scaledHue - 2f);
+				}
+				else if (scaledHue < 4f)
+				{
+					rgb.b += c;
+					rgb.g += c * (4f - scaledHue);
+				}
+				else if (scaledHue < 5f)
+				{
+					rgb.b += c;
+					rgb.r += c * (scaledHue - 4f);
+				}
+				else
+				{
+					rgb.r += c;
+					rgb.b += c * (6f - scaledHue);
+				}
+			}
+			return rgb;
+		}
+
+		#endregion
+
+		#region Conversion from CMY
+
+		/// <summary>
+		/// Initializes a color by converting the given CMY color to the HSV color space.
+		/// </summary>
+		/// <param name="cmy">The CMY color to convert to HSV.</param>
+		public ColorHSV(ColorCMY cmy)
+		{
+			this = FromCMY(cmy.c, cmy.m, cmy.y, cmy.a);
+		}
+
+		/// <summary>
+		/// Converts the given CMY color to the HSV color space.
+		/// </summary>
+		/// <param name="cmy">The CMY color to convert to HSV.</param>
+		/// <returns>The color converted to the HSV color space.</returns>
+		public static explicit operator ColorHSV(ColorCMY cmy)
+		{
+			return FromCMY(cmy.c, cmy.m, cmy.y, cmy.a);
+		}
+
+		/// <summary>
+		/// Converts the given CMY color to the HSV color space.
+		/// </summary>
+		/// <param name="c">The cyan component of the CMY color to convert to HSV.</param>
+		/// <param name="m">The magenta component of the CMY color to convert to HSV.</param>
+		/// <param name="y">The yellow component of the CMY color to convert to HSV.</param>
+		/// <returns>The HSV representation of the given color.</returns>
+		public static ColorHSV FromCMY(float c, float m, float y)
+		{
+			return FromCMY(c, m, y, 1f);
+		}
+
+		/// <summary>
+		/// Converts the given CMY color to the HSV color space.
+		/// </summary>
+		/// <param name="c">The cyan component of the CMY color to convert to HSV.</param>
+		/// <param name="m">The magenta component of the CMY color to convert to HSV.</param>
+		/// <param name="y">The yellow component of the CMY color to convert to HSV.</param>
+		/// <param name="a">The opacity of the color.</param>
+		/// <returns>The HSV representation of the given color.</returns>
+		public static ColorHSV FromCMY(float c, float m, float y, float a)
+		{
+			ColorHSV hsv;
+			float min = Mathf.Min(Mathf.Min(c, m), y);
+			float max = Mathf.Max(Mathf.Max(c, m), y);
+
+			float chroma = max - min;
+			float minInverse = 1f - min;
+
+			if (chroma > 0f)
+			{
+				if (c == min)
+				{
+					hsv.h = Mathf.Repeat((y - m) / chroma, 6f) / 6f;
+				}
+				else if (m == min)
+				{
+					hsv.h = ((c - y) / chroma + 2f) / 6f;
+				}
+				else
+				{
+					hsv.h = ((m - c) / chroma + 4f) / 6f;
+				}
+
+				hsv.s = chroma / minInverse;
+			}
+			else
+			{
+				hsv.h = 0f;
+				hsv.s = 0f;
+			}
+
+			hsv.v = minInverse;
+			hsv.a = a;
+
+			return hsv;
+		}
+
+		#endregion
+
+		#region Conversion from CMYK
+
+		/// <summary>
+		/// Initializes a color by converting the given CMYK color to the HSV color space.
+		/// </summary>
+		/// <param name="cmyk">The CMYK color to convert to HSV.</param>
+		public ColorHSV(ColorCMYK cmyk)
+		{
+			this = FromCMYK(cmyk.c, cmyk.m, cmyk.y, cmyk.k, cmyk.a);
+		}
+
+		/// <summary>
+		/// Converts the given CMYK color to the HSV color space.
+		/// </summary>
+		/// <param name="cmyk">The CMYK color to convert to HSV.</param>
+		/// <returns>The color converted to the HSV color space.</returns>
+		public static explicit operator ColorHSV(ColorCMYK cmyk)
+		{
+			return FromCMYK(cmyk.c, cmyk.m, cmyk.y, cmyk.k, cmyk.a);
+		}
+
+		/// <summary>
+		/// Converts the given CMYK color to the HSV color space.
+		/// </summary>
+		/// <param name="c">The cyan component of the CMYK color to convert to HSV.</param>
+		/// <param name="m">The magenta component of the CMYK color to convert to HSV.</param>
+		/// <param name="y">The yellow component of the CMYK color to convert to HSV.</param>
+		/// <param name="k">The key component of the CMYK color to convert to HSV.</param>
+		/// <returns>The HSV representation of the given color.</returns>
+		public static ColorHSV FromCMYK(float c, float m, float y, float k)
+		{
+			return FromCMYK(c, m, y, k, 1f);
+		}
+
+		/// <summary>
+		/// Converts the given CMYK color to the HSV color space.
+		/// </summary>
+		/// <param name="c">The cyan component of the CMYK color to convert to HSV.</param>
+		/// <param name="m">The magenta component of the CMYK color to convert to HSV.</param>
+		/// <param name="y">The yellow component of the CMYK color to convert to HSV.</param>
+		/// <param name="k">The key component of the CMYK color to convert to HSV.</param>
+		/// <param name="a">The opacity of the color.</param>
+		/// <returns>The HSV representation of the given color.</returns>
+		public static ColorHSV FromCMYK(float c, float m, float y, float k, float a)
+		{
+			if (k >= 1f) return new ColorHSV(0f, 0f, 0f, a);
+
+			float kInv = 1f - k;
+
+			ColorHSV hsv;
+			float min = Mathf.Min(Mathf.Min(c, m), y);
+			float max = Mathf.Max(Mathf.Max(c, m), y);
+
+			float chroma = max - min;
+			float minInverse = (1f - min) * kInv;
+
+			if (chroma > 0f)
+			{
+				if (c == min)
+				{
+					hsv.h = Mathf.Repeat((y - m) / chroma, 6f) / 6f;
+				}
+				else if (m == min)
+				{
+					hsv.h = ((c - y) / chroma + 2f) / 6f;
+				}
+				else
+				{
+					hsv.h = ((m - c) / chroma + 4f) / 6f;
+				}
+
+				hsv.s = chroma * kInv / minInverse;
+			}
+			else
+			{
+				hsv.h = 0f;
+				hsv.s = 0f;
+			}
+
+			hsv.v = minInverse;
+			hsv.a = a;
+
+			return hsv;
+		}
+
+		#endregion
+
+		#region Conversion from HCV
+
+		/// <summary>
+		/// Initializes a color by converting the given HCV color to the HSV color space.
+		/// </summary>
+		/// <param name="hcv">The HCV color to convert to HSV.</param>
+		public ColorHSV(ColorHCV hcv)
+		{
+			this = FromHCV(hcv.h, hcv.c, hcv.v, hcv.a);
+		}
+
+		/// <summary>
+		/// Converts the given HCV color to the HSV color space.
+		/// </summary>
+		/// <param name="hcv">The HCV color to convert to HSV.</param>
+		/// <returns>The color converted to the HSV color space.</returns>
+		public static explicit operator ColorHSV(ColorHCV hcv)
+		{
+			return FromHCV(hcv.h, hcv.c, hcv.v, hcv.a);
+		}
+
+		/// <summary>
+		/// Converts the given HCV color to the HSV color space.
+		/// </summary>
+		/// <param name="h">The hue component of the HCV color to convert to HSV.</param>
+		/// <param name="c">The chroma component of the HCV color to convert to HSV.</param>
+		/// <param name="v">The value component of the HCV color to convert to HSV.</param>
+		/// <returns>The HSV representation of the given color.</returns>
+		public static ColorHSV FromHCV(float h, float c, float v)
+		{
+			return FromHCV(h, c, v, 1f);
+		}
+
+		/// <summary>
+		/// Converts the given HCV color to the HSV color space.
+		/// </summary>
+		/// <param name="h">The hue component of the HCV color to convert to HSV.</param>
+		/// <param name="c">The chroma component of the HCV color to convert to HSV.</param>
+		/// <param name="v">The value component of the HCV color to convert to HSV.</param>
+		/// <param name="a">The opacity of the color.</param>
+		/// <returns>The HSV representation of the given color.</returns>
+		public static ColorHSV FromHCV(float h, float c, float v, float a)
+		{
+			return new ColorHSV(h, v != 0f ? c / v : 0f, v, a);
+		}
+
+		#endregion
+
+		#region Conversion from HSL
+
+		/// <summary>
+		/// Initializes a color by converting the given HSL color to the HSV color space.
+		/// </summary>
+		/// <param name="hsl">The HSL color to convert to HSV.</param>
+		public ColorHSV(ColorHSL hsl)
+		{
+			this = FromHSL(hsl.h, hsl.s, hsl.l, hsl.a);
+		}
+
+		/// <summary>
+		/// Converts the given HSL color to the HSV color space.
+		/// </summary>
+		/// <param name="hsl">The HSL color to convert to HSV.</param>
+		/// <returns>The color converted to the HSV color space.</returns>
+		public static explicit operator ColorHSV(ColorHSL hsl)
+		{
+			return FromHSL(hsl.h, hsl.s, hsl.l, hsl.a);
+		}
+
+		/// <summary>
+		/// Converts the given HSL color to the HSV color space.
+		/// </summary>
+		/// <param name="h">The hue component of the HSL color to convert to HSV.</param>
+		/// <param name="s">The saturation component of the HSL color to convert to HSV.</param>
+		/// <param name="l">The lightness component of the HSL color to convert to HSV.</param>
+		/// <returns>The HSV representation of the given color.</returns>
+		public static ColorHSV FromHSL(float h, float s, float l)
+		{
+			return FromHSL(h, s, l, 1f);
+		}
+
+		/// <summary>
+		/// Converts the given HSL color to the HSV color space.
+		/// </summary>
+		/// <param name="h">The hue component of the HSL color to convert to HSV.</param>
+		/// <param name="s">The saturation component of the HSL color to convert to HSV.</param>
+		/// <param name="l">The lightness component of the HSL color to convert to HSV.</param>
+		/// <param name="a">The opacity of the color.</param>
+		/// <returns>The HSV representation of the given color.</returns>
+		public static ColorHSV FromHSL(float h, float s, float l, float a)
+		{
+			return new ColorHSV(h, s, l / (1f - s * 0.5f), a);
+		}
+
+		#endregion
+
+		#region Conversion from HCL
+
+		/// <summary>
+		/// Initializes a color by converting the given HCL color to the HSV color space.
+		/// </summary>
+		/// <param name="hcl">The HCL color to convert to HSV.</param>
+		public ColorHSV(ColorHCL hcl)
+		{
+			this = FromHCL(hcl.h, hcl.c, hcl.l, hcl.a);
+		}
+
+		/// <summary>
+		/// Converts the given HCL color to the HSV color space.
+		/// </summary>
+		/// <param name="hcl">The HCL color to convert to HSV.</param>
+		/// <returns>The color converted to the HSV color space.</returns>
+		public static explicit operator ColorHSV(ColorHCL hcl)
+		{
+			return FromHCL(hcl.h, hcl.c, hcl.l, hcl.a);
+		}
+
+		/// <summary>
+		/// Converts the given HCL color to the HSV color space.
+		/// </summary>
+		/// <param name="h">The hue component of the HCL color to convert to HSV.</param>
+		/// <param name="c">The chroma component of the HCL color to convert to HSV.</param>
+		/// <param name="l">The lightness component of the HCL color to convert to HSV.</param>
+		/// <returns>The HSV representation of the given color.</returns>
+		public static ColorHSV FromHCL(float h, float c, float l)
+		{
+			return FromHCL(h, c, l, 1f);
+		}
+
+		/// <summary>
+		/// Converts the given HCL color to the HSV color space.
+		/// </summary>
+		/// <param name="h">The hue component of the HCL color to convert to HSV.</param>
+		/// <param name="c">The chroma component of the HCL color to convert to HSV.</param>
+		/// <param name="l">The lightness component of the HCL color to convert to HSV.</param>
+		/// <param name="a">The opacity of the color.</param>
+		/// <returns>The HSV representation of the given color.</returns>
+		public static ColorHSV FromHCL(float h, float c, float l, float a)
+		{
+			float min = l - c * 0.5f;
+			float max = c + min;
+
+			return new ColorHSV(h, c / max, max, a);
+		}
+
+		#endregion
+
+		#region Conversion from HSY
+
+		/// <summary>
+		/// Initializes a color by converting the given HSY color to the HSV color space.
+		/// </summary>
+		/// <param name="hsy">The HSY color to convert to HSV.</param>
+		public ColorHSV(ColorHSY hsy)
+		{
+			this = FromHSY(hsy.h, hsy.s, hsy.y, hsy.a);
+		}
+
+		/// <summary>
+		/// Converts the given HSY color to the HSV color space.
+		/// </summary>
+		/// <param name="hsy">The HSY color to convert to HSV.</param>
+		/// <returns>The color converted to the HSV color space.</returns>
+		public static explicit operator ColorHSV(ColorHSY hsy)
+		{
+			return FromHSY(hsy.h, hsy.s, hsy.y, hsy.a);
+		}
+
+		/// <summary>
+		/// Converts the given HSY color to the HSV color space.
+		/// </summary>
+		/// <param name="h">The hue component of the HSY color to convert to HSV.</param>
+		/// <param name="s">The saturation component of the HSY color to convert to HSV.</param>
+		/// <param name="y">The luma component of the HSY color to convert to HSV.</param>
+		/// <returns>The HSV representation of the given color.</returns>
+		public static ColorHSV FromHSY(float h, float s, float y)
+		{
+			return FromHSY(h, s, y, 1f);
+		}
+
+		/// <summary>
+		/// Converts the given HSY color to the HSV color space.
+		/// </summary>
+		/// <param name="h">The hue component of the HSY color to convert to HSV.</param>
+		/// <param name="s">The saturation component of the HSY color to convert to HSV.</param>
+		/// <param name="y">The luma component of the HSY color to convert to HSV.</param>
+		/// <param name="a">The opacity of the color.</param>
+		/// <returns>The HSV representation of the given color.</returns>
+		public static ColorHSV FromHSY(float h, float s, float y, float a)
+		{
+			float r = 0f;
+			float g = 0f;
+			float b = 0f;
+			float c = s * ColorHCY.GetMaxChroma(h, y);
+			if (c > 0f)
+			{
+				float scaledHue = h * 6f;
+				if (scaledHue < 1f)
+				{
+					r = c;
+					g = c * scaledHue;
+				}
+				else if (scaledHue < 2f)
+				{
+					g = c;
+					r = c * (2f - scaledHue);
+				}
+				else if (scaledHue < 3f)
+				{
+					g = c;
+					b = c * (scaledHue - 2f);
+				}
+				else if (scaledHue < 4f)
+				{
+					b = c;
+					g = c * (4f - scaledHue);
+				}
+				else if (scaledHue < 5f)
+				{
+					b = c;
+					r = c * (scaledHue - 4f);
+				}
+				else
+				{
+					r = c;
+					b = c * (6f - scaledHue);
+				}
+			}
+
+			float min = y - (r * ColorHSY.redLumaFactor + g * ColorHSY.greenLumaFactor + b * ColorHSY.blueLumaFactor);
+			float max = c + min;
+
+			return new ColorHSV(h, c > 0f ? c / max : 0f, max, a);
+		}
+
+		#endregion
+
+		#region Conversion from HCY
+
+		/// <summary>
+		/// Initializes a color by converting the given HCY color to the HSV color space.
+		/// </summary>
+		/// <param name="hcy">The HCY color to convert to HSV.</param>
+		public ColorHSV(ColorHCY hcy)
+		{
+			this = FromHCY(hcy.h, hcy.c, hcy.y, hcy.a);
+		}
+
+		/// <summary>
+		/// Converts the given HCY color to the HSV color space.
+		/// </summary>
+		/// <param name="hcy">The HCY color to convert to HSV.</param>
+		/// <returns>The color converted to the HSV color space.</returns>
+		public static explicit operator ColorHSV(ColorHCY hcy)
+		{
+			return FromHCY(hcy.h, hcy.c, hcy.y, hcy.a);
+		}
+
+		/// <summary>
+		/// Converts the given HCY color to the HSV color space.
+		/// </summary>
+		/// <param name="h">The hue component of the HCY color to convert to HSV.</param>
+		/// <param name="c">The chroma component of the HCY color to convert to HSV.</param>
+		/// <param name="y">The luma component of the HCY color to convert to HSV.</param>
+		/// <returns>The HSV representation of the given color.</returns>
+		public static ColorHSV FromHCY(float h, float c, float y)
+		{
+			return FromHCY(h, c, y, 1f);
+		}
+
+		/// <summary>
+		/// Converts the given HCY color to the HSV color space.
+		/// </summary>
+		/// <param name="h">The hue component of the HCY color to convert to HSV.</param>
+		/// <param name="c">The chroma component of the HCY color to convert to HSV.</param>
+		/// <param name="y">The luma component of the HCY color to convert to HSV.</param>
+		/// <param name="a">The opacity of the color.</param>
+		/// <returns>The HSV representation of the given color.</returns>
+		public static ColorHSV FromHCY(float h, float c, float y, float a)
+		{
+			float r = 0f;
+			float g = 0f;
+			float b = 0f;
+			if (c > 0f)
+			{
+				float scaledHue = h * 6f;
+				if (scaledHue < 1f)
+				{
+					r = c;
+					g = c * scaledHue;
+				}
+				else if (scaledHue < 2f)
+				{
+					g = c;
+					r = c * (2f - scaledHue);
+				}
+				else if (scaledHue < 3f)
+				{
+					g = c;
+					b = c * (scaledHue - 2f);
+				}
+				else if (scaledHue < 4f)
+				{
+					b = c;
+					g = c * (4f - scaledHue);
+				}
+				else if (scaledHue < 5f)
+				{
+					b = c;
+					r = c * (scaledHue - 4f);
+				}
+				else
+				{
+					r = c;
+					b = c * (6f - scaledHue);
+				}
+			}
+
+			float min = y - (r * ColorHCY.redLumaFactor + g * ColorHCY.greenLumaFactor + b * ColorHCY.blueLumaFactor);
+			float max = c + min;
+
+			return new ColorHSV(h, c > 0f ? c / max : 0f, max, a);
+		}
+
+		#endregion
+
+		#region Conversion to/from Vector
+
+		/// <summary>
+		/// Converts the specified color to a <see cref="Vector3"/>, with hue as x, saturation as y, and value as z, while opacity is discarded.
+		/// </summary>
+		/// <param name="hsv">The color to convert to a <see cref="Vector3"/>.</param>
+		/// <returns>The vector converted from the provided HSV color.</returns>
+		public static explicit operator Vector3(ColorHSV hsv)
+		{
+			return new Vector3(hsv.h, hsv.s, hsv.v);
+		}
+
+		/// <summary>
+		/// Converts the specified color to a <see cref="Vector4"/>, with hue as x, saturation as y, value as z, and opacity as w.
+		/// </summary>
+		/// <param name="hsv">The color to convert to a <see cref="Vector4"/>.</param>
+		/// <returns>The vector converted from the provided HSV color.</returns>
+		public static explicit operator Vector4(ColorHSV hsv)
+		{
+			return new Vector4(hsv.h, hsv.s, hsv.v, hsv.a);
+		}
+
+		/// <summary>
+		/// Converts the specified <see cref="Vector3"/> color to an HSV color, with x as hue, y as saturation, z as value, assuming an opacity of 1.
+		/// </summary>
+		/// <param name="v">The <see cref="Vector3"/> to convert to an HSV color.</param>
+		/// <returns>The HSV color converted from the provided vector.</returns>
+		public static explicit operator ColorHSV(Vector3 v)
+		{
+			return new ColorHSV(v.x, v.y, v.z, 1f);
+		}
+
+		/// <summary>
+		/// Converts the specified <see cref="Vector4"/> color to an HSV color, with x as hue, y as saturation, z as value, and w as opacity.
+		/// </summary>
+		/// <param name="v">The <see cref="Vector4"/> to convert to an HSV color.</param>
+		/// <returns>The HSV color converted from the provided vector.</returns>
+		public static explicit operator ColorHSV(Vector4 v)
+		{
+			return new ColorHSV(v.x, v.y, v.z, v.w);
+		}
+
+		#endregion
+
+		#region Channel Indexing
+
+		/// <summary>
+		/// The number of color channels, including opacity, for colors in this color space.
+		/// </summary>
+		/// <remarks>For HSV colors, the value is 4, for hue, saturation, value, and opacity.</remarks>
+		public const int channelCount = 4;
 
 		/// <summary>
 		/// Provides access to the four color channels using a numeric zero-based index.
@@ -239,6 +770,10 @@ namespace Experilous.MakeItColorful
 				}
 			}
 		}
+
+		#endregion
+
+		#region Lerp
 
 		/// <summary>
 		/// Performs a linear interpolation between the two colors specified for each color channel independently.
@@ -383,6 +918,10 @@ namespace Experilous.MakeItColorful
 				Numerics.Math.LerpUnclamped(a.a, b.a, t));
 		}
 
+		#endregion
+
+		#region Arithmetic Operators
+
 		/// <summary>
 		/// Adds the color channels of the two specified colors together, wrapping the hue channel if necessary.
 		/// </summary>
@@ -411,9 +950,9 @@ namespace Experilous.MakeItColorful
 		/// <param name="a">The value by which to multiply the color's channels.</param>
 		/// <param name="b">The color whose channels are to be multiplied.</param>
 		/// <returns>A new color with each channel set to the corresponding value of the provided color multiplied by the provided value.</returns>
-		public static ColorHSV operator *(float b, ColorHSV a)
+		public static ColorHSV operator *(float a, ColorHSV b)
 		{
-			return new ColorHSV(Mathf.Repeat(a.h * b, 1f), a.s * b, a.v * b, a.a * b);
+			return new ColorHSV(Mathf.Repeat(b.h * a, 1f), b.s * a, b.v * a, b.a * a);
 		}
 
 		/// <summary>
@@ -448,6 +987,10 @@ namespace Experilous.MakeItColorful
 		{
 			return new ColorHSV(Mathf.Repeat(a.h / b, 1f), a.s / b, a.v / b, a.a / b);
 		}
+
+		#endregion
+
+		#region Comparisons
 
 		/// <summary>
 		/// Checks if the color is equal to a specified color.
@@ -499,25 +1042,9 @@ namespace Experilous.MakeItColorful
 			return lhs.h != rhs.h || lhs.s != rhs.s || lhs.v != rhs.v || lhs.a != rhs.a;
 		}
 
-		/// <summary>
-		/// Converts the specified color to a <see cref="Vector4"/>, with hue as x, saturation as y, value as z, and opacity as w.
-		/// </summary>
-		/// <param name="hsv">The color to convert to a <see cref="Vector4"/>.</param>
-		/// <returns>The vector converted from the provided HSV color.</returns>
-		public static implicit operator Vector4(ColorHSV hsv)
-		{
-			return new Vector4(hsv.h, hsv.s, hsv.v, hsv.a);
-		}
+		#endregion
 
-		/// <summary>
-		/// Converts the specified <see cref="Vector4"/> color to an HSV color, with x as hue, y as saturation, z as value, and and w as opacity.
-		/// </summary>
-		/// <param name="v">The <see cref="Vector4"/> to convert to an HSV color.</param>
-		/// <returns>The HSV color converted from the provided vector.</returns>
-		public static implicit operator ColorHSV(Vector4 v)
-		{
-			return new ColorHSV(v.x, v.y, v.z, v.w);
-		}
+		#region Conversion to String
 
 		/// <summary>
 		/// Converts the color to string representation, appropriate for diagnositic display.
@@ -537,5 +1064,46 @@ namespace Experilous.MakeItColorful
 		{
 			return string.Format("HSVA({0}, {1}, {2}, {3})", h.ToString(format), s.ToString(format), v.ToString(format), a.ToString(format));
 		}
+
+		#endregion
+
+		#region Color Space Boundaries
+
+		/// <summary>
+		/// Indicates if the values for hue, saturation, and value together represent a valid color within the RGB color space.
+		/// </summary>
+		/// <returns>Returns true if the color is valid, false if not.</returns>
+		public bool IsValid()
+		{
+			return (a >= 0f & a <= 1f & s >= 0f & s <= 1f & v >= 0f & v <= 1f);
+		}
+
+		/// <summary>
+		/// Gets the nearest HSV color that is also valid within the RGB color space.
+		/// </summary>
+		/// <returns>The nearest valid HSV color.</returns>
+		public ColorHSV GetNearestValid()
+		{
+			return new ColorHSV(Mathf.Repeat(h, 1f), Mathf.Clamp01(s), Mathf.Clamp01(v), Mathf.Clamp01(a));
+		}
+
+		/// <summary>
+		/// Gets the canonical representation of the color.
+		/// </summary>
+		/// <returns>The canonical representation of the color.</returns>
+		/// <remarks>
+		/// <para>The canonical color representation, when converted to RGB and back, should not be any different from
+		/// its original value, aside from any minor loss of accuracy that could occur during the conversions.</para>
+		/// <para>For the HSV color space, if value is 0, then hue and saturation are set to 0.  If saturationis 0, then
+		/// hue is set to 0.  Otherwise, if hue is outside the range [0, 1), it is wrapped such that it is restricted to
+		/// that range.  In all other cases, the color is already canonical.</para>
+		/// </remarks>
+		public ColorHSV GetCanonical()
+		{
+			if (s == 0f | v == 0f) return new ColorHSV(0f, 0f, v, a);
+			return new ColorHSV(Mathf.Repeat(h, 1f), s, v, a);
+		}
+
+		#endregion
 	}
 }

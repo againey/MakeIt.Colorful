@@ -79,13 +79,13 @@ namespace Experilous.Examples.MakeItColorful
 					if (fx < 0f)
 					{
 						var hcv = new ColorHCV(hue, -fx, fy);
-						hcv.a = hcv.canConvertToRGB ? 1f : 0f;
+						hcv.a = hcv.IsValid() ? 1f : 0f;
 						colors[i] = (Color)hcv;
 					}
 					else
 					{
 						var hcv = new ColorHCV(complementaryHue, fx, fy);
-						hcv.a = hcv.canConvertToRGB ? 1f : 0f;
+						hcv.a = hcv.IsValid() ? 1f : 0f;
 						colors[i] = (Color)hcv;
 					}
 				}
@@ -137,13 +137,13 @@ namespace Experilous.Examples.MakeItColorful
 					if (fx < 0f)
 					{
 						var hcl = new ColorHCL(hue, -fx, fy);
-						hcl.a = hcl.canConvertToRGB ? 1f : 0f;
+						hcl.a = hcl.IsValid() ? 1f : 0f;
 						colors[i] = (Color)hcl;
 					}
 					else
 					{
 						var hcl = new ColorHCL(complementaryHue, fx, fy);
-						hcl.a = hcl.canConvertToRGB ? 1f : 0f;
+						hcl.a = hcl.IsValid() ? 1f : 0f;
 						colors[i] = (Color)hcl;
 					}
 				}
@@ -195,13 +195,13 @@ namespace Experilous.Examples.MakeItColorful
 					if (fx < 0f)
 					{
 						var hcy = new ColorHCY(hue, -fx, fy);
-						hcy.a = hcy.canConvertToRGB ? 1f : 0f;
+						hcy.a = hcy.IsValid() ? 1f : 0f;
 						colors[i] = (Color)hcy;
 					}
 					else
 					{
 						var hcy = new ColorHCY(complementaryHue, fx, fy);
-						hcy.a = hcy.canConvertToRGB ? 1f : 0f;
+						hcy.a = hcy.IsValid() ? 1f : 0f;
 						colors[i] = (Color)hcy;
 					}
 				}
