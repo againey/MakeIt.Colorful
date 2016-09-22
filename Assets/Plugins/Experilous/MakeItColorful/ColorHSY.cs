@@ -12,14 +12,6 @@ namespace Experilous.MakeItColorful
 	/// </summary>
 	[Serializable] public struct ColorHSY
 	{
-		#region Constants
-
-		public const float redLumaFactor = 0.30f;
-		public const float greenLumaFactor = 0.59f;
-		public const float blueLumaFactor = 0.11f;
-
-		#endregion
-
 		#region Fields and Direct Constructors
 
 		/// <summary>
@@ -124,32 +116,10 @@ namespace Experilous.MakeItColorful
 
 			float c = max - min;
 
-			hsy.y = r * redLumaFactor + g * greenLumaFactor + b * blueLumaFactor;
-
-			if (c > 0f)
-			{
-				if (r == max)
-				{
-					hsy.h = Mathf.Repeat((g - b) / c, 6f) / 6f;
-				}
-				else if (g == max)
-				{
-					hsy.h = ((b - r) / c + 2f) / 6f;
-				}
-				else
-				{
-					hsy.h = ((r - g) / c + 4f) / 6f;
-				}
-
-				float maxChroma = ColorHCY.GetMaxChroma(hsy.h, hsy.y);
-				hsy.s = (maxChroma != 0f) ? c / maxChroma : 0f;
-			}
-			else
-			{
-				hsy.h = 0f;
-				hsy.s = 0f;
-			}
-
+			hsy.h = Detail.HueUtility.FromRGB(r, g, b, max, c);
+			hsy.y = Detail.LumaUtility.FromRGB(r, g, b);
+			float maxChroma = ColorHCY.GetMaxChroma(hsy.h, hsy.y);
+			hsy.s = (maxChroma != 0f) ? c / maxChroma : 0f;
 			hsy.a = a;
 
 			return hsy;
@@ -162,48 +132,20 @@ namespace Experilous.MakeItColorful
 		/// <returns>The color converted to the RGB color space.</returns>
 		public static explicit operator Color(ColorHSY hsy)
 		{
-			Color rgb = new Color(0f, 0f, 0f, hsy.a);
 			float c = hsy.s * ColorHCY.GetMaxChroma(hsy.h, hsy.y);
 			if (c > 0f)
 			{
-				float scaledHue = hsy.h * 6f;
-				if (scaledHue < 1f)
-				{
-					rgb.r = c;
-					rgb.g = c * scaledHue;
-				}
-				else if (scaledHue < 2f)
-				{
-					rgb.g = c;
-					rgb.r = c * (2f - scaledHue);
-				}
-				else if (scaledHue < 3f)
-				{
-					rgb.g = c;
-					rgb.b = c * (scaledHue - 2f);
-				}
-				else if (scaledHue < 4f)
-				{
-					rgb.b = c;
-					rgb.g = c * (4f - scaledHue);
-				}
-				else if (scaledHue < 5f)
-				{
-					rgb.b = c;
-					rgb.r = c * (scaledHue - 4f);
-				}
-				else
-				{
-					rgb.r = c;
-					rgb.b = c * (6f - scaledHue);
-				}
+				Color rgb = Detail.HueUtility.ToRGB(hsy.h, c, hsy.a);
+				float min = hsy.y - Detail.LumaUtility.FromRGB(rgb.r, rgb.g, rgb.b);
+				rgb.r += min;
+				rgb.g += min;
+				rgb.b += min;
+				return rgb;
+ 			}
+			else
+			{
+				return new Color(hsy.y, hsy.y, hsy.y, hsy.a);
 			}
-
-			float min = hsy.y - (rgb.r * redLumaFactor + rgb.g * greenLumaFactor + rgb.b * blueLumaFactor);
-			rgb.r = Mathf.Clamp01(rgb.r + min);
-			rgb.g = Mathf.Clamp01(rgb.g + min);
-			rgb.b = Mathf.Clamp01(rgb.b + min);
-			return rgb;
 		}
 
 		#endregion
@@ -257,32 +199,10 @@ namespace Experilous.MakeItColorful
 
 			float chroma = max - min;
 
-			hsy.y = 1f - (c * redLumaFactor + m * greenLumaFactor + y * blueLumaFactor);
-
-			if (chroma > 0f)
-			{
-				if (c == min)
-				{
-					hsy.h = Mathf.Repeat((y - m) / chroma, 6f) / 6f;
-				}
-				else if (m == min)
-				{
-					hsy.h = ((c - y) / chroma + 2f) / 6f;
-				}
-				else
-				{
-					hsy.h = ((m - c) / chroma + 4f) / 6f;
-				}
-
-				float maxChroma = ColorHCY.GetMaxChroma(hsy.h, hsy.y);
-				hsy.s = (maxChroma != 0f) ? chroma / maxChroma : 0f;
-			}
-			else
-			{
-				hsy.h = 0f;
-				hsy.s = 0f;
-			}
-
+			hsy.h = Detail.HueUtility.FromCMY(c, m, y, min, chroma);
+			hsy.y = Detail.LumaUtility.FromCMY(c, m, y);
+			float maxChroma = ColorHCY.GetMaxChroma(hsy.h, hsy.y);
+			hsy.s = (maxChroma != 0f) ? chroma / maxChroma : 0f;
 			hsy.a = a;
 
 			return hsy;
@@ -345,32 +265,10 @@ namespace Experilous.MakeItColorful
 
 			float chroma = max - min;
 
-			hsy.y = kInv - (c * redLumaFactor + m * greenLumaFactor + y * blueLumaFactor) * kInv;
-
-			if (chroma > 0f)
-			{
-				if (c == min)
-				{
-					hsy.h = Mathf.Repeat((y - m) / chroma, 6f) / 6f;
-				}
-				else if (m == min)
-				{
-					hsy.h = ((c - y) / chroma + 2f) / 6f;
-				}
-				else
-				{
-					hsy.h = ((m - c) / chroma + 4f) / 6f;
-				}
-
-				float maxChroma = ColorHCY.GetMaxChroma(hsy.h, hsy.y);
-				hsy.s = (maxChroma != 0f) ? chroma * kInv / maxChroma : 0f;
-			}
-			else
-			{
-				hsy.h = 0f;
-				hsy.s = 0f;
-			}
-
+			hsy.h = Detail.HueUtility.FromCMY(c, m, y, min, chroma);
+			hsy.y = Detail.LumaUtility.FromCMY(c, m, y) * kInv;
+			float maxChroma = ColorHCY.GetMaxChroma(hsy.h, hsy.y);
+			hsy.s = (maxChroma != 0f) ? chroma * kInv / maxChroma : 0f;
 			hsy.a = a;
 
 			return hsy;
@@ -423,47 +321,12 @@ namespace Experilous.MakeItColorful
 		{
 			float c = v * s;
 			float min = v - c;
-			float r = min;
-			float g = min;
-			float b = min;
-			if (c > 0f)
-			{
-				float scaledHue = h * 6f;
-				if (scaledHue < 1f)
-				{
-					r += c;
-					g += c * scaledHue;
-				}
-				else if (scaledHue < 2f)
-				{
-					g += c;
-					r += c * (2f - scaledHue);
-				}
-				else if (scaledHue < 3f)
-				{
-					g += c;
-					b += c * (scaledHue - 2f);
-				}
-				else if (scaledHue < 4f)
-				{
-					b += c;
-					g += c * (4f - scaledHue);
-				}
-				else if (scaledHue < 5f)
-				{
-					b += c;
-					r += c * (scaledHue - 4f);
-				}
-				else
-				{
-					r += c;
-					b += c * (6f - scaledHue);
-				}
-			}
+			float r, g, b;
+			Detail.HueUtility.ToRGB(h, c, min, out r, out g, out b);
 
 			ColorHSY hsy;
 			hsy.h = h;
-			hsy.y = r * redLumaFactor + g * greenLumaFactor + b * blueLumaFactor;
+			hsy.y = Detail.LumaUtility.FromRGB(r, g, b);
 			float maxChroma = ColorHCY.GetMaxChroma(h, hsy.y);
 			hsy.s = (maxChroma != 0f) ? c / maxChroma : 0f;
 			hsy.a = a;
@@ -517,47 +380,12 @@ namespace Experilous.MakeItColorful
 		public static ColorHSY FromHCV(float h, float c, float v, float a)
 		{
 			float min = v - c;
-			float r = min;
-			float g = min;
-			float b = min;
-			if (c > 0f)
-			{
-				float scaledHue = h * 6f;
-				if (scaledHue < 1f)
-				{
-					r += c;
-					g += c * scaledHue;
-				}
-				else if (scaledHue < 2f)
-				{
-					g += c;
-					r += c * (2f - scaledHue);
-				}
-				else if (scaledHue < 3f)
-				{
-					g += c;
-					b += c * (scaledHue - 2f);
-				}
-				else if (scaledHue < 4f)
-				{
-					b += c;
-					g += c * (4f - scaledHue);
-				}
-				else if (scaledHue < 5f)
-				{
-					b += c;
-					r += c * (scaledHue - 4f);
-				}
-				else
-				{
-					r += c;
-					b += c * (6f - scaledHue);
-				}
-			}
+			float r, g, b;
+			Detail.HueUtility.ToRGB(h, c, min, out r, out g, out b);
 
 			ColorHSY hsy;
 			hsy.h = h;
-			hsy.y = r * redLumaFactor + g * greenLumaFactor + b * blueLumaFactor;
+			hsy.y = Detail.LumaUtility.FromRGB(r, g, b);
 			float maxChroma = ColorHCY.GetMaxChroma(h, hsy.y);
 			hsy.s = (maxChroma != 0f) ? c / maxChroma : 0f;
 			hsy.a = a;
@@ -612,47 +440,12 @@ namespace Experilous.MakeItColorful
 		{
 			float c = (1f - Mathf.Abs(2f * l - 1f)) * s;
 			float min = l - c * 0.5f;
-			float r = min;
-			float g = min;
-			float b = min;
-			if (c > 0f)
-			{
-				float scaledHue = h * 6f;
-				if (scaledHue < 1f)
-				{
-					r += c;
-					g += c * scaledHue;
-				}
-				else if (scaledHue < 2f)
-				{
-					g += c;
-					r += c * (2f - scaledHue);
-				}
-				else if (scaledHue < 3f)
-				{
-					g += c;
-					b += c * (scaledHue - 2f);
-				}
-				else if (scaledHue < 4f)
-				{
-					b += c;
-					g += c * (4f - scaledHue);
-				}
-				else if (scaledHue < 5f)
-				{
-					b += c;
-					r += c * (scaledHue - 4f);
-				}
-				else
-				{
-					r += c;
-					b += c * (6f - scaledHue);
-				}
-			}
+			float r, g, b;
+			Detail.HueUtility.ToRGB(h, c, min, out r, out g, out b);
 
 			ColorHSY hsy;
 			hsy.h = h;
-			hsy.y = r * redLumaFactor + g * greenLumaFactor + b * blueLumaFactor;
+			hsy.y = Detail.LumaUtility.FromRGB(r, g, b);
 			float maxChroma = ColorHCY.GetMaxChroma(h, hsy.y);
 			hsy.s = (maxChroma != 0f) ? c / maxChroma : 0f;
 			hsy.a = a;
@@ -706,47 +499,12 @@ namespace Experilous.MakeItColorful
 		public static ColorHSY FromHCL(float h, float c, float l, float a)
 		{
 			float min = l - c * 0.5f;
-			float r = min;
-			float g = min;
-			float b = min;
-			if (c > 0f)
-			{
-				float scaledHue = h * 6f;
-				if (scaledHue < 1f)
-				{
-					r += c;
-					g += c * scaledHue;
-				}
-				else if (scaledHue < 2f)
-				{
-					g += c;
-					r += c * (2f - scaledHue);
-				}
-				else if (scaledHue < 3f)
-				{
-					g += c;
-					b += c * (scaledHue - 2f);
-				}
-				else if (scaledHue < 4f)
-				{
-					b += c;
-					g += c * (4f - scaledHue);
-				}
-				else if (scaledHue < 5f)
-				{
-					b += c;
-					r += c * (scaledHue - 4f);
-				}
-				else
-				{
-					r += c;
-					b += c * (6f - scaledHue);
-				}
-			}
+			float r, g, b;
+			Detail.HueUtility.ToRGB(h, c, min, out r, out g, out b);
 
 			ColorHSY hsy;
 			hsy.h = h;
-			hsy.y = r * redLumaFactor + g * greenLumaFactor + b * blueLumaFactor;
+			hsy.y = Detail.LumaUtility.FromRGB(r, g, b);
 			float maxChroma = ColorHCY.GetMaxChroma(h, hsy.y);
 			hsy.s = (maxChroma != 0f) ? c / maxChroma : 0f;
 			hsy.a = a;
@@ -935,17 +693,8 @@ namespace Experilous.MakeItColorful
 		/// <seealso cref="LerpBackwardUnclamped(ColorHSY, ColorHSY, float)"/>
 		public static ColorHSY LerpUnclamped(ColorHSY a, ColorHSY b, float t)
 		{
-			float hueA = Mathf.Repeat(a.h, 1f);
-			float hueB = Mathf.Repeat(b.h, 1f);
-			float hueDelta = Mathf.Abs(hueB - hueA);
 			return new ColorHSY(
-				hueDelta <= 0.5f
-					? Numerics.Math.LerpUnclamped(hueA, hueB, t)
-					: Mathf.Repeat(
-						hueA < hueB
-							? Numerics.Math.LerpUnclamped(hueA + 1f, hueB, t)
-							: Numerics.Math.LerpUnclamped(hueA, hueB + 1f, t),
-						1f),
+				Detail.HueUtility.LerpUnclamped(a.h, b.h, t),
 				Numerics.Math.LerpUnclamped(a.s, b.s, t),
 				Numerics.Math.LerpUnclamped(a.y, b.y, t),
 				Numerics.Math.LerpUnclamped(a.a, b.a, t));
@@ -982,12 +731,8 @@ namespace Experilous.MakeItColorful
 		/// <seealso cref="LerpBackwardUnclamped(ColorHSY, ColorHSY, float)"/>
 		public static ColorHSY LerpForwardUnclamped(ColorHSY a, ColorHSY b, float t)
 		{
-			float hueA = Mathf.Repeat(a.h, 1f);
-			float hueB = Mathf.Repeat(b.h, 1f);
 			return new ColorHSY(
-				hueA <= hueB
-					? Numerics.Math.LerpUnclamped(hueA, hueB, t)
-					: Mathf.Repeat(Numerics.Math.LerpUnclamped(hueA, hueB + 1f, t), 1f),
+				Detail.HueUtility.LerpForwardUnclamped(a.h, b.h, t),
 				Numerics.Math.LerpUnclamped(a.s, b.s, t),
 				Numerics.Math.LerpUnclamped(a.y, b.y, t),
 				Numerics.Math.LerpUnclamped(a.a, b.a, t));
@@ -1024,12 +769,8 @@ namespace Experilous.MakeItColorful
 		/// <seealso cref="LerpForwardUnclamped(ColorHSY, ColorHSY, float)"/>
 		public static ColorHSY LerpBackwardUnclamped(ColorHSY a, ColorHSY b, float t)
 		{
-			float hueA = Mathf.Repeat(a.h, 1f);
-			float hueB = Mathf.Repeat(b.h, 1f);
 			return new ColorHSY(
-				hueA >= hueB
-					? Numerics.Math.LerpUnclamped(hueA, hueB, t)
-					: Mathf.Repeat(Numerics.Math.LerpUnclamped(hueA + 1f, hueB, t), 1f),
+				Detail.HueUtility.LerpBackwardUnclamped(a.h, b.h, t),
 				Numerics.Math.LerpUnclamped(a.s, b.s, t),
 				Numerics.Math.LerpUnclamped(a.y, b.y, t),
 				Numerics.Math.LerpUnclamped(a.a, b.a, t));

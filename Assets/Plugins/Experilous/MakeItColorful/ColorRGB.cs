@@ -3,7 +3,6 @@
 \******************************************************************************/
 
 using UnityEngine;
-using System;
 
 namespace Experilous.MakeItColorful
 {

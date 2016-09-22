@@ -464,7 +464,7 @@ namespace Experilous.MakeItColorful.Tests
 		[Test]
 		public void GetNearestValid_HCY()
 		{
-			float hueAtHalfLuma = (0.5f - ColorHCY.redLumaFactor) / (ColorHCY.greenLumaFactor * 6f);
+			float hueAtHalfLuma = (0.5f - Detail.LumaUtility.rWeight) / (Detail.LumaUtility.gWeight * 6f);
 			float halfLuma = 0.5f;
 
 			AssertNearest(new ColorHCY(hueAtHalfLuma, 0f, 0f, 0.25f), new ColorHCY(hueAtHalfLuma - 1f, -1f, -0.125f, 0.25f), 0.0001f);
@@ -510,7 +510,7 @@ namespace Experilous.MakeItColorful.Tests
 			AssertNearest(new ColorHCY(hueAtHalfLuma, 0.5f, halfLuma, 0.25f), new ColorHCY(hueAtHalfLuma + 1f, 0.5f, halfLuma, 0.25f), 0.0001f, true);
 
 			float hueAtMinLuma = 4f / 6f;
-			float minLuma = ColorHCY.blueLumaFactor;
+			float minLuma = Detail.LumaUtility.bWeight;
 			float minLower = 1f - minLuma * minLuma / (1f + minLuma * minLuma);
 			float minUpper = 1f - (1f - minLuma) * (1f - minLuma) / (1f + (1f - minLuma) * (1f - minLuma));
 
@@ -557,7 +557,7 @@ namespace Experilous.MakeItColorful.Tests
 			AssertNearest(new ColorHCY(hueAtMinLuma, 0.5f, minLuma, 0.25f), new ColorHCY(hueAtMinLuma + 1f, 0.5f, minLuma, 0.25f), 0.0001f, true);
 
 			float hueAtMaxLuma = 2f / 6f;
-			float maxLuma = ColorHCY.greenLumaFactor;
+			float maxLuma = Detail.LumaUtility.gWeight;
 			float maxLower = 1f - maxLuma * maxLuma / (1f + maxLuma * maxLuma);
 			float maxUpper = 1f - (1f - maxLuma) * (1f - maxLuma) / (1f + (1f - maxLuma) * (1f - maxLuma));
 

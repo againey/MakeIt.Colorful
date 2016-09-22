@@ -245,44 +245,7 @@ namespace Experilous.MakeItColorful
 		{
 			float c = v * s;
 			float min = v - c;
-			float r = min;
-			float g = min;
-			float b = min;
-			if (c > 0f)
-			{
-				float scaledHue = h * 6f;
-				if (scaledHue < 1f)
-				{
-					r += c;
-					g += c * scaledHue;
-				}
-				else if (scaledHue < 2f)
-				{
-					g += c;
-					r += c * (2f - scaledHue);
-				}
-				else if (scaledHue < 3f)
-				{
-					g += c;
-					b += c * (scaledHue - 2f);
-				}
-				else if (scaledHue < 4f)
-				{
-					b += c;
-					g += c * (4f - scaledHue);
-				}
-				else if (scaledHue < 5f)
-				{
-					b += c;
-					r += c * (scaledHue - 4f);
-				}
-				else
-				{
-					r += c;
-					b += c * (6f - scaledHue);
-				}
-			}
-			return FromRGB(r, g, b, a);
+			return (c > 0f) ? (ColorCMYK)Detail.HueUtility.ToRGB(h, c, min, a) : new ColorCMYK(0f, 0f, 0f, 1f - min, a);
 		}
 
 		#endregion
@@ -331,44 +294,7 @@ namespace Experilous.MakeItColorful
 		public static ColorCMYK FromHCV(float h, float c, float v, float a)
 		{
 			float min = v - c;
-			float r = min;
-			float g = min;
-			float b = min;
-			if (c > 0f)
-			{
-				float scaledHue = h * 6f;
-				if (scaledHue < 1f)
-				{
-					r += c;
-					g += c * scaledHue;
-				}
-				else if (scaledHue < 2f)
-				{
-					g += c;
-					r += c * (2f - scaledHue);
-				}
-				else if (scaledHue < 3f)
-				{
-					g += c;
-					b += c * (scaledHue - 2f);
-				}
-				else if (scaledHue < 4f)
-				{
-					b += c;
-					g += c * (4f - scaledHue);
-				}
-				else if (scaledHue < 5f)
-				{
-					b += c;
-					r += c * (scaledHue - 4f);
-				}
-				else
-				{
-					r += c;
-					b += c * (6f - scaledHue);
-				}
-			}
-			return FromRGB(r, g, b, a);
+			return (c > 0f) ? (ColorCMYK)Detail.HueUtility.ToRGB(h, c, min, a) : new ColorCMYK(0f, 0f, 0f, 1f - min, a);
 		}
 
 		#endregion
@@ -418,44 +344,7 @@ namespace Experilous.MakeItColorful
 		{
 			float c = (1f - Mathf.Abs(2f * l - 1f)) * s;
 			float min = l - c * 0.5f;
-			float r = min;
-			float g = min;
-			float b = min;
-			if (c > 0f)
-			{
-				float scaledHue = h * 6f;
-				if (scaledHue < 1f)
-				{
-					r += c;
-					g += c * scaledHue;
-				}
-				else if (scaledHue < 2f)
-				{
-					g += c;
-					r += c * (2f - scaledHue);
-				}
-				else if (scaledHue < 3f)
-				{
-					g += c;
-					b += c * (scaledHue - 2f);
-				}
-				else if (scaledHue < 4f)
-				{
-					b += c;
-					g += c * (4f - scaledHue);
-				}
-				else if (scaledHue < 5f)
-				{
-					b += c;
-					r += c * (scaledHue - 4f);
-				}
-				else
-				{
-					r += c;
-					b += c * (6f - scaledHue);
-				}
-			}
-			return FromRGB(r, g, b, a);
+			return (c > 0f) ? (ColorCMYK)Detail.HueUtility.ToRGB(h, c, min, a) : new ColorCMYK(0f, 0f, 0f, 1f - min, a);
 		}
 
 		#endregion
@@ -504,44 +393,7 @@ namespace Experilous.MakeItColorful
 		public static ColorCMYK FromHCL(float h, float c, float l, float a)
 		{
 			float min = l - c * 0.5f;
-			float r = min;
-			float g = min;
-			float b = min;
-			if (c > 0f)
-			{
-				float scaledHue = h * 6f;
-				if (scaledHue < 1f)
-				{
-					r += c;
-					g += c * scaledHue;
-				}
-				else if (scaledHue < 2f)
-				{
-					g += c;
-					r += c * (2f - scaledHue);
-				}
-				else if (scaledHue < 3f)
-				{
-					g += c;
-					b += c * (scaledHue - 2f);
-				}
-				else if (scaledHue < 4f)
-				{
-					b += c;
-					g += c * (4f - scaledHue);
-				}
-				else if (scaledHue < 5f)
-				{
-					b += c;
-					r += c * (scaledHue - 4f);
-				}
-				else
-				{
-					r += c;
-					b += c * (6f - scaledHue);
-				}
-			}
-			return FromRGB(r, g, b, a);
+			return (c > 0f) ? (ColorCMYK)Detail.HueUtility.ToRGB(h, c, min, a) : new ColorCMYK(0f, 0f, 0f, 1f - min, a);
 		}
 
 		#endregion
@@ -590,46 +442,19 @@ namespace Experilous.MakeItColorful
 		public static ColorCMYK FromHSY(float h, float s, float y, float a)
 		{
 			float c = s * ColorHCY.GetMaxChroma(h, y);
-			float r = 0f;
-			float g = 0f;
-			float b = 0f;
 			if (c > 0f)
 			{
-				float scaledHue = h * 6f;
-				if (scaledHue < 1f)
-				{
-					r = c;
-					g = c * scaledHue;
-				}
-				else if (scaledHue < 2f)
-				{
-					g = c;
-					r = c * (2f - scaledHue);
-				}
-				else if (scaledHue < 3f)
-				{
-					g = c;
-					b = c * (scaledHue - 2f);
-				}
-				else if (scaledHue < 4f)
-				{
-					b = c;
-					g = c * (4f - scaledHue);
-				}
-				else if (scaledHue < 5f)
-				{
-					b = c;
-					r = c * (scaledHue - 4f);
-				}
-				else
-				{
-					r = c;
-					b = c * (6f - scaledHue);
-				}
+				Color rgb = Detail.HueUtility.ToRGB(h, c, a);
+				float min = y - Detail.LumaUtility.FromRGB(rgb.r, rgb.g, rgb.b);
+				rgb.r += min;
+				rgb.g += min;
+				rgb.b += min;
+				return (ColorCMYK)rgb;
+ 			}
+			else
+			{
+				return new ColorCMYK(0f, 0f, 0f, 1f - y, a);
 			}
-
-			float min = y - (r * ColorHSY.redLumaFactor + g * ColorHSY.greenLumaFactor + b * ColorHSY.blueLumaFactor);
-			return FromRGB(r + min, g + min, b + min, a);
 		}
 
 		#endregion
@@ -677,46 +502,19 @@ namespace Experilous.MakeItColorful
 		/// <returns>The CMYK representation of the given color.</returns>
 		public static ColorCMYK FromHCY(float h, float c, float y, float a)
 		{
-			float r = 0f;
-			float g = 0f;
-			float b = 0f;
 			if (c > 0f)
 			{
-				float scaledHue = h * 6f;
-				if (scaledHue < 1f)
-				{
-					r = c;
-					g = c * scaledHue;
-				}
-				else if (scaledHue < 2f)
-				{
-					g = c;
-					r = c * (2f - scaledHue);
-				}
-				else if (scaledHue < 3f)
-				{
-					g = c;
-					b = c * (scaledHue - 2f);
-				}
-				else if (scaledHue < 4f)
-				{
-					b = c;
-					g = c * (4f - scaledHue);
-				}
-				else if (scaledHue < 5f)
-				{
-					b = c;
-					r = c * (scaledHue - 4f);
-				}
-				else
-				{
-					r = c;
-					b = c * (6f - scaledHue);
-				}
+				Color rgb = Detail.HueUtility.ToRGB(h, c, a);
+				float min = y - Detail.LumaUtility.FromRGB(rgb.r, rgb.g, rgb.b);
+				rgb.r += min;
+				rgb.g += min;
+				rgb.b += min;
+				return (ColorCMYK)rgb;
+ 			}
+			else
+			{
+				return new ColorCMYK(0f, 0f, 0f, 1f - y, a);
 			}
-
-			float min = y - (r * ColorHSY.redLumaFactor + g * ColorHSY.greenLumaFactor + b * ColorHSY.blueLumaFactor);
-			return FromRGB(r + min, g + min, b + min, a);
 		}
 
 		#endregion
