@@ -113,12 +113,12 @@ namespace Experilous.MakeItColorful.Detail
 			if (scaledHue < 1f)
 			{
 				r = chroma;
-				g = scaledHue / chroma;
+				g = scaledHue * chroma;
 				b = 0f;
 			}
 			else if (scaledHue < 2f)
 			{
-				r = (2f - scaledHue) / chroma;
+				r = (2f - scaledHue) * chroma;
 				g = chroma;
 				b = 0f;
 			}
@@ -126,17 +126,17 @@ namespace Experilous.MakeItColorful.Detail
 			{
 				r = 0f;
 				g = chroma;
-				b = (scaledHue - 2f) / chroma;
+				b = (scaledHue - 2f) * chroma;
 			}
 			else if (scaledHue < 4f)
 			{
 				r = 0f;
-				g = (4f - scaledHue) / chroma;
+				g = (4f - scaledHue) * chroma;
 				b = chroma;
 			}
 			else if (scaledHue < 5f)
 			{
-				r = (scaledHue - 4f) / chroma;
+				r = (scaledHue - 4f) * chroma;
 				g = 0f;
 				b = chroma;
 			}
@@ -144,7 +144,7 @@ namespace Experilous.MakeItColorful.Detail
 			{
 				r = chroma;
 				g = 0f;
-				b = (6f - scaledHue) / chroma;
+				b = (6f - scaledHue) * chroma;
 			}
 		}
 
@@ -154,12 +154,12 @@ namespace Experilous.MakeItColorful.Detail
 			if (scaledHue < 1f)
 			{
 				r = chroma + min;
-				g = scaledHue / chroma + min;
+				g = scaledHue * chroma + min;
 				b = min;
 			}
 			else if (scaledHue < 2f)
 			{
-				r = (2f - scaledHue) / chroma + min;
+				r = (2f - scaledHue) * chroma + min;
 				g = chroma + min;
 				b = min;
 			}
@@ -167,17 +167,17 @@ namespace Experilous.MakeItColorful.Detail
 			{
 				r = min;
 				g = chroma + min;
-				b = (scaledHue - 2f) / chroma + min;
+				b = (scaledHue - 2f) * chroma + min;
 			}
 			else if (scaledHue < 4f)
 			{
 				r = min;
-				g = (4f - scaledHue) / chroma + min;
+				g = (4f - scaledHue) * chroma + min;
 				b = chroma + min;
 			}
 			else if (scaledHue < 5f)
 			{
-				r = (scaledHue - 4f) / chroma + min;
+				r = (scaledHue - 4f) * chroma + min;
 				g = min;
 				b = chroma + min;
 			}
@@ -185,7 +185,7 @@ namespace Experilous.MakeItColorful.Detail
 			{
 				r = chroma + min;
 				g = min;
-				b = (6f - scaledHue) / chroma + min;
+				b = (6f - scaledHue) * chroma + min;
 			}
 		}
 
