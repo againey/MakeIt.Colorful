@@ -299,7 +299,7 @@ namespace Experilous.MakeItColorful
 		/// <returns>The HCL representation of the given color.</returns>
 		public static ColorHCL FromHSV(float h, float s, float v, float a)
 		{
-			return new ColorHCL(h, s * v, v * (1f - s * 0.5f), a);
+			return new ColorHCL(h, Detail.ValueUtility.GetChroma(s, v), v * (1f - s * 0.5f), a);
 		}
 
 		#endregion
@@ -395,7 +395,7 @@ namespace Experilous.MakeItColorful
 		/// <returns>The HCL representation of the given color.</returns>
 		public static ColorHCL FromHSL(float h, float s, float l, float a)
 		{
-			float c = (1f - Mathf.Abs(2f * l - 1f)) * s;
+			float c = Detail.LightnessUtility.GetChroma(s, l);
 
 			return new ColorHCL(h, c, l, a);
 		}
@@ -445,13 +445,20 @@ namespace Experilous.MakeItColorful
 		/// <returns>The HCL representation of the given color.</returns>
 		public static ColorHCL FromHSY(float h, float s, float y, float a)
 		{
-			float c = s * ColorHCY.GetMaxChroma(h, y);
-			float r, g, b;
-			Detail.HueUtility.ToRGB(h, c, out r, out g, out b);
+			float c = Detail.LumaUtility.GetChroma(h, s, y);
+			if (c > 0f)
+			{
+				float r, g, b;
+				Detail.HueUtility.ToRGB(h, c, out r, out g, out b);
 
-			float min = y - Detail.LumaUtility.FromRGB(r, g, b);
+				float min = y - Detail.LumaUtility.FromRGB(r, g, b);
 
-			return new ColorHCL(h, c, c * 0.5f + min, a);
+				return new ColorHCL(h, c, c * 0.5f + min, a);
+			}
+			else
+			{
+				return new ColorHCL(h, 0f, y, a);
+			}
 		}
 
 		#endregion
@@ -499,12 +506,19 @@ namespace Experilous.MakeItColorful
 		/// <returns>The HCL representation of the given color.</returns>
 		public static ColorHCL FromHCY(float h, float c, float y, float a)
 		{
-			float r, g, b;
-			Detail.HueUtility.ToRGB(h, c, out r, out g, out b);
+			if (c > 0f)
+			{
+				float r, g, b;
+				Detail.HueUtility.ToRGB(h, c, out r, out g, out b);
 
-			float min = y - Detail.LumaUtility.FromRGB(r, g, b);
+				float min = y - Detail.LumaUtility.FromRGB(r, g, b);
 
-			return new ColorHCL(h, c, c * 0.5f + min, a);
+				return new ColorHCL(h, c, c * 0.5f + min, a);
+			}
+			else
+			{
+				return new ColorHCL(h, 0f, y, a);
+			}
 		}
 
 		#endregion
@@ -954,7 +968,7 @@ namespace Experilous.MakeItColorful
 		/// <remarks>For the HCL color space, the lightness channel is always 1 when chroma is at its maximum value of 1/2.</remarks>
 		public static float GetLightnessAtMaxChroma()
 		{
-			return 0.5f;
+			return Detail.LightnessUtility.GetLightnessAtMaxChroma();
 		}
 
 		/// <summary>
@@ -966,8 +980,7 @@ namespace Experilous.MakeItColorful
 		/// <remarks>For the HCL color space, the lightness channel must be in the range [chroma / 2, 1 - chroma / 2].</remarks>
 		public static void GetMinMaxLightness(float c, out float lMin, out float lMax)
 		{
-			lMin = c * 0.5f;
-			lMax = 1f - lMin;
+			Detail.LightnessUtility.GetMinMaxLightness(c, out lMin, out lMax);
 		}
 
 		/// <summary>
@@ -978,7 +991,7 @@ namespace Experilous.MakeItColorful
 		/// <remarks>For the HCL color space, the chroma channel must be in the range [0, 1 - Abs(2 * lightness - 1)].</remarks>
 		public static float GetMaxChroma(float l)
 		{
-			return 1f - Mathf.Abs(2f * l - 1f);
+			return Detail.LightnessUtility.GetMaxChroma(l);
 		}
 
 		#endregion

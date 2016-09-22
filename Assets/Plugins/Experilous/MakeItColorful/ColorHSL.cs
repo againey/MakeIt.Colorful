@@ -118,7 +118,7 @@ namespace Experilous.MakeItColorful
 
 			hsl.h = Detail.HueUtility.FromRGB(r, g, b, max, c);
 			hsl.l = (max + min) * 0.5f;
-			hsl.s = (hsl.l != 0 & hsl.l != 1) ? c / (1f - Mathf.Abs(max + min - 1f)) : 0f;
+			hsl.s = Detail.LightnessUtility.GetSaturation(c, hsl.l);
 			hsl.a = a;
 
 			return hsl;
@@ -131,7 +131,7 @@ namespace Experilous.MakeItColorful
 		/// <returns>The color converted to the RGB color space.</returns>
 		public static explicit operator Color(ColorHSL hsl)
 		{
-			float c = (1f - Mathf.Abs(2f * hsl.l - 1f)) * hsl.s;
+			float c = Detail.LightnessUtility.GetChroma(hsl.s, hsl.l);
 			float min = hsl.l - c * 0.5f;
 			return (c > 0f) ? Detail.HueUtility.ToRGB(hsl.h, c, min, hsl.a) : new Color(min, min, min, hsl.a);
 		}
@@ -189,7 +189,7 @@ namespace Experilous.MakeItColorful
 
 			hsl.h = Detail.HueUtility.FromCMY(c, m, y, min, chroma);
 			hsl.l = 1f - (max + min) * 0.5f;
-			hsl.s = (hsl.l != 0f & hsl.l != 1f) ? chroma / (1f - Mathf.Abs(hsl.l * 2f - 1f)) : 0f;
+			hsl.s = Detail.LightnessUtility.GetSaturation(chroma, hsl.l);
 			hsl.a = a;
 
 			return hsl;
@@ -254,7 +254,7 @@ namespace Experilous.MakeItColorful
 
 			hsl.h = Detail.HueUtility.FromCMY(c, m, y, min, chroma);
 			hsl.l = kInv - (max + min) * kInv * 0.5f;
-			hsl.s = (hsl.l != 0f & hsl.l != 1f) ? chroma * kInv / (1f - Mathf.Abs(hsl.l * 2f - 1f)) : 0f;
+			hsl.s = Detail.LightnessUtility.GetSaturation(chroma * kInv, hsl.l);
 			hsl.a = a;
 
 			return hsl;
@@ -305,7 +305,9 @@ namespace Experilous.MakeItColorful
 		/// <returns>The HSL representation of the given color.</returns>
 		public static ColorHSL FromHSV(float h, float s, float v, float a)
 		{
-			return new ColorHSL(h, s, v * (1f - s * 0.5f), a);
+			float c = Detail.ValueUtility.GetChroma(s, v);
+			float l = v - c * 0.5f;
+			return new ColorHSL(h, Detail.LightnessUtility.GetSaturation(c, l), l, a);
 		}
 
 		#endregion
@@ -354,7 +356,7 @@ namespace Experilous.MakeItColorful
 		public static ColorHSL FromHCV(float h, float c, float v, float a)
 		{
 			float l = v - c * 0.5f;
-			float s = c / (1f - Mathf.Abs(l * 2f - 1f));
+			float s = Detail.LightnessUtility.GetSaturation(c, l);
 
 			return new ColorHSL(h, s, l, a);
 		}
@@ -404,7 +406,7 @@ namespace Experilous.MakeItColorful
 		/// <returns>The HSL representation of the given color.</returns>
 		public static ColorHSL FromHCL(float h, float c, float l, float a)
 		{
-			return new ColorHSL(h, c / (1f - Mathf.Abs(l * 2 - 1)), l, a);
+			return new ColorHSL(h, Detail.LightnessUtility.GetSaturation(c, l), l, a);
 		}
 
 		#endregion
@@ -452,14 +454,22 @@ namespace Experilous.MakeItColorful
 		/// <returns>The HSL representation of the given color.</returns>
 		public static ColorHSL FromHSY(float h, float s, float y, float a)
 		{
-			float c = s * ColorHCY.GetMaxChroma(h, y);
-			float r, g, b;
-			Detail.HueUtility.ToRGB(h, c, out r, out g, out b);
+			float c = Detail.LumaUtility.GetChroma(h, s, y);
+			if (c > 0f)
+			{
+				float r, g, b;
+				Detail.HueUtility.ToRGB(h, c, out r, out g, out b);
 
-			float min = y - Detail.LumaUtility.FromRGB(r, g, b);
-			float max = c + min;
+				float min = y - Detail.LumaUtility.FromRGB(r, g, b);
+				float max = c + min;
+				float l = (max + min) * 0.5f;
 
-			return new ColorHSL(h, c / (1f - Mathf.Abs(max + min - 1f)), (max + min) * 0.5f, a);
+				return new ColorHSL(h, Detail.LightnessUtility.GetSaturation(c, l), l, a);
+			}
+			else
+			{
+				return new ColorHSL(h, 0f, y, a);
+			}
 		}
 
 		#endregion
@@ -507,13 +517,21 @@ namespace Experilous.MakeItColorful
 		/// <returns>The HSL representation of the given color.</returns>
 		public static ColorHSL FromHCY(float h, float c, float y, float a)
 		{
-			float r, g, b;
-			Detail.HueUtility.ToRGB(h, c, out r, out g, out b);
+			if (c > 0f)
+			{
+				float r, g, b;
+				Detail.HueUtility.ToRGB(h, c, out r, out g, out b);
 
-			float min = y - Detail.LumaUtility.FromRGB(r, g, b);
-			float max = c + min;
+				float min = y - Detail.LumaUtility.FromRGB(r, g, b);
+				float max = c + min;
+				float l = (max + min) * 0.5f;
 
-			return new ColorHSL(h, c / (1f - Mathf.Abs(max + min - 1f)), (max + min) * 0.5f, a);
+				return new ColorHSL(h, Detail.LightnessUtility.GetSaturation(c, l), l, a);
+			}
+			else
+			{
+				return new ColorHSL(h, 0f, y, a);
+			}
 		}
 
 		#endregion

@@ -218,7 +218,7 @@ namespace Experilous.MakeItColorful
 		/// <returns>The CMY representation of the given color.</returns>
 		public static ColorCMY FromHSV(float h, float s, float v, float a)
 		{
-			float c = v * s;
+			float c = Detail.ValueUtility.GetChroma(s, v);
 			float min = v - c;
 			return (c > 0f) ? (ColorCMY)Detail.HueUtility.ToRGB(h, c, min, a) : new ColorCMY(1f - min, 1f - min, 1f - min, a);
 		}
@@ -317,7 +317,7 @@ namespace Experilous.MakeItColorful
 		/// <returns>The CMY representation of the given color.</returns>
 		public static ColorCMY FromHSL(float h, float s, float l, float a)
 		{
-			float c = (1f - Mathf.Abs(2f * l - 1f)) * s;
+			float c = Detail.LightnessUtility.GetChroma(s, l);
 			float min = l - c * 0.5f;
 			return (c > 0f) ? (ColorCMY)Detail.HueUtility.ToRGB(h, c, min, a) : new ColorCMY(1f - min, 1f - min, 1f - min, a);
 		}
@@ -416,7 +416,7 @@ namespace Experilous.MakeItColorful
 		/// <returns>The CMY representation of the given color.</returns>
 		public static ColorCMY FromHSY(float h, float s, float y, float a)
 		{
-			float c = s * ColorHCY.GetMaxChroma(h, y);
+			float c = Detail.LumaUtility.GetChroma(h, s, y);
 			if (c > 0f)
 			{
 				Color rgb = Detail.HueUtility.ToRGB(h, c, a);

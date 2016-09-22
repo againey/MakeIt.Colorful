@@ -310,18 +310,25 @@ namespace Experilous.MakeItColorful
 		/// <returns>The HCY representation of the given color.</returns>
 		public static ColorHCY FromHSV(float h, float s, float v, float a)
 		{
-			float c = v * s;
+			float c = Detail.ValueUtility.GetChroma(s, v);
 			float min = v - c;
-			float r, g, b;
-			Detail.HueUtility.ToRGB(h, c, min, out r, out g, out b);
+			if (c > 0f)
+			{
+				float r, g, b;
+				Detail.HueUtility.ToRGB(h, c, min, out r, out g, out b);
 
-			ColorHCY hcy;
-			hcy.h = h;
-			hcy.c = c;
-			hcy.y = Detail.LumaUtility.FromRGB(r, g, b);
-			hcy.a = a;
+				ColorHCY hcy;
+				hcy.h = h;
+				hcy.c = c;
+				hcy.y = Detail.LumaUtility.FromRGB(r, g, b);
+				hcy.a = a;
 
-			return hcy;
+				return hcy;
+			}
+			else
+			{
+				return new ColorHCY(h, 0f, min, a);
+			}
 		}
 
 		#endregion
@@ -370,16 +377,23 @@ namespace Experilous.MakeItColorful
 		public static ColorHCY FromHCV(float h, float c, float v, float a)
 		{
 			float min = v - c;
-			float r, g, b;
-			Detail.HueUtility.ToRGB(h, c, min, out r, out g, out b);
+			if (c > 0f)
+			{
+				float r, g, b;
+				Detail.HueUtility.ToRGB(h, c, min, out r, out g, out b);
 
-			ColorHCY hcy;
-			hcy.h = h;
-			hcy.c = c;
-			hcy.y = Detail.LumaUtility.FromRGB(r, g, b);
-			hcy.a = a;
+				ColorHCY hcy;
+				hcy.h = h;
+				hcy.c = c;
+				hcy.y = Detail.LumaUtility.FromRGB(r, g, b);
+				hcy.a = a;
 
-			return hcy;
+				return hcy;
+			}
+			else
+			{
+				return new ColorHCY(h, 0f, min, a);
+			}
 		}
 
 		#endregion
@@ -427,18 +441,25 @@ namespace Experilous.MakeItColorful
 		/// <returns>The HCY representation of the given color.</returns>
 		public static ColorHCY FromHSL(float h, float s, float l, float a)
 		{
-			float c = (1f - Mathf.Abs(2f * l - 1f)) * s;
+			float c = Detail.LightnessUtility.GetChroma(s, l);
 			float min = l - c * 0.5f;
-			float r, g, b;
-			Detail.HueUtility.ToRGB(h, c, min, out r, out g, out b);
+			if (c > 0f)
+			{
+				float r, g, b;
+				Detail.HueUtility.ToRGB(h, c, min, out r, out g, out b);
 
-			ColorHCY hcy;
-			hcy.h = h;
-			hcy.c = c;
-			hcy.y = Detail.LumaUtility.FromRGB(r, g, b);
-			hcy.a = a;
+				ColorHCY hcy;
+				hcy.h = h;
+				hcy.c = c;
+				hcy.y = Detail.LumaUtility.FromRGB(r, g, b);
+				hcy.a = a;
 
-			return hcy;
+				return hcy;
+			}
+			else
+			{
+				return new ColorHCY(h, 0f, min, a);
+			}
 		}
 
 		#endregion
@@ -487,16 +508,23 @@ namespace Experilous.MakeItColorful
 		public static ColorHCY FromHCL(float h, float c, float l, float a)
 		{
 			float min = l - c * 0.5f;
-			float r, g, b;
-			Detail.HueUtility.ToRGB(h, c, min, out r, out g, out b);
+			if (c > 0f)
+			{
+				float r, g, b;
+				Detail.HueUtility.ToRGB(h, c, min, out r, out g, out b);
 
-			ColorHCY hcy;
-			hcy.h = h;
-			hcy.c = c;
-			hcy.y = Detail.LumaUtility.FromRGB(r, g, b);
-			hcy.a = a;
+				ColorHCY hcy;
+				hcy.h = h;
+				hcy.c = c;
+				hcy.y = Detail.LumaUtility.FromRGB(r, g, b);
+				hcy.a = a;
 
-			return hcy;
+				return hcy;
+			}
+			else
+			{
+				return new ColorHCY(h, 0f, min, a);
+			}
 		}
 
 		#endregion
@@ -544,8 +572,7 @@ namespace Experilous.MakeItColorful
 		/// <returns>The HCY representation of the given color.</returns>
 		public static ColorHCY FromHSY(float h, float s, float y, float a)
 		{
-			float maxChroma = GetMaxChroma(h, y);
-			return new ColorHCY(h, s * maxChroma, y, a);
+			return new ColorHCY(h, Detail.LumaUtility.GetChroma(h, s, y), y, a);
 		}
 
 		#endregion
@@ -1005,9 +1032,7 @@ namespace Experilous.MakeItColorful
 		/// <returns>The luma channel at maximum chroma.</returns>
 		public static float GetLumaAtMaxChroma(float h)
 		{
-			float r, g, b;
-			Detail.HueUtility.ToRGB(h, out r, out g, out b);
-			return Detail.LumaUtility.FromRGB(r, g, b);
+			return Detail.LumaUtility.GetLumaAtMaxChroma(h);
 		}
 
 		/// <summary>
@@ -1019,11 +1044,8 @@ namespace Experilous.MakeItColorful
 		/// <param name="yMax">The maximum value of the luma channel for the given hue and chroma.</param>
 		public static void GetMinMaxLuma(float h, float c, out float yMin, out float yMax)
 		{
-			float yMid = GetLumaAtMaxChroma(h);
-			yMin = c * yMid;
-			yMax = (1f - c) * (1f - yMid) + yMid;
+			Detail.LumaUtility.GetMinMaxLuma(h, c, out yMin, out yMax);
 		}
-
 
 		/// <summary>
 		/// Indicates the maximum value that the chroma channel can have for given values of the hue and luma channels, if it is to remain valid within the RGB color space.
@@ -1033,8 +1055,7 @@ namespace Experilous.MakeItColorful
 		/// <returns>The maximum chroma for the given hue and luma.</returns>
 		public static float GetMaxChroma(float h, float y)
 		{
-			float yMid = GetLumaAtMaxChroma(h);
-			return (y <= yMid) ? y / yMid : (1f - y) / (1f - yMid);
+			return Detail.LumaUtility.GetMaxChroma(h, y);
 		}
 
 		#endregion

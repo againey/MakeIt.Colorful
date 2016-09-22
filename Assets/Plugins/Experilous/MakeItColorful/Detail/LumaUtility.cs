@@ -19,5 +19,37 @@ namespace Experilous.MakeItColorful.Detail
 		{
 			return 1f - (c * rWeight + m * gWeight + y * bWeight);
 		}
+
+		public static float GetChroma(float h, float s, float y)
+		{
+			float maxChroma = GetMaxChroma(h, y);
+			return s * maxChroma;
+		}
+
+		public static float GetSaturation(float h, float c, float y)
+		{
+			float maxChroma = GetMaxChroma(h, y);
+			return (maxChroma != 0f) ? c / maxChroma : 0f;
+		}
+
+		public static float GetLumaAtMaxChroma(float h)
+		{
+			float r, g, b;
+			HueUtility.ToRGB(h, out r, out g, out b);
+			return FromRGB(r, g, b);
+		}
+
+		public static void GetMinMaxLuma(float h, float c, out float yMin, out float yMax)
+		{
+			float yMid = GetLumaAtMaxChroma(h);
+			yMin = c * yMid;
+			yMax = (1f - c) * (1f - yMid) + yMid;
+		}
+
+		public static float GetMaxChroma(float h, float y)
+		{
+			float yMid = GetLumaAtMaxChroma(h);
+			return (y <= yMid) ? y / yMid : (1f - y) / (1f - yMid);
+		}
 	}
 }

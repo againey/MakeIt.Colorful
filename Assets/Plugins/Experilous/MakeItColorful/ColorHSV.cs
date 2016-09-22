@@ -117,7 +117,7 @@ namespace Experilous.MakeItColorful
 			float c = max - min;
 
 			hsv.h = Detail.HueUtility.FromRGB(r, g, b, max, c);
-			hsv.s = (max > 0f) ? c / max : 0f;
+			hsv.s = Detail.ValueUtility.GetSaturation(c, max);
 			hsv.v = max;
 			hsv.a = a;
 
@@ -131,7 +131,7 @@ namespace Experilous.MakeItColorful
 		/// <returns>The color converted to the RGB color space.</returns>
 		public static explicit operator Color(ColorHSV hsv)
 		{
-			float c = hsv.v * hsv.s;
+			float c = Detail.ValueUtility.GetChroma(hsv.s, hsv.v);
 			float min = hsv.v - c;
 			return (c > 0f) ? Detail.HueUtility.ToRGB(hsv.h, c, min, hsv.a) : new Color(min, min, min, hsv.a);
 		}
@@ -189,7 +189,7 @@ namespace Experilous.MakeItColorful
 
 			hsv.h = Detail.HueUtility.FromCMY(c, m, y, min, chroma);
 			hsv.v = 1f - min;
-			hsv.s = (hsv.v != 0f) ? chroma / hsv.v : 0f;
+			hsv.s = Detail.ValueUtility.GetSaturation(chroma, hsv.v);
 			hsv.a = a;
 
 			return hsv;
@@ -254,7 +254,7 @@ namespace Experilous.MakeItColorful
 
 			hsv.h = Detail.HueUtility.FromCMY(c, m, y, min, chroma);
 			hsv.v = (1f - min) * kInv;
-			hsv.s = (hsv.v != 0f) ? chroma * kInv / hsv.v : 0f;
+			hsv.s = Detail.ValueUtility.GetSaturation(chroma * kInv, hsv.v);
 			hsv.a = a;
 
 			return hsv;
@@ -305,7 +305,7 @@ namespace Experilous.MakeItColorful
 		/// <returns>The HSV representation of the given color.</returns>
 		public static ColorHSV FromHCV(float h, float c, float v, float a)
 		{
-			return new ColorHSV(h, v != 0f ? c / v : 0f, v, a);
+			return new ColorHSV(h, Detail.ValueUtility.GetSaturation(c, v), v, a);
 		}
 
 		#endregion
@@ -353,7 +353,9 @@ namespace Experilous.MakeItColorful
 		/// <returns>The HSV representation of the given color.</returns>
 		public static ColorHSV FromHSL(float h, float s, float l, float a)
 		{
-			return new ColorHSV(h, s, l / (1f - s * 0.5f), a);
+			float c = Detail.LightnessUtility.GetChroma(s, l);
+			float v = l + c * 0.5f;
+			return new ColorHSV(h, Detail.ValueUtility.GetSaturation(c, v), v, a);
 		}
 
 		#endregion
@@ -401,10 +403,9 @@ namespace Experilous.MakeItColorful
 		/// <returns>The HSV representation of the given color.</returns>
 		public static ColorHSV FromHCL(float h, float c, float l, float a)
 		{
-			float min = l - c * 0.5f;
-			float max = c + min;
+			float v = l + c * 0.5f;
 
-			return new ColorHSV(h, c / max, max, a);
+			return new ColorHSV(h, Detail.ValueUtility.GetSaturation(c, v), v, a);
 		}
 
 		#endregion
@@ -452,14 +453,21 @@ namespace Experilous.MakeItColorful
 		/// <returns>The HSV representation of the given color.</returns>
 		public static ColorHSV FromHSY(float h, float s, float y, float a)
 		{
-			float c = s * ColorHCY.GetMaxChroma(h, y);
-			float r, g, b;
-			Detail.HueUtility.ToRGB(h, c, out r, out g, out b);
+			float c = Detail.LumaUtility.GetChroma(h, s, y);
+			if (c > 0f)
+			{
+				float r, g, b;
+				Detail.HueUtility.ToRGB(h, c, out r, out g, out b);
 
-			float min = y - Detail.LumaUtility.FromRGB(r, g, b);
-			float max = c + min;
+				float min = y - Detail.LumaUtility.FromRGB(r, g, b);
+				float max = c + min;
 
-			return new ColorHSV(h, c > 0f ? c / max : 0f, max, a);
+				return new ColorHSV(h, Detail.ValueUtility.GetSaturation(c, max), max, a);
+			}
+			else
+			{
+				return new ColorHSV(h, 0f, y, a);
+			}
 		}
 
 		#endregion
@@ -507,13 +515,20 @@ namespace Experilous.MakeItColorful
 		/// <returns>The HSV representation of the given color.</returns>
 		public static ColorHSV FromHCY(float h, float c, float y, float a)
 		{
-			float r, g, b;
-			Detail.HueUtility.ToRGB(h, c, out r, out g, out b);
+			if (c > 0f)
+			{
+				float r, g, b;
+				Detail.HueUtility.ToRGB(h, c, out r, out g, out b);
 
-			float min = y - Detail.LumaUtility.FromRGB(r, g, b);
-			float max = c + min;
+				float min = y - Detail.LumaUtility.FromRGB(r, g, b);
+				float max = c + min;
 
-			return new ColorHSV(h, c > 0f ? c / max : 0f, max, a);
+				return new ColorHSV(h, Detail.ValueUtility.GetSaturation(c, max), max, a);
+			}
+			else
+			{
+				return new ColorHSV(h, 0f, y, a);
+			}
 		}
 
 		#endregion

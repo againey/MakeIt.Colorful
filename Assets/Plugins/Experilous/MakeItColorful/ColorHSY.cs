@@ -118,8 +118,7 @@ namespace Experilous.MakeItColorful
 
 			hsy.h = Detail.HueUtility.FromRGB(r, g, b, max, c);
 			hsy.y = Detail.LumaUtility.FromRGB(r, g, b);
-			float maxChroma = ColorHCY.GetMaxChroma(hsy.h, hsy.y);
-			hsy.s = (maxChroma != 0f) ? c / maxChroma : 0f;
+			hsy.s = Detail.LumaUtility.GetSaturation(hsy.h, c, hsy.y);
 			hsy.a = a;
 
 			return hsy;
@@ -132,7 +131,7 @@ namespace Experilous.MakeItColorful
 		/// <returns>The color converted to the RGB color space.</returns>
 		public static explicit operator Color(ColorHSY hsy)
 		{
-			float c = hsy.s * ColorHCY.GetMaxChroma(hsy.h, hsy.y);
+			float c = Detail.LumaUtility.GetChroma(hsy.h, hsy.s, hsy.y);
 			if (c > 0f)
 			{
 				Color rgb = Detail.HueUtility.ToRGB(hsy.h, c, hsy.a);
@@ -201,8 +200,7 @@ namespace Experilous.MakeItColorful
 
 			hsy.h = Detail.HueUtility.FromCMY(c, m, y, min, chroma);
 			hsy.y = Detail.LumaUtility.FromCMY(c, m, y);
-			float maxChroma = ColorHCY.GetMaxChroma(hsy.h, hsy.y);
-			hsy.s = (maxChroma != 0f) ? chroma / maxChroma : 0f;
+			hsy.s = Detail.LumaUtility.GetSaturation(hsy.h, chroma, hsy.y);
 			hsy.a = a;
 
 			return hsy;
@@ -267,8 +265,7 @@ namespace Experilous.MakeItColorful
 
 			hsy.h = Detail.HueUtility.FromCMY(c, m, y, min, chroma);
 			hsy.y = Detail.LumaUtility.FromCMY(c, m, y) * kInv;
-			float maxChroma = ColorHCY.GetMaxChroma(hsy.h, hsy.y);
-			hsy.s = (maxChroma != 0f) ? chroma * kInv / maxChroma : 0f;
+			hsy.s = Detail.LumaUtility.GetSaturation(hsy.h, chroma * kInv, hsy.y);
 			hsy.a = a;
 
 			return hsy;
@@ -319,19 +316,25 @@ namespace Experilous.MakeItColorful
 		/// <returns>The HSY representation of the given color.</returns>
 		public static ColorHSY FromHSV(float h, float s, float v, float a)
 		{
-			float c = v * s;
+			float c = Detail.ValueUtility.GetChroma(s, v);
 			float min = v - c;
-			float r, g, b;
-			Detail.HueUtility.ToRGB(h, c, min, out r, out g, out b);
+			if (c > 0f)
+			{
+				float r, g, b;
+				Detail.HueUtility.ToRGB(h, c, min, out r, out g, out b);
 
-			ColorHSY hsy;
-			hsy.h = h;
-			hsy.y = Detail.LumaUtility.FromRGB(r, g, b);
-			float maxChroma = ColorHCY.GetMaxChroma(h, hsy.y);
-			hsy.s = (maxChroma != 0f) ? c / maxChroma : 0f;
-			hsy.a = a;
+				ColorHSY hsy;
+				hsy.h = h;
+				hsy.y = Detail.LumaUtility.FromRGB(r, g, b);
+				hsy.s = Detail.LumaUtility.GetSaturation(h, c, hsy.y);
+				hsy.a = a;
 
-			return hsy;
+				return hsy;
+			}
+			else
+			{
+				return new ColorHSY(h, 0f, min, a);
+			}
 		}
 
 		#endregion
@@ -380,17 +383,23 @@ namespace Experilous.MakeItColorful
 		public static ColorHSY FromHCV(float h, float c, float v, float a)
 		{
 			float min = v - c;
-			float r, g, b;
-			Detail.HueUtility.ToRGB(h, c, min, out r, out g, out b);
+			if (c > 0f)
+			{
+				float r, g, b;
+				Detail.HueUtility.ToRGB(h, c, min, out r, out g, out b);
 
-			ColorHSY hsy;
-			hsy.h = h;
-			hsy.y = Detail.LumaUtility.FromRGB(r, g, b);
-			float maxChroma = ColorHCY.GetMaxChroma(h, hsy.y);
-			hsy.s = (maxChroma != 0f) ? c / maxChroma : 0f;
-			hsy.a = a;
+				ColorHSY hsy;
+				hsy.h = h;
+				hsy.y = Detail.LumaUtility.FromRGB(r, g, b);
+				hsy.s = Detail.LumaUtility.GetSaturation(h, c, hsy.y);
+				hsy.a = a;
 
-			return hsy;
+				return hsy;
+			}
+			else
+			{
+				return new ColorHSY(h, 0f, min, a);
+			}
 		}
 
 		#endregion
@@ -438,19 +447,25 @@ namespace Experilous.MakeItColorful
 		/// <returns>The HSY representation of the given color.</returns>
 		public static ColorHSY FromHSL(float h, float s, float l, float a)
 		{
-			float c = (1f - Mathf.Abs(2f * l - 1f)) * s;
+			float c = Detail.LightnessUtility.GetChroma(s, l);
 			float min = l - c * 0.5f;
-			float r, g, b;
-			Detail.HueUtility.ToRGB(h, c, min, out r, out g, out b);
+			if (c > 0f)
+			{
+				float r, g, b;
+				Detail.HueUtility.ToRGB(h, c, min, out r, out g, out b);
 
-			ColorHSY hsy;
-			hsy.h = h;
-			hsy.y = Detail.LumaUtility.FromRGB(r, g, b);
-			float maxChroma = ColorHCY.GetMaxChroma(h, hsy.y);
-			hsy.s = (maxChroma != 0f) ? c / maxChroma : 0f;
-			hsy.a = a;
+				ColorHSY hsy;
+				hsy.h = h;
+				hsy.y = Detail.LumaUtility.FromRGB(r, g, b);
+				hsy.s = Detail.LumaUtility.GetSaturation(h, c, hsy.y);
+				hsy.a = a;
 
-			return hsy;
+				return hsy;
+			}
+			else
+			{
+				return new ColorHSY(h, 0f, min, a);
+			}
 		}
 
 		#endregion
@@ -499,17 +514,23 @@ namespace Experilous.MakeItColorful
 		public static ColorHSY FromHCL(float h, float c, float l, float a)
 		{
 			float min = l - c * 0.5f;
-			float r, g, b;
-			Detail.HueUtility.ToRGB(h, c, min, out r, out g, out b);
+			if (c > 0f)
+			{
+				float r, g, b;
+				Detail.HueUtility.ToRGB(h, c, min, out r, out g, out b);
 
-			ColorHSY hsy;
-			hsy.h = h;
-			hsy.y = Detail.LumaUtility.FromRGB(r, g, b);
-			float maxChroma = ColorHCY.GetMaxChroma(h, hsy.y);
-			hsy.s = (maxChroma != 0f) ? c / maxChroma : 0f;
-			hsy.a = a;
+				ColorHSY hsy;
+				hsy.h = h;
+				hsy.y = Detail.LumaUtility.FromRGB(r, g, b);
+				hsy.s = Detail.LumaUtility.GetSaturation(h, c, hsy.y);
+				hsy.a = a;
 
-			return hsy;
+				return hsy;
+			}
+			else
+			{
+				return new ColorHSY(h, 0f, min, a);
+			}
 		}
 
 		#endregion
@@ -557,8 +578,7 @@ namespace Experilous.MakeItColorful
 		/// <returns>The HSY representation of the given color.</returns>
 		public static ColorHSY FromHCY(float h, float c, float y, float a)
 		{
-			float maxChroma = ColorHCY.GetMaxChroma(h, y);
-			return new ColorHSY(h, (maxChroma != 0f) ? c / maxChroma : 0f, y, a);
+			return new ColorHSY(h, Detail.LumaUtility.GetSaturation(h, c, y), y, a);
 		}
 
 		#endregion

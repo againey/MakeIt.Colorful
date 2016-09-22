@@ -299,7 +299,7 @@ namespace Experilous.MakeItColorful
 		/// <returns>The HCV representation of the given color.</returns>
 		public static ColorHCV FromHSV(float h, float s, float v, float a)
 		{
-			return new ColorHCV(h, s * v, v, a);
+			return new ColorHCV(h, Detail.ValueUtility.GetChroma(s, v), v, a);
 		}
 
 		#endregion
@@ -347,7 +347,7 @@ namespace Experilous.MakeItColorful
 		/// <returns>The HCV representation of the given color.</returns>
 		public static ColorHCV FromHSL(float h, float s, float l, float a)
 		{
-			float c = (1f - Mathf.Abs(2f * l - 1f)) * s;
+			float c = Detail.LightnessUtility.GetChroma(s, l);
 			float min = l - c * 0.5f;
 			float max = c + min;
 
@@ -450,14 +450,21 @@ namespace Experilous.MakeItColorful
 		/// <returns>The HCV representation of the given color.</returns>
 		public static ColorHCV FromHSY(float h, float s, float y, float a)
 		{
-			float c = s * ColorHCY.GetMaxChroma(h, y);
-			float r, g, b;
-			Detail.HueUtility.ToRGB(h, c, out r, out g, out b);
+			float c = Detail.LumaUtility.GetChroma(h, s, y);
+			if (c > 0f)
+			{
+				float r, g, b;
+				Detail.HueUtility.ToRGB(h, c, out r, out g, out b);
 
-			float min = y - Detail.LumaUtility.FromRGB(r, g, b);
-			float max = c + min;
+				float min = y - Detail.LumaUtility.FromRGB(r, g, b);
+				float max = c + min;
 
-			return new ColorHCV(h, c, max, a);
+				return new ColorHCV(h, c, max, a);
+			}
+			else
+			{
+				return new ColorHCV(h, 0f, y, a);
+			}
 		}
 
 		#endregion
@@ -505,13 +512,20 @@ namespace Experilous.MakeItColorful
 		/// <returns>The HCV representation of the given color.</returns>
 		public static ColorHCV FromHCY(float h, float c, float y, float a)
 		{
-			float r, g, b;
-			Detail.HueUtility.ToRGB(h, c, out r, out g, out b);
+			if (c > 0f)
+			{
+				float r, g, b;
+				Detail.HueUtility.ToRGB(h, c, out r, out g, out b);
 
-			float min = y - Detail.LumaUtility.FromRGB(r, g, b);
-			float max = c + min;
+				float min = y - Detail.LumaUtility.FromRGB(r, g, b);
+				float max = c + min;
 
-			return new ColorHCV(h, c, max, a);
+				return new ColorHCV(h, c, max, a);
+			}
+			else
+			{
+				return new ColorHCV(h, 0f, y, a);
+			}
 		}
 
 		#endregion
@@ -941,7 +955,7 @@ namespace Experilous.MakeItColorful
 		/// <remarks>For the HCV color space, the value channel is always 1 when chroma is at its maximum value of 1.</remarks>
 		public static float GetValueAtMaxChroma()
 		{
-			return 1f;
+			return Detail.ValueUtility.GetValueAtMaxChroma();
 		}
 
 		/// <summary>
@@ -953,8 +967,7 @@ namespace Experilous.MakeItColorful
 		/// <remarks>For the HCV color space, the value channel must be in the range [chroma, 1].</remarks>
 		public static void GetMinMaxValue(float c, out float vMin, out float vMax)
 		{
-			vMin = c;
-			vMax = 1f;
+			Detail.ValueUtility.GetMinMaxValue(c, out vMin, out vMax);
 		}
 
 		/// <summary>
@@ -965,7 +978,7 @@ namespace Experilous.MakeItColorful
 		/// <remarks>For the HCV color space, the chroma channel must be in the range [0, value].</remarks>
 		public static float GetMaxChroma(float v)
 		{
-			return v;
+			return Detail.ValueUtility.GetMaxChroma(v);
 		}
 
 		#endregion

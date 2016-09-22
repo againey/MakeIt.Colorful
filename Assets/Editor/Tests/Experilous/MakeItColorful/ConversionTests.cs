@@ -56,6 +56,35 @@ namespace Experilous.MakeItColorful.Tests
 			return false;
 		}
 
+		private MethodInfo FindGetNearestValidMethod<TColor>()
+		{
+			var type = typeof(TColor);
+
+			if (type == typeof(Color))
+			{
+				return type.GetMethod("GetNearestValid");
+			}
+
+			var methods = type.GetMethods(BindingFlags.Public | BindingFlags.Instance);
+			foreach (var method in methods)
+			{
+				if (method.Name == "GetNearestValid" && method.ReturnType == type && method.GetParameters().Length == 0)
+				{
+					return method;
+				}
+			}
+
+			return null;
+		}
+
+		private string GetColorTypeLabel(Type type)
+		{
+			if (type == typeof(Color)) return "RGBA";
+			string name = type.Name;
+			if (name.StartsWith("Color") && name.Length > 5) return name.Substring(5);
+			return name;
+		}
+
 		//TODO Delete if unused
 		private bool FindChannelIndexer<TColor>(out PropertyInfo indexer, out int channelCount)
 		{
@@ -91,6 +120,8 @@ namespace Experilous.MakeItColorful.Tests
 			MethodInfo firstToSecond, secondToFirst;
 			if (!FindRoundtrippedConversionOperators<TFirst, TSecond>(out firstToSecond, out secondToFirst)) Assert.Inconclusive();
 
+			MethodInfo secondGetNearestValid = FindGetNearestValidMethod<TSecond>();
+
 			object[] parameter = new object[1];
 			Func<TFirst, TFirst> roundtrip = (TFirst color) =>
 			{
@@ -99,17 +130,34 @@ namespace Experilous.MakeItColorful.Tests
 				return (TFirst)secondToFirst.Invoke(null, parameter);
 			};
 
-			Action<TFirst, TFirst> assertNearlyEqual = (TFirst initial, TFirst final) =>
+			Func<TFirst, TFirst> roundtripClamped = (TFirst color) =>
+			{
+				parameter[0] = color;
+				parameter[0] = secondGetNearestValid.Invoke(firstToSecond.Invoke(null, parameter), null);
+				return (TFirst)secondToFirst.Invoke(null, parameter);
+			};
+
+			Action<TFirst, TFirst, string> assertNearlyEqual = (TFirst initial, TFirst final, string message) =>
 			{
 				for (int i = 0; i < channelCount; ++i)
 				{
-					Assert.LessOrEqual(Mathf.Abs(indexer(initial, i) - indexer(final, i)), margin, string.Format("From {0} to {1}", initial, final));
+					Assert.LessOrEqual(Mathf.Abs(indexer(initial, i) - indexer(final, i)), margin, string.Format(message, initial, final));
 				}
 			};
 
+			string roundtripMessage = string.Format("Roundtrip from {{0}} through {0} to {{1}}", GetColorTypeLabel(typeof(TSecond)));
 			foreach (var color in colors)
 			{
-				assertNearlyEqual(color, roundtrip(color));
+				assertNearlyEqual(color, roundtrip(color), roundtripMessage);
+			}
+
+			string roundtripClampMessage = string.Format("Roundtrip from {{0}} through {0} with clamp to {{1}}", GetColorTypeLabel(typeof(TSecond)));
+			if (secondGetNearestValid != null)
+			{
+				foreach (var color in colors)
+				{
+					assertNearlyEqual(color, roundtripClamped(color), roundtripClampMessage);
+				}
 			}
 		}
 
@@ -569,7 +617,7 @@ namespace Experilous.MakeItColorful.Tests
 		{
 			ValidateConversionRoundtrips<ColorHSL, ColorHSV>(
 				(ColorHSL color, int index) => color[index], 4, 0.0001f,
-				CreateColorTestArray((float h, float s, float l, float a) => new ColorHSL(h, s, l, a).GetNearestValid(), 100));
+				CreateColorTestArray((float h, float s, float l, float a) => new ColorHSL(h, s, l, a).GetNearestValid().GetCanonical(), 100));
 		}
 
 		[Test]
@@ -577,7 +625,7 @@ namespace Experilous.MakeItColorful.Tests
 		{
 			ValidateConversionRoundtrips<ColorHSL, ColorHCV>(
 				(ColorHSL color, int index) => color[index], 4, 0.0001f,
-				CreateColorTestArray((float h, float s, float l, float a) => new ColorHSL(h, s, l, a).GetNearestValid(), 100));
+				CreateColorTestArray((float h, float s, float l, float a) => new ColorHSL(h, s, l, a).GetNearestValid().GetCanonical(), 100));
 		}
 
 		[Test]
@@ -585,7 +633,7 @@ namespace Experilous.MakeItColorful.Tests
 		{
 			ValidateConversionRoundtrips<ColorHSL, ColorHCL>(
 				(ColorHSL color, int index) => color[index], 4, 0.0001f,
-				CreateColorTestArray((float h, float s, float l, float a) => new ColorHSL(h, s, l, a).GetNearestValid(), 100));
+				CreateColorTestArray((float h, float s, float l, float a) => new ColorHSL(h, s, l, a).GetNearestValid().GetCanonical(), 100));
 		}
 
 		[Test]
@@ -593,7 +641,7 @@ namespace Experilous.MakeItColorful.Tests
 		{
 			ValidateConversionRoundtrips<ColorHSL, ColorHSY>(
 				(ColorHSL color, int index) => color[index], 4, 0.0001f,
-				CreateColorTestArray((float h, float s, float l, float a) => new ColorHSL(h, s, l, a).GetNearestValid(), 100));
+				CreateColorTestArray((float h, float s, float l, float a) => new ColorHSL(h, s, l, a).GetNearestValid().GetCanonical(), 100));
 		}
 
 		[Test]
@@ -601,7 +649,7 @@ namespace Experilous.MakeItColorful.Tests
 		{
 			ValidateConversionRoundtrips<ColorHSL, ColorHCY>(
 				(ColorHSL color, int index) => color[index], 4, 0.0001f,
-				CreateColorTestArray((float h, float s, float l, float a) => new ColorHSL(h, s, l, a).GetNearestValid(), 100));
+				CreateColorTestArray((float h, float s, float l, float a) => new ColorHSL(h, s, l, a).GetNearestValid().GetCanonical(), 100));
 		}
 
 		#endregion
@@ -721,7 +769,7 @@ namespace Experilous.MakeItColorful.Tests
 		{
 			ValidateConversionRoundtrips<ColorHSY, ColorHSL>(
 				(ColorHSY color, int index) => color[index], 4, 0.0001f,
-				CreateColorTestArray((float h, float s, float y, float a) => new ColorHSY(h, s, y, a).GetNearestValid(), 100));
+				CreateColorTestArray((float h, float s, float y, float a) => new ColorHSY(h, s, y, a).GetNearestValid().GetCanonical(), 100));
 		}
 
 		[Test]
