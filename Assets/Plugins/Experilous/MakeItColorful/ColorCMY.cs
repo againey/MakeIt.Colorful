@@ -983,6 +983,18 @@ namespace Experilous.MakeItColorful
 		}
 
 		/// <summary>
+		/// Indicates if the color is canonical, or if there is a different representation of this color that is canonical.
+		/// </summary>
+		/// <returns>Returns true if the color is canonical, false if there is a different representation that is canonical.</returns>
+		/// <remarks>
+		/// <para>A CMY color is always canonical, because there is never more than one representation of any color.</para>
+		/// </remarks>
+		public bool IsCanonical()
+		{
+			return true;
+		}
+
+		/// <summary>
 		/// Gets the canonical representation of the color.
 		/// </summary>
 		/// <returns>The canonical representation of the color.</returns>

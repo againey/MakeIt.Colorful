@@ -10,7 +10,7 @@ namespace Experilous.MakeItColorful
 	/// <summary>
 	/// Extensions to the standard <see cref="Color"/> struct for colors in the RGB color space.
 	/// </summary>
-	public static class ColorExtensions
+	public static class ColorRGB
 	{
 		#region Color Space Boundaries
 
@@ -30,6 +30,18 @@ namespace Experilous.MakeItColorful
 		public static Color GetNearestValid(this Color rgb)
 		{
 			return new Color(Mathf.Clamp01(rgb.r), Mathf.Clamp01(rgb.g), Mathf.Clamp01(rgb.b), Mathf.Clamp01(rgb.a));
+		}
+
+		/// <summary>
+		/// Indicates if the color is canonical, or if there is a different representation of this color that is canonical.
+		/// </summary>
+		/// <returns>Returns true if the color is canonical, false if there is a different representation that is canonical.</returns>
+		/// <remarks>
+		/// <para>An RGB color is always canonical, because there is never more than one representation of any color.</para>
+		/// </remarks>
+		public static bool IsCanonical(this Color rgb)
+		{
+			return true;
 		}
 
 		/// <summary>

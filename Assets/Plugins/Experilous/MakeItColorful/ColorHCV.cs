@@ -1092,6 +1092,19 @@ namespace Experilous.MakeItColorful
 		}
 
 		/// <summary>
+		/// Indicates if the color is canonical, or if there is a different representation of this color that is canonical.
+		/// </summary>
+		/// <returns>Returns true if the color is canonical, false if there is a different representation that is canonical.</returns>
+		/// <remarks>
+		/// <para>For an HCV color to be canonical, the hue must be in the range [0, 1).  Also, if the value is 0, then
+		/// the chroma must also be 0, and if either the value or chroma are 0, then the hue must be 0.</para>
+		/// </remarks>
+		public bool IsCanonical()
+		{
+			return (h >= 0f & h < 1f & (h == 0f | (c != 0f & v != 0f)) & (c == 0f | v != 0f));
+		}
+
+		/// <summary>
 		/// Gets the canonical representation of the color.
 		/// </summary>
 		/// <returns>The canonical representation of the color.</returns>

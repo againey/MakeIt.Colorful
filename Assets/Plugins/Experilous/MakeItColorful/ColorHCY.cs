@@ -1175,7 +1175,7 @@ namespace Experilous.MakeItColorful
 		/// <seealso cref="GetMinMaxLuma(float, float, out float, out float)"/>
 		public bool IsValid()
 		{
-			return (a >= 0f & a <= 1f & y >= 0f & y <= 1f & c >= 0f) && (c <= GetMaxChroma(h, y));
+			return (a >= 0f & a <= 1f & y >= 0f & y <= 1f & c >= 0f) && (c <= GetMaxChroma(Mathf.Repeat(h, 1f), y));
 		}
 
 		/// <summary>
@@ -1184,30 +1184,54 @@ namespace Experilous.MakeItColorful
 		/// <returns>The nearest valid HCY color.</returns>
 		public ColorHCY GetNearestValid()
 		{
-			float c = this.c;
-			float y = this.y;
-			float lHalf = y * 0.5f;
-			if (-lHalf >= c - 1.25f && lHalf >= - 0.75f)
+			float h = Mathf.Repeat(this.h, 1f);
+			float yMid = GetLumaAtMaxChroma(h);
+			float maxChroma = (this.y <= yMid) ? this.y / yMid : (1f - this.y) / (1f - yMid);
+			if (this.c <= maxChroma)
 			{
-				float lDouble = y * 2f;
-				if (c > lDouble)
-				{
-					float n = (2f * c + y);
-					c = 0.4f * n;
-					y = 0.2f * n;
-				}
-				else if (c > 2f - lDouble)
-				{
-					float n = (2f * c - y);
-					c = 0.4f * n + 0.4f;
-					y = -0.2f * n + 0.8f;
-				}
-				return new ColorHCY(Mathf.Repeat(h, 1f), Mathf.Max(0f, c), Mathf.Clamp01(y), Mathf.Clamp01(a));
+				return new ColorHCY(h, Mathf.Max(0f, this.c), Mathf.Clamp01(this.y), Mathf.Clamp01(a));
 			}
 			else
 			{
-				return new ColorHCY(Mathf.Repeat(h, 1f), 1f, 0.5f, Mathf.Clamp01(a));
+				float dx = this.c - 1f;
+				float dy = this.y - yMid;
+
+				if (dx < -dy * yMid  || dx < dy - dy * yMid)
+				{
+					float c = this.c;
+					float y = this.y;
+
+					if (dy < dx * yMid)
+					{
+						c = (c + y * yMid) / (1f + yMid * yMid);
+						y = c * yMid;
+					}
+					else if (dy > dx * yMid - dx)
+					{
+						float n = (dx + dy * yMid - dy) / (yMid * yMid - 2f * yMid + 2f);
+						c = n + 1f;
+						y = n * yMid - n + yMid;
+					}
+					return new ColorHCY(h, Mathf.Max(0f, c), Mathf.Clamp01(y), Mathf.Clamp01(a));
+				}
+				else
+				{
+					return new ColorHCY(h, 1f, yMid, Mathf.Clamp01(a));
+				}
 			}
+		}
+
+		/// <summary>
+		/// Indicates if the color is canonical, or if there is a different representation of this color that is canonical.
+		/// </summary>
+		/// <returns>Returns true if the color is canonical, false if there is a different representation that is canonical.</returns>
+		/// <remarks>
+		/// <para>For an HCY color to be canonical, the hue must be in the range [0, 1).  Also, if the luma is 0 or 1, then
+		/// the chroma must be 0, and if the luma is 0 or the chroma is 0 or 1, then the hue must be 0.</para>
+		/// </remarks>
+		public bool IsCanonical()
+		{
+			return (h >= 0f & h < 1f & (h == 0f | (c != 0f & y != 0f & y != 1f)) & (c == 0f | (y != 0f & y != 1f)));
 		}
 
 		/// <summary>

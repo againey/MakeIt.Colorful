@@ -975,7 +975,7 @@ namespace Experilous.MakeItColorful
 		/// <returns>A string representation of the color using default formatting.</returns>
 		public override string ToString()
 		{
-			return string.Format("CMYKA({0:F3}, {1:F3}, {2:F3}, {3:F3}, {3:F3})", c, m, y, k, a);
+			return string.Format("CMYKA({0:F3}, {1:F3}, {2:F3}, {3:F3}, {4:F3})", c, m, y, k, a);
 		}
 
 		/// <summary>
@@ -985,7 +985,7 @@ namespace Experilous.MakeItColorful
 		/// <returns>A string representation of the color using the specified formatting.</returns>
 		public string ToString(string format)
 		{
-			return string.Format("CMYKA({0}, {1}, {2}, {3}, {3})", c.ToString(format), m.ToString(format), y.ToString(format), k.ToString(format), a.ToString(format));
+			return string.Format("CMYKA({0}, {1}, {2}, {3}, {4})", c.ToString(format), m.ToString(format), y.ToString(format), k.ToString(format), a.ToString(format));
 		}
 
 		#endregion
@@ -1008,6 +1008,19 @@ namespace Experilous.MakeItColorful
 		public ColorCMYK GetNearestValid()
 		{
 			return new ColorCMYK(Mathf.Clamp01(c), Mathf.Clamp01(m), Mathf.Clamp01(y), Mathf.Clamp01(k), Mathf.Clamp01(a));
+		}
+
+		/// <summary>
+		/// Indicates if the color is canonical, or if there is a different representation of this color that is canonical.
+		/// </summary>
+		/// <returns>Returns true if the color is canonical, false if there is a different representation that is canonical.</returns>
+		/// <remarks>
+		/// <para>For a CMYK color to be canonical, at least one of cyan, magenta, or yellow must be 0.  Also, if
+		/// the key is 1, then cyan, magenta, and yellow must all be 0.</para>
+		/// </remarks>
+		public bool IsCanonical()
+		{
+			return ((c == 0f | m == 0f | y == 0f) & (k != 1f | (c == 0f & m == 0f & y == 0f)));
 		}
 
 		/// <summary>
