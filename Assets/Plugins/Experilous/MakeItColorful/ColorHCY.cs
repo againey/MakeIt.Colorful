@@ -1020,10 +1020,10 @@ namespace Experilous.MakeItColorful
 		/// hue is set to 0.  Otherwise, if hue is outside the range [0, 1), it is wrapped such that it is restricted
 		/// to that range.  In all other cases, the color is already canonical.</para>
 		/// </remarks>
-		public ColorHSY GetCanonical()
+		public ColorHCY GetCanonical()
 		{
-			if (c == 0f | y == 0f | y == 1f) return new ColorHSY(0f, 0f, y, a);
-			return new ColorHSY(Mathf.Repeat(h, 1f), c, y, a);
+			if (c == 0f | y == 0f | y == 1f) return new ColorHCY(0f, 0f, y, a);
+			return new ColorHCY(Mathf.Repeat(h, 1f), c, y, a);
 		}
 
 		/// <summary>
