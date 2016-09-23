@@ -56,13 +56,36 @@ namespace Experilous.MakeItColorful.Tests
 			return false;
 		}
 
-		private MethodInfo FindGetNearestValidMethod<TColor>()
+		private bool FindRoundtrippedConversionOperators<TFirst, TSecond, TThird>(out MethodInfo firstToSecond, out MethodInfo secondToThird, out MethodInfo thirdToFirst)
+		{
+			var first = typeof(TFirst);
+			var second = typeof(TSecond);
+			var third = typeof(TThird);
+			firstToSecond = secondToThird = thirdToFirst = null;
+			FindChainedConversionOperators(first, second, third, ref firstToSecond, ref secondToThird);
+			if (FindChainedConversionOperators(second, third, first, ref secondToThird, ref thirdToFirst) && firstToSecond != null) return true;
+			if (FindChainedConversionOperators(third, first, second, ref thirdToFirst, ref firstToSecond) && secondToThird != null) return true;
+			return false;
+		}
+
+		private Func<TColor, TColor> FindGetNearestValidMethod<TColor>()
 		{
 			var type = typeof(TColor);
 
 			if (type == typeof(Color))
 			{
-				return type.GetMethod("GetNearestValid");
+				var method = typeof(ColorRGB).GetMethod("GetNearestValid");
+
+				if (method == null)
+				{
+					Debug.LogWarning("No GetNearestValid() method found for the type " + type.Name + ".");
+					return null;
+				}
+				else
+				{
+					var parameter = new object[1];
+					return (TColor color) => { parameter[0] = color; return (TColor)method.Invoke(null, parameter); };
+				}
 			}
 
 			var methods = type.GetMethods(BindingFlags.Public | BindingFlags.Instance);
@@ -70,10 +93,11 @@ namespace Experilous.MakeItColorful.Tests
 			{
 				if (method.Name == "GetNearestValid" && method.ReturnType == type && method.GetParameters().Length == 0)
 				{
-					return method;
+					return (TColor color) => { return (TColor)method.Invoke(color, null); };
 				}
 			}
 
+			Debug.LogWarning("No GetNearestValid() method found for the type " + type.Name + ".");
 			return null;
 		}
 
@@ -85,42 +109,12 @@ namespace Experilous.MakeItColorful.Tests
 			return name;
 		}
 
-		//TODO Delete if unused
-		private bool FindChannelIndexer<TColor>(out PropertyInfo indexer, out int channelCount)
-		{
-			indexer = null;
-			channelCount = 0;
-
-			var type = typeof(TColor);
-			var properties = type.GetProperties(BindingFlags.Public | BindingFlags.Instance);
-			foreach (var property in properties)
-			{
-				var parameters = property.GetIndexParameters();
-				if (parameters.Length == 1 && parameters[0].ParameterType == typeof(int))
-				{
-					indexer = property;
-					break;
-				}
-			}
-
-			if (indexer == null) return false;
-
-			var field = type.GetField("channelCount", BindingFlags.Public | BindingFlags.Static);
-			if (field.IsLiteral && !field.IsInitOnly && field.FieldType == typeof(int))
-			{
-				channelCount = (int)field.GetRawConstantValue();
-				return true;
-			}
-
-			return false;
-		}
-
 		private void ValidateConversionRoundtrips<TFirst, TSecond>(Func<TFirst, int, float> indexer, int channelCount, float margin, params TFirst[] colors)
 		{
 			MethodInfo firstToSecond, secondToFirst;
 			if (!FindRoundtrippedConversionOperators<TFirst, TSecond>(out firstToSecond, out secondToFirst)) Assert.Inconclusive();
 
-			MethodInfo secondGetNearestValid = FindGetNearestValidMethod<TSecond>();
+			var secondGetNearestValid = FindGetNearestValidMethod<TSecond>();
 
 			object[] parameter = new object[1];
 			Func<TFirst, TFirst> roundtrip = (TFirst color) =>
@@ -133,7 +127,7 @@ namespace Experilous.MakeItColorful.Tests
 			Func<TFirst, TFirst> roundtripClamped = (TFirst color) =>
 			{
 				parameter[0] = color;
-				parameter[0] = secondGetNearestValid.Invoke(firstToSecond.Invoke(null, parameter), null);
+				parameter[0] = secondGetNearestValid((TSecond)firstToSecond.Invoke(null, parameter));
 				return (TFirst)secondToFirst.Invoke(null, parameter);
 			};
 
@@ -153,6 +147,55 @@ namespace Experilous.MakeItColorful.Tests
 
 			string roundtripClampMessage = string.Format("Roundtrip from {{0}} through {0} with clamp to {{1}}", GetColorTypeLabel(typeof(TSecond)));
 			if (secondGetNearestValid != null)
+			{
+				foreach (var color in colors)
+				{
+					assertNearlyEqual(color, roundtripClamped(color), roundtripClampMessage);
+				}
+			}
+		}
+
+		private void ValidateConversionRoundtrips<TFirst, TSecond, TThird>(Func<TFirst, int, float> indexer, int channelCount, float margin, params TFirst[] colors)
+		{
+			MethodInfo firstToSecond, secondToThird, thirdToFirst;
+			if (!FindRoundtrippedConversionOperators<TFirst, TSecond, TThird>(out firstToSecond, out secondToThird, out thirdToFirst)) Assert.Inconclusive();
+
+			var secondGetNearestValid = FindGetNearestValidMethod<TSecond>();
+			var thirdGetNearestValid = FindGetNearestValidMethod<TThird>();
+
+			object[] parameter = new object[1];
+			Func<TFirst, TFirst> roundtrip = (TFirst color) =>
+			{
+				parameter[0] = color;
+				parameter[0] = firstToSecond.Invoke(null, parameter);
+				parameter[0] = secondToThird.Invoke(null, parameter);
+				return (TFirst)thirdToFirst.Invoke(null, parameter);
+			};
+
+			Func<TFirst, TFirst> roundtripClamped = (TFirst color) =>
+			{
+				parameter[0] = color;
+				parameter[0] = secondGetNearestValid((TSecond)firstToSecond.Invoke(null, parameter));
+				parameter[0] = thirdGetNearestValid((TThird)secondToThird.Invoke(null, parameter));
+				return (TFirst)thirdToFirst.Invoke(null, parameter);
+			};
+
+			Action<TFirst, TFirst, string> assertNearlyEqual = (TFirst initial, TFirst final, string message) =>
+			{
+				for (int i = 0; i < channelCount; ++i)
+				{
+					Assert.LessOrEqual(Mathf.Abs(indexer(initial, i) - indexer(final, i)), margin, string.Format(message, initial, final));
+				}
+			};
+
+			string roundtripMessage = string.Format("Roundtrip from {{0}} through {0} to {{1}}", GetColorTypeLabel(typeof(TSecond)));
+			foreach (var color in colors)
+			{
+				assertNearlyEqual(color, roundtrip(color), roundtripMessage);
+			}
+
+			string roundtripClampMessage = string.Format("Roundtrip from {{0}} through {0} with clamp to {{1}}", GetColorTypeLabel(typeof(TSecond)));
+			if (secondGetNearestValid != null && thirdGetNearestValid != null)
 			{
 				foreach (var color in colors)
 				{
@@ -312,6 +355,47 @@ namespace Experilous.MakeItColorful.Tests
 				CreateColorTestArray((float r, float g, float b, float a) => new Color(r, g, b, a), 100));
 		}
 
+		[Test]
+		public void Roundtrip_RGB_TwoStep_RGB()
+		{
+			var colors = CreateColorTestArray((float r, float g, float b, float a) => new Color(r, g, b, a), 100);
+
+			ValidateConversionRoundtrips<Color, ColorCMY, ColorCMYK>((Color color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<Color, ColorCMYK, ColorCMY>((Color color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<Color, ColorHSV, ColorHCV>((Color color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<Color, ColorHCV, ColorHSV>((Color color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<Color, ColorHSL, ColorHCL>((Color color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<Color, ColorHCL, ColorHSL>((Color color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<Color, ColorHSY, ColorHCY>((Color color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<Color, ColorHCY, ColorHSY>((Color color, int index) => color[index], 4, 0.0001f, colors);
+
+			ValidateConversionRoundtrips<Color, ColorHSV, ColorCMYK>((Color color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<Color, ColorCMYK, ColorHSV>((Color color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<Color, ColorHCV, ColorCMYK>((Color color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<Color, ColorCMYK, ColorHCV>((Color color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<Color, ColorHSL, ColorCMYK>((Color color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<Color, ColorCMYK, ColorHSL>((Color color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<Color, ColorHCL, ColorCMYK>((Color color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<Color, ColorCMYK, ColorHCL>((Color color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<Color, ColorHSY, ColorCMYK>((Color color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<Color, ColorCMYK, ColorHSY>((Color color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<Color, ColorHCY, ColorCMYK>((Color color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<Color, ColorCMYK, ColorHCY>((Color color, int index) => color[index], 4, 0.0001f, colors);
+
+			ValidateConversionRoundtrips<Color, ColorHSV, ColorHCL>((Color color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<Color, ColorHCV, ColorHSL>((Color color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<Color, ColorHSL, ColorHCV>((Color color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<Color, ColorHCL, ColorHSV>((Color color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<Color, ColorHSL, ColorHCY>((Color color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<Color, ColorHCL, ColorHSY>((Color color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<Color, ColorHSY, ColorHCL>((Color color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<Color, ColorHCY, ColorHSL>((Color color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<Color, ColorHSY, ColorHCV>((Color color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<Color, ColorHCY, ColorHSV>((Color color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<Color, ColorHSV, ColorHCY>((Color color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<Color, ColorHCV, ColorHSY>((Color color, int index) => color[index], 4, 0.0001f, colors);
+		}
+
 		#endregion
 
 		#region CMY Roundtrip
@@ -378,6 +462,47 @@ namespace Experilous.MakeItColorful.Tests
 			ValidateConversionRoundtrips<ColorCMY, ColorHCY>(
 				(ColorCMY color, int index) => color[index], 4, 0.0001f,
 				CreateColorTestArray((float c, float m, float y, float a) => new ColorCMY(c, m, y, a), 100));
+		}
+
+		[Test]
+		public void Roundtrip_CMY_TwoStep_CMY()
+		{
+			var colors = CreateColorTestArray((float c, float m, float y, float a) => new ColorCMY(c, m, y, a), 100);
+
+			ValidateConversionRoundtrips<ColorCMY, Color, ColorCMYK>((ColorCMY color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorCMY, ColorCMYK, Color>((ColorCMY color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorCMY, ColorHSV, ColorHCV>((ColorCMY color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorCMY, ColorHCV, ColorHSV>((ColorCMY color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorCMY, ColorHSL, ColorHCL>((ColorCMY color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorCMY, ColorHCL, ColorHSL>((ColorCMY color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorCMY, ColorHSY, ColorHCY>((ColorCMY color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorCMY, ColorHCY, ColorHSY>((ColorCMY color, int index) => color[index], 4, 0.0001f, colors);
+
+			ValidateConversionRoundtrips<ColorCMY, ColorHSV, ColorCMYK>((ColorCMY color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorCMY, ColorCMYK, ColorHSV>((ColorCMY color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorCMY, ColorHCV, ColorCMYK>((ColorCMY color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorCMY, ColorCMYK, ColorHCV>((ColorCMY color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorCMY, ColorHSL, ColorCMYK>((ColorCMY color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorCMY, ColorCMYK, ColorHSL>((ColorCMY color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorCMY, ColorHCL, ColorCMYK>((ColorCMY color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorCMY, ColorCMYK, ColorHCL>((ColorCMY color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorCMY, ColorHSY, ColorCMYK>((ColorCMY color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorCMY, ColorCMYK, ColorHSY>((ColorCMY color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorCMY, ColorHCY, ColorCMYK>((ColorCMY color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorCMY, ColorCMYK, ColorHCY>((ColorCMY color, int index) => color[index], 4, 0.0001f, colors);
+
+			ValidateConversionRoundtrips<ColorCMY, ColorHSV, ColorHCL>((ColorCMY color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorCMY, ColorHCV, ColorHSL>((ColorCMY color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorCMY, ColorHSL, ColorHCV>((ColorCMY color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorCMY, ColorHCL, ColorHSV>((ColorCMY color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorCMY, ColorHSL, ColorHCY>((ColorCMY color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorCMY, ColorHCL, ColorHSY>((ColorCMY color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorCMY, ColorHSY, ColorHCL>((ColorCMY color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorCMY, ColorHCY, ColorHSL>((ColorCMY color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorCMY, ColorHSY, ColorHCV>((ColorCMY color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorCMY, ColorHCY, ColorHSV>((ColorCMY color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorCMY, ColorHSV, ColorHCY>((ColorCMY color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorCMY, ColorHCV, ColorHSY>((ColorCMY color, int index) => color[index], 4, 0.0001f, colors);
 		}
 
 		#endregion
@@ -448,6 +573,47 @@ namespace Experilous.MakeItColorful.Tests
 				CreateColorTestArray((float c, float m, float y, float k, float a) => new ColorCMYK(c, m, y, k, a).GetCanonical(), 100));
 		}
 
+		[Test]
+		public void Roundtrip_CMYK_TwoStep_CMYK()
+		{
+			var colors = CreateColorTestArray((float c, float m, float y, float k, float a) => new ColorCMYK(c, m, y, k, a).GetCanonical(), 100);
+
+			ValidateConversionRoundtrips<ColorCMYK, Color, ColorCMY>((ColorCMYK color, int index) => color[index], 5, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorCMYK, ColorCMY, Color>((ColorCMYK color, int index) => color[index], 5, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorCMYK, ColorHSV, ColorHCV>((ColorCMYK color, int index) => color[index], 5, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorCMYK, ColorHCV, ColorHSV>((ColorCMYK color, int index) => color[index], 5, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorCMYK, ColorHSL, ColorHCL>((ColorCMYK color, int index) => color[index], 5, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorCMYK, ColorHCL, ColorHSL>((ColorCMYK color, int index) => color[index], 5, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorCMYK, ColorHSY, ColorHCY>((ColorCMYK color, int index) => color[index], 5, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorCMYK, ColorHCY, ColorHSY>((ColorCMYK color, int index) => color[index], 5, 0.0001f, colors);
+
+			ValidateConversionRoundtrips<ColorCMYK, ColorHSV, ColorCMY>((ColorCMYK color, int index) => color[index], 5, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorCMYK, ColorCMY, ColorHSV>((ColorCMYK color, int index) => color[index], 5, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorCMYK, ColorHCV, ColorCMY>((ColorCMYK color, int index) => color[index], 5, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorCMYK, ColorCMY, ColorHCV>((ColorCMYK color, int index) => color[index], 5, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorCMYK, ColorHSL, ColorCMY>((ColorCMYK color, int index) => color[index], 5, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorCMYK, ColorCMY, ColorHSL>((ColorCMYK color, int index) => color[index], 5, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorCMYK, ColorHCL, ColorCMY>((ColorCMYK color, int index) => color[index], 5, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorCMYK, ColorCMY, ColorHCL>((ColorCMYK color, int index) => color[index], 5, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorCMYK, ColorHSY, ColorCMY>((ColorCMYK color, int index) => color[index], 5, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorCMYK, ColorCMY, ColorHSY>((ColorCMYK color, int index) => color[index], 5, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorCMYK, ColorHCY, ColorCMY>((ColorCMYK color, int index) => color[index], 5, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorCMYK, ColorCMY, ColorHCY>((ColorCMYK color, int index) => color[index], 5, 0.0001f, colors);
+
+			ValidateConversionRoundtrips<ColorCMYK, ColorHSV, ColorHCL>((ColorCMYK color, int index) => color[index], 5, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorCMYK, ColorHCV, ColorHSL>((ColorCMYK color, int index) => color[index], 5, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorCMYK, ColorHSL, ColorHCV>((ColorCMYK color, int index) => color[index], 5, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorCMYK, ColorHCL, ColorHSV>((ColorCMYK color, int index) => color[index], 5, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorCMYK, ColorHSL, ColorHCY>((ColorCMYK color, int index) => color[index], 5, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorCMYK, ColorHCL, ColorHSY>((ColorCMYK color, int index) => color[index], 5, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorCMYK, ColorHSY, ColorHCL>((ColorCMYK color, int index) => color[index], 5, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorCMYK, ColorHCY, ColorHSL>((ColorCMYK color, int index) => color[index], 5, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorCMYK, ColorHSY, ColorHCV>((ColorCMYK color, int index) => color[index], 5, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorCMYK, ColorHCY, ColorHSV>((ColorCMYK color, int index) => color[index], 5, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorCMYK, ColorHSV, ColorHCY>((ColorCMYK color, int index) => color[index], 5, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorCMYK, ColorHCV, ColorHSY>((ColorCMYK color, int index) => color[index], 5, 0.0001f, colors);
+		}
+
 		#endregion
 
 		#region HSV Roundtrip
@@ -457,7 +623,7 @@ namespace Experilous.MakeItColorful.Tests
 		{
 			ValidateConversionRoundtrips<ColorHSV, Color>(
 				(ColorHSV color, int index) => color[index], 4, 0.0001f,
-				CreateColorTestArray((float h, float s, float l, float a) => new ColorHSV((s > 0f && l > 0f) ? h : 0f, l > 0f ? s : 0f, l, a).GetNearestValid(), 100));
+				CreateColorTestArray((float h, float s, float v, float a) => new ColorHSV((s > 0f && v > 0f) ? h : 0f, v > 0f ? s : 0f, v, a).GetNearestValid(), 100));
 		}
 
 		[Test]
@@ -465,7 +631,7 @@ namespace Experilous.MakeItColorful.Tests
 		{
 			ValidateConversionRoundtrips<ColorHSV, ColorCMY>(
 				(ColorHSV color, int index) => color[index], 4, 0.0001f,
-				CreateColorTestArray((float h, float s, float l, float a) => new ColorHSV((s > 0f && l > 0f) ? h : 0f, l > 0f ? s : 0f, l, a).GetNearestValid(), 100));
+				CreateColorTestArray((float h, float s, float v, float a) => new ColorHSV((s > 0f && v > 0f) ? h : 0f, v > 0f ? s : 0f, v, a).GetNearestValid(), 100));
 		}
 
 		[Test]
@@ -473,7 +639,7 @@ namespace Experilous.MakeItColorful.Tests
 		{
 			ValidateConversionRoundtrips<ColorHSV, ColorCMYK>(
 				(ColorHSV color, int index) => color[index], 4, 0.0001f,
-				CreateColorTestArray((float h, float s, float l, float a) => new ColorHSV((s > 0f && l > 0f) ? h : 0f, l > 0f ? s : 0f, l, a).GetNearestValid(), 100));
+				CreateColorTestArray((float h, float s, float v, float a) => new ColorHSV((s > 0f && v > 0f) ? h : 0f, v > 0f ? s : 0f, v, a).GetNearestValid(), 100));
 		}
 
 		[Test]
@@ -481,7 +647,7 @@ namespace Experilous.MakeItColorful.Tests
 		{
 			ValidateConversionRoundtrips<ColorHSV, ColorHCV>(
 				(ColorHSV color, int index) => color[index], 4, 0.0001f,
-				CreateColorTestArray((float h, float s, float l, float a) => new ColorHSV(h, l > 0f ? s : 0f, l, a).GetNearestValid(), 100));
+				CreateColorTestArray((float h, float s, float v, float a) => new ColorHSV(h, v > 0f ? s : 0f, v, a).GetNearestValid(), 100));
 		}
 
 		[Test]
@@ -489,7 +655,7 @@ namespace Experilous.MakeItColorful.Tests
 		{
 			ValidateConversionRoundtrips<ColorHSV, ColorHSL>(
 				(ColorHSV color, int index) => color[index], 4, 0.0001f,
-				CreateColorTestArray((float h, float s, float l, float a) => new ColorHSV(h, l > 0f ? s : 0f, l, a).GetNearestValid(), 100));
+				CreateColorTestArray((float h, float s, float v, float a) => new ColorHSV(h, v > 0f ? s : 0f, v, a).GetNearestValid(), 100));
 		}
 
 		[Test]
@@ -497,7 +663,7 @@ namespace Experilous.MakeItColorful.Tests
 		{
 			ValidateConversionRoundtrips<ColorHSV, ColorHCL>(
 				(ColorHSV color, int index) => color[index], 4, 0.0001f,
-				CreateColorTestArray((float h, float s, float l, float a) => new ColorHSV(h, l > 0f ? s : 0f, l, a).GetNearestValid(), 100));
+				CreateColorTestArray((float h, float s, float v, float a) => new ColorHSV(h, v > 0f ? s : 0f, v, a).GetNearestValid(), 100));
 		}
 
 		[Test]
@@ -505,7 +671,7 @@ namespace Experilous.MakeItColorful.Tests
 		{
 			ValidateConversionRoundtrips<ColorHSV, ColorHSY>(
 				(ColorHSV color, int index) => color[index], 4, 0.0001f,
-				CreateColorTestArray((float h, float s, float l, float a) => new ColorHSV(h, l > 0f ? s : 0f, l, a).GetNearestValid(), 100));
+				CreateColorTestArray((float h, float s, float v, float a) => new ColorHSV(h, v > 0f ? s : 0f, v, a).GetNearestValid(), 100));
 		}
 
 		[Test]
@@ -513,7 +679,48 @@ namespace Experilous.MakeItColorful.Tests
 		{
 			ValidateConversionRoundtrips<ColorHSV, ColorHCY>(
 				(ColorHSV color, int index) => color[index], 4, 0.0001f,
-				CreateColorTestArray((float h, float s, float l, float a) => new ColorHSV(h, l > 0f ? s : 0f, l, a).GetNearestValid(), 100));
+				CreateColorTestArray((float h, float s, float v, float a) => new ColorHSV(h, v > 0f ? s : 0f, v, a).GetNearestValid(), 100));
+		}
+
+		[Test]
+		public void Roundtrip_HSV_TwoStep_HSV()
+		{
+			var colors = CreateColorTestArray((float h, float s, float v, float a) => new ColorHSV(h, s, v, a).GetCanonical(), 100);
+
+			ValidateConversionRoundtrips<ColorHSV, Color, ColorCMY>((ColorHSV color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorHSV, ColorCMY, Color>((ColorHSV color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorHSV, Color, ColorHCV>((ColorHSV color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorHSV, ColorHCV, Color>((ColorHSV color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorHSV, ColorHSL, ColorHCL>((ColorHSV color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorHSV, ColorHCL, ColorHSL>((ColorHSV color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorHSV, ColorHSY, ColorHCY>((ColorHSV color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorHSV, ColorHCY, ColorHSY>((ColorHSV color, int index) => color[index], 4, 0.0001f, colors);
+
+			ValidateConversionRoundtrips<ColorHSV, Color, ColorCMY>((ColorHSV color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorHSV, ColorCMY, Color>((ColorHSV color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorHSV, ColorHCV, ColorCMY>((ColorHSV color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorHSV, ColorCMY, ColorHCV>((ColorHSV color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorHSV, ColorHSL, ColorCMY>((ColorHSV color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorHSV, ColorCMY, ColorHSL>((ColorHSV color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorHSV, ColorHCL, ColorCMY>((ColorHSV color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorHSV, ColorCMY, ColorHCL>((ColorHSV color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorHSV, ColorHSY, ColorCMY>((ColorHSV color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorHSV, ColorCMY, ColorHSY>((ColorHSV color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorHSV, ColorHCY, ColorCMY>((ColorHSV color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorHSV, ColorCMY, ColorHCY>((ColorHSV color, int index) => color[index], 4, 0.0001f, colors);
+
+			ValidateConversionRoundtrips<ColorHSV, Color, ColorHCL>((ColorHSV color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorHSV, ColorHCV, ColorHSL>((ColorHSV color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorHSV, ColorHSL, ColorHCV>((ColorHSV color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorHSV, ColorHCL, Color>((ColorHSV color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorHSV, ColorHSL, ColorHCY>((ColorHSV color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorHSV, ColorHCL, ColorHSY>((ColorHSV color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorHSV, ColorHSY, ColorHCL>((ColorHSV color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorHSV, ColorHCY, ColorHSL>((ColorHSV color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorHSV, ColorHSY, ColorHCV>((ColorHSV color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorHSV, ColorHCY, Color>((ColorHSV color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorHSV, Color, ColorHCY>((ColorHSV color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorHSV, ColorHCV, ColorHSY>((ColorHSV color, int index) => color[index], 4, 0.0001f, colors);
 		}
 
 		#endregion
@@ -525,7 +732,7 @@ namespace Experilous.MakeItColorful.Tests
 		{
 			ValidateConversionRoundtrips<ColorHCV, Color>(
 				(ColorHCV color, int index) => color[index], 4, 0.0001f,
-				CreateColorTestArray((float h, float c, float l, float a) => new ColorHCV(c > 0f ? h : 0f, c, l, a).GetNearestValid(), 100));
+				CreateColorTestArray((float h, float c, float v, float a) => new ColorHCV(c > 0f ? h : 0f, c, v, a).GetNearestValid(), 100));
 		}
 
 		[Test]
@@ -533,7 +740,7 @@ namespace Experilous.MakeItColorful.Tests
 		{
 			ValidateConversionRoundtrips<ColorHCV, ColorCMY>(
 				(ColorHCV color, int index) => color[index], 4, 0.0001f,
-				CreateColorTestArray((float h, float c, float l, float a) => new ColorHCV(c > 0f ? h : 0f, c, l, a).GetNearestValid(), 100));
+				CreateColorTestArray((float h, float c, float v, float a) => new ColorHCV(c > 0f ? h : 0f, c, v, a).GetNearestValid(), 100));
 		}
 
 		[Test]
@@ -541,7 +748,7 @@ namespace Experilous.MakeItColorful.Tests
 		{
 			ValidateConversionRoundtrips<ColorHCV, ColorCMYK>(
 				(ColorHCV color, int index) => color[index], 4, 0.0001f,
-				CreateColorTestArray((float h, float c, float l, float a) => new ColorHCV(c > 0f ? h : 0f, c, l, a).GetNearestValid(), 100));
+				CreateColorTestArray((float h, float c, float v, float a) => new ColorHCV(c > 0f ? h : 0f, c, v, a).GetNearestValid(), 100));
 		}
 
 		[Test]
@@ -549,7 +756,7 @@ namespace Experilous.MakeItColorful.Tests
 		{
 			ValidateConversionRoundtrips<ColorHCV, ColorHSV>(
 				(ColorHCV color, int index) => color[index], 4, 0.0001f,
-				CreateColorTestArray((float h, float c, float l, float a) => new ColorHCV(h, c, l, a).GetNearestValid(), 100));
+				CreateColorTestArray((float h, float c, float v, float a) => new ColorHCV(h, c, v, a).GetNearestValid(), 100));
 		}
 
 		[Test]
@@ -557,7 +764,7 @@ namespace Experilous.MakeItColorful.Tests
 		{
 			ValidateConversionRoundtrips<ColorHCV, ColorHSL>(
 				(ColorHCV color, int index) => color[index], 4, 0.0001f,
-				CreateColorTestArray((float h, float c, float l, float a) => new ColorHCV(h, c, l, a).GetNearestValid(), 100));
+				CreateColorTestArray((float h, float c, float v, float a) => new ColorHCV(h, c, v, a).GetNearestValid(), 100));
 		}
 
 		[Test]
@@ -565,7 +772,7 @@ namespace Experilous.MakeItColorful.Tests
 		{
 			ValidateConversionRoundtrips<ColorHCV, ColorHCL>(
 				(ColorHCV color, int index) => color[index], 4, 0.0001f,
-				CreateColorTestArray((float h, float c, float l, float a) => new ColorHCV(h, c, l, a).GetNearestValid(), 100));
+				CreateColorTestArray((float h, float c, float v, float a) => new ColorHCV(h, c, v, a).GetNearestValid(), 100));
 		}
 
 		[Test]
@@ -573,7 +780,7 @@ namespace Experilous.MakeItColorful.Tests
 		{
 			ValidateConversionRoundtrips<ColorHCV, ColorHSY>(
 				(ColorHCV color, int index) => color[index], 4, 0.0001f,
-				CreateColorTestArray((float h, float c, float l, float a) => new ColorHCV(h, c, l, a).GetNearestValid(), 100));
+				CreateColorTestArray((float h, float c, float v, float a) => new ColorHCV(h, c, v, a).GetNearestValid(), 100));
 		}
 
 		[Test]
@@ -581,7 +788,48 @@ namespace Experilous.MakeItColorful.Tests
 		{
 			ValidateConversionRoundtrips<ColorHCV, ColorHCY>(
 				(ColorHCV color, int index) => color[index], 4, 0.0001f,
-				CreateColorTestArray((float h, float c, float l, float a) => new ColorHCV(h, c, l, a).GetNearestValid(), 100));
+				CreateColorTestArray((float h, float c, float v, float a) => new ColorHCV(h, c, v, a).GetNearestValid(), 100));
+		}
+
+		[Test]
+		public void Roundtrip_HCV_TwoStep_HCV()
+		{
+			var colors = CreateColorTestArray((float h, float c, float v, float a) => new ColorHCV(h, c, v, a).GetNearestValid().GetCanonical(), 100);
+
+			ValidateConversionRoundtrips<ColorHCV, ColorHSV, ColorCMY>((ColorHCV color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorHCV, ColorCMY, ColorHSV>((ColorHCV color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorHCV, ColorHSV, Color>((ColorHCV color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorHCV, Color, ColorHSV>((ColorHCV color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorHCV, ColorHSL, ColorHCL>((ColorHCV color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorHCV, ColorHCL, ColorHSL>((ColorHCV color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorHCV, ColorHSY, ColorHCY>((ColorHCV color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorHCV, ColorHCY, ColorHSY>((ColorHCV color, int index) => color[index], 4, 0.0001f, colors);
+
+			ValidateConversionRoundtrips<ColorHCV, ColorHSV, ColorCMY>((ColorHCV color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorHCV, ColorCMY, ColorHSV>((ColorHCV color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorHCV, Color, ColorCMY>((ColorHCV color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorHCV, ColorCMY, Color>((ColorHCV color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorHCV, ColorHSL, ColorCMY>((ColorHCV color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorHCV, ColorCMY, ColorHSL>((ColorHCV color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorHCV, ColorHCL, ColorCMY>((ColorHCV color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorHCV, ColorCMY, ColorHCL>((ColorHCV color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorHCV, ColorHSY, ColorCMY>((ColorHCV color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorHCV, ColorCMY, ColorHSY>((ColorHCV color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorHCV, ColorHCY, ColorCMY>((ColorHCV color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorHCV, ColorCMY, ColorHCY>((ColorHCV color, int index) => color[index], 4, 0.0001f, colors);
+
+			ValidateConversionRoundtrips<ColorHCV, ColorHSV, ColorHCL>((ColorHCV color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorHCV, Color, ColorHSL>((ColorHCV color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorHCV, ColorHSL, Color>((ColorHCV color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorHCV, ColorHCL, ColorHSV>((ColorHCV color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorHCV, ColorHSL, ColorHCY>((ColorHCV color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorHCV, ColorHCL, ColorHSY>((ColorHCV color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorHCV, ColorHSY, ColorHCL>((ColorHCV color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorHCV, ColorHCY, ColorHSL>((ColorHCV color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorHCV, ColorHSY, Color>((ColorHCV color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorHCV, ColorHCY, ColorHSV>((ColorHCV color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorHCV, ColorHSV, ColorHCY>((ColorHCV color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorHCV, Color, ColorHSY>((ColorHCV color, int index) => color[index], 4, 0.0001f, colors);
 		}
 
 		#endregion
@@ -652,6 +900,47 @@ namespace Experilous.MakeItColorful.Tests
 				CreateColorTestArray((float h, float s, float l, float a) => new ColorHSL(h, s, l, a).GetNearestValid().GetCanonical(), 100));
 		}
 
+		[Test]
+		public void Roundtrip_HSL_TwoStep_HSL()
+		{
+			var colors = CreateColorTestArray((float h, float s, float l, float a) => new ColorHSL(h, s, l, a).GetCanonical(), 100);
+
+			ValidateConversionRoundtrips<ColorHSL, ColorHSV, ColorCMY>((ColorHSL color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorHSL, ColorCMY, ColorHSV>((ColorHSL color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorHSL, ColorHSV, ColorHCV>((ColorHSL color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorHSL, ColorHCV, ColorHSV>((ColorHSL color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorHSL, Color, ColorHCL>((ColorHSL color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorHSL, ColorHCL, Color>((ColorHSL color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorHSL, ColorHSY, ColorHCY>((ColorHSL color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorHSL, ColorHCY, ColorHSY>((ColorHSL color, int index) => color[index], 4, 0.0001f, colors);
+
+			ValidateConversionRoundtrips<ColorHSL, ColorHSV, ColorCMY>((ColorHSL color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorHSL, ColorCMY, ColorHSV>((ColorHSL color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorHSL, ColorHCV, ColorCMY>((ColorHSL color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorHSL, ColorCMY, ColorHCV>((ColorHSL color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorHSL, Color, ColorCMY>((ColorHSL color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorHSL, ColorCMY, Color>((ColorHSL color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorHSL, ColorHCL, ColorCMY>((ColorHSL color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorHSL, ColorCMY, ColorHCL>((ColorHSL color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorHSL, ColorHSY, ColorCMY>((ColorHSL color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorHSL, ColorCMY, ColorHSY>((ColorHSL color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorHSL, ColorHCY, ColorCMY>((ColorHSL color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorHSL, ColorCMY, ColorHCY>((ColorHSL color, int index) => color[index], 4, 0.0001f, colors);
+
+			ValidateConversionRoundtrips<ColorHSL, ColorHSV, ColorHCL>((ColorHSL color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorHSL, ColorHCV, Color>((ColorHSL color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorHSL, Color, ColorHCV>((ColorHSL color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorHSL, ColorHCL, ColorHSV>((ColorHSL color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorHSL, Color, ColorHCY>((ColorHSL color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorHSL, ColorHCL, ColorHSY>((ColorHSL color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorHSL, ColorHSY, ColorHCL>((ColorHSL color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorHSL, ColorHCY, Color>((ColorHSL color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorHSL, ColorHSY, ColorHCV>((ColorHSL color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorHSL, ColorHCY, ColorHSV>((ColorHSL color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorHSL, ColorHSV, ColorHCY>((ColorHSL color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorHSL, ColorHCV, ColorHSY>((ColorHSL color, int index) => color[index], 4, 0.0001f, colors);
+		}
+
 		#endregion
 
 		#region HCL Roundtrip
@@ -718,6 +1007,47 @@ namespace Experilous.MakeItColorful.Tests
 			ValidateConversionRoundtrips<ColorHCL, ColorHCY>(
 				(ColorHCL color, int index) => color[index], 4, 0.0001f,
 				CreateColorTestArray((float h, float c, float l, float a) => new ColorHCL(h, c, l, a).GetNearestValid(), 100));
+		}
+
+		[Test]
+		public void Roundtrip_HCL_TwoStep_HCL()
+		{
+			var colors = CreateColorTestArray((float h, float c, float l, float a) => new ColorHCL(h, c, l, a).GetNearestValid().GetCanonical(), 100);
+
+			ValidateConversionRoundtrips<ColorHCL, ColorHSV, ColorCMY>((ColorHCL color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorHCL, ColorCMY, ColorHSV>((ColorHCL color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorHCL, ColorHSV, ColorHCV>((ColorHCL color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorHCL, ColorHCV, ColorHSV>((ColorHCL color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorHCL, ColorHSL, Color>((ColorHCL color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorHCL, Color, ColorHSL>((ColorHCL color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorHCL, ColorHSY, ColorHCY>((ColorHCL color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorHCL, ColorHCY, ColorHSY>((ColorHCL color, int index) => color[index], 4, 0.0001f, colors);
+
+			ValidateConversionRoundtrips<ColorHCL, ColorHSV, ColorCMY>((ColorHCL color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorHCL, ColorCMY, ColorHSV>((ColorHCL color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorHCL, ColorHCV, ColorCMY>((ColorHCL color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorHCL, ColorCMY, ColorHCV>((ColorHCL color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorHCL, ColorHSL, ColorCMY>((ColorHCL color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorHCL, ColorCMY, ColorHSL>((ColorHCL color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorHCL, Color, ColorCMY>((ColorHCL color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorHCL, ColorCMY, Color>((ColorHCL color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorHCL, ColorHSY, ColorCMY>((ColorHCL color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorHCL, ColorCMY, ColorHSY>((ColorHCL color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorHCL, ColorHCY, ColorCMY>((ColorHCL color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorHCL, ColorCMY, ColorHCY>((ColorHCL color, int index) => color[index], 4, 0.0001f, colors);
+
+			ValidateConversionRoundtrips<ColorHCL, ColorHSV, Color>((ColorHCL color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorHCL, ColorHCV, ColorHSL>((ColorHCL color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorHCL, ColorHSL, ColorHCV>((ColorHCL color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorHCL, Color, ColorHSV>((ColorHCL color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorHCL, ColorHSL, ColorHCY>((ColorHCL color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorHCL, Color, ColorHSY>((ColorHCL color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorHCL, ColorHSY, Color>((ColorHCL color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorHCL, ColorHCY, ColorHSL>((ColorHCL color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorHCL, ColorHSY, ColorHCV>((ColorHCL color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorHCL, ColorHCY, ColorHSV>((ColorHCL color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorHCL, ColorHSV, ColorHCY>((ColorHCL color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorHCL, ColorHCV, ColorHSY>((ColorHCL color, int index) => color[index], 4, 0.0001f, colors);
 		}
 
 		#endregion
@@ -788,6 +1118,47 @@ namespace Experilous.MakeItColorful.Tests
 				CreateColorTestArray((float h, float s, float y, float a) => new ColorHSY(h, (y > 0f && y < 1f) ? s : 0f, y, a).GetNearestValid(), 100));
 		}
 
+		[Test]
+		public void Roundtrip_HSY_TwoStep_HSY()
+		{
+			var colors = CreateColorTestArray((float h, float s, float y, float a) => new ColorHSY(h, s, y, a).GetCanonical(), 100);
+
+			ValidateConversionRoundtrips<ColorHSY, ColorHSV, ColorCMY>((ColorHSY color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorHSY, ColorCMY, ColorHSV>((ColorHSY color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorHSY, ColorHSV, ColorHCV>((ColorHSY color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorHSY, ColorHCV, ColorHSV>((ColorHSY color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorHSY, ColorHSL, ColorHCL>((ColorHSY color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorHSY, ColorHCL, ColorHSL>((ColorHSY color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorHSY, Color, ColorHCY>((ColorHSY color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorHSY, ColorHCY, Color>((ColorHSY color, int index) => color[index], 4, 0.0001f, colors);
+
+			ValidateConversionRoundtrips<ColorHSY, ColorHSV, ColorCMY>((ColorHSY color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorHSY, ColorCMY, ColorHSV>((ColorHSY color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorHSY, ColorHCV, ColorCMY>((ColorHSY color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorHSY, ColorCMY, ColorHCV>((ColorHSY color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorHSY, ColorHSL, ColorCMY>((ColorHSY color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorHSY, ColorCMY, ColorHSL>((ColorHSY color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorHSY, ColorHCL, ColorCMY>((ColorHSY color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorHSY, ColorCMY, ColorHCL>((ColorHSY color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorHSY, Color, ColorCMY>((ColorHSY color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorHSY, ColorCMY, Color>((ColorHSY color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorHSY, ColorHCY, ColorCMY>((ColorHSY color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorHSY, ColorCMY, ColorHCY>((ColorHSY color, int index) => color[index], 4, 0.0001f, colors);
+
+			ValidateConversionRoundtrips<ColorHSY, ColorHSV, ColorHCL>((ColorHSY color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorHSY, ColorHCV, ColorHSL>((ColorHSY color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorHSY, ColorHSL, ColorHCV>((ColorHSY color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorHSY, ColorHCL, ColorHSV>((ColorHSY color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorHSY, ColorHSL, ColorHCY>((ColorHSY color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorHSY, ColorHCL, Color>((ColorHSY color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorHSY, Color, ColorHCL>((ColorHSY color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorHSY, ColorHCY, ColorHSL>((ColorHSY color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorHSY, Color, ColorHCV>((ColorHSY color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorHSY, ColorHCY, ColorHSV>((ColorHSY color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorHSY, ColorHSV, ColorHCY>((ColorHSY color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorHSY, ColorHCV, Color>((ColorHSY color, int index) => color[index], 4, 0.0001f, colors);
+		}
+
 		#endregion
 
 		#region HCY Roundtrip
@@ -854,6 +1225,47 @@ namespace Experilous.MakeItColorful.Tests
 			ValidateConversionRoundtrips<ColorHCY, ColorHSY>(
 				(ColorHCY color, int index) => color[index], 4, 0.0001f,
 				CreateColorTestArray((float h, float c, float y, float a) => new ColorHCY(h, c, y, a).GetNearestValid(), 100));
+		}
+
+		[Test]
+		public void Roundtrip_HCY_TwoStep_HCY()
+		{
+			var colors = CreateColorTestArray((float h, float c, float y, float a) => new ColorHCY(h, c, y, a).GetNearestValid().GetCanonical(), 100);
+
+			ValidateConversionRoundtrips<ColorHCY, ColorHSV, ColorCMY>((ColorHCY color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorHCY, ColorCMY, ColorHSV>((ColorHCY color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorHCY, ColorHSV, ColorHCV>((ColorHCY color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorHCY, ColorHCV, ColorHSV>((ColorHCY color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorHCY, ColorHSL, ColorHCL>((ColorHCY color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorHCY, ColorHCL, ColorHSL>((ColorHCY color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorHCY, ColorHSY, Color>((ColorHCY color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorHCY, Color, ColorHSY>((ColorHCY color, int index) => color[index], 4, 0.0001f, colors);
+
+			ValidateConversionRoundtrips<ColorHCY, ColorHSV, ColorCMY>((ColorHCY color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorHCY, ColorCMY, ColorHSV>((ColorHCY color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorHCY, ColorHCV, ColorCMY>((ColorHCY color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorHCY, ColorCMY, ColorHCV>((ColorHCY color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorHCY, ColorHSL, ColorCMY>((ColorHCY color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorHCY, ColorCMY, ColorHSL>((ColorHCY color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorHCY, ColorHCL, ColorCMY>((ColorHCY color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorHCY, ColorCMY, ColorHCL>((ColorHCY color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorHCY, ColorHSY, ColorCMY>((ColorHCY color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorHCY, ColorCMY, ColorHSY>((ColorHCY color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorHCY, Color, ColorCMY>((ColorHCY color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorHCY, ColorCMY, Color>((ColorHCY color, int index) => color[index], 4, 0.0001f, colors);
+
+			ValidateConversionRoundtrips<ColorHCY, ColorHSV, ColorHCL>((ColorHCY color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorHCY, ColorHCV, ColorHSL>((ColorHCY color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorHCY, ColorHSL, ColorHCV>((ColorHCY color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorHCY, ColorHCL, ColorHSV>((ColorHCY color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorHCY, ColorHSL, Color>((ColorHCY color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorHCY, ColorHCL, ColorHSY>((ColorHCY color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorHCY, ColorHSY, ColorHCL>((ColorHCY color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorHCY, Color, ColorHSL>((ColorHCY color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorHCY, ColorHSY, ColorHCV>((ColorHCY color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorHCY, Color, ColorHSV>((ColorHCY color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorHCY, ColorHSV, Color>((ColorHCY color, int index) => color[index], 4, 0.0001f, colors);
+			ValidateConversionRoundtrips<ColorHCY, ColorHCV, ColorHSY>((ColorHCY color, int index) => color[index], 4, 0.0001f, colors);
 		}
 
 		#endregion
