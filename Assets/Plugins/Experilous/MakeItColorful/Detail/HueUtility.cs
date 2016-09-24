@@ -238,7 +238,7 @@ namespace Experilous.MakeItColorful.Detail
 		public static float LerpUnclamped(float a, float b, float t)
 		{
 			a = Mathf.Repeat(a, 1f);
-			b = Mathf.Repeat(a, 1f);
+			b = Mathf.Repeat(b, 1f);
 			float delta = Mathf.Abs(b - a);
 			if (delta < 0.5f)
 			{
@@ -271,7 +271,7 @@ namespace Experilous.MakeItColorful.Detail
 		public static float LerpForwardUnclamped(float a, float b, float t)
 		{
 			a = Mathf.Repeat(a, 1f);
-			b = Mathf.Repeat(a, 1f);
+			b = Mathf.Repeat(b, 1f);
 			if (a <= b)
 			{
 				return Numerics.Math.LerpUnclamped(a, b, t);
@@ -285,7 +285,7 @@ namespace Experilous.MakeItColorful.Detail
 		public static float LerpBackwardUnclamped(float a, float b, float t)
 		{
 			a = Mathf.Repeat(a, 1f);
-			b = Mathf.Repeat(a, 1f);
+			b = Mathf.Repeat(b, 1f);
 			if (a >= b)
 			{
 				return Numerics.Math.LerpUnclamped(a, b, t);
