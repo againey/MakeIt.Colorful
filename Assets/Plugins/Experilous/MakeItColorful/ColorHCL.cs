@@ -130,7 +130,7 @@ namespace Experilous.MakeItColorful
 		public static explicit operator Color(ColorHCL hcl)
 		{
 			float min = hcl.l - hcl.c * 0.5f;
-			return (hcl.c > 0f) ? Detail.HueUtility.ToRGB(hcl.h, hcl.c, min, hcl.a) : new Color(min, min, min, hcl.a);
+			return (hcl.c > 0f) ? Detail.HueUtility.ToRGB(Mathf.Repeat(hcl.h, 1f), hcl.c, min, hcl.a) : new Color(min, min, min, hcl.a);
 		}
 
 		#endregion
@@ -449,7 +449,7 @@ namespace Experilous.MakeItColorful
 			if (c > 0f)
 			{
 				float r, g, b;
-				Detail.HueUtility.ToRGB(h, c, out r, out g, out b);
+				Detail.HueUtility.ToRGB(Mathf.Repeat(h, 1), c, out r, out g, out b);
 
 				float min = y - Detail.LumaUtility.FromRGB(r, g, b);
 
@@ -509,7 +509,7 @@ namespace Experilous.MakeItColorful
 			if (c > 0f)
 			{
 				float r, g, b;
-				Detail.HueUtility.ToRGB(h, c, out r, out g, out b);
+				Detail.HueUtility.ToRGB(Mathf.Repeat(h, 1), c, out r, out g, out b);
 
 				float min = y - Detail.LumaUtility.FromRGB(r, g, b);
 

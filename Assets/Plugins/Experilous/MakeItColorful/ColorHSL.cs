@@ -133,7 +133,7 @@ namespace Experilous.MakeItColorful
 		{
 			float c = Detail.LightnessUtility.GetChroma(hsl.s, hsl.l);
 			float min = hsl.l - c * 0.5f;
-			return (c > 0f) ? Detail.HueUtility.ToRGB(hsl.h, c, min, hsl.a) : new Color(min, min, min, hsl.a);
+			return (c > 0f) ? Detail.HueUtility.ToRGB(Mathf.Repeat(hsl.h, 1f), c, min, hsl.a) : new Color(min, min, min, hsl.a);
 		}
 
 		#endregion
@@ -458,7 +458,7 @@ namespace Experilous.MakeItColorful
 			if (c > 0f)
 			{
 				float r, g, b;
-				Detail.HueUtility.ToRGB(h, c, out r, out g, out b);
+				Detail.HueUtility.ToRGB(Mathf.Repeat(h, 1), c, out r, out g, out b);
 
 				float min = y - Detail.LumaUtility.FromRGB(r, g, b);
 				float max = c + min;
@@ -520,7 +520,7 @@ namespace Experilous.MakeItColorful
 			if (c > 0f)
 			{
 				float r, g, b;
-				Detail.HueUtility.ToRGB(h, c, out r, out g, out b);
+				Detail.HueUtility.ToRGB(Mathf.Repeat(h, 1), c, out r, out g, out b);
 
 				float min = y - Detail.LumaUtility.FromRGB(r, g, b);
 				float max = c + min;

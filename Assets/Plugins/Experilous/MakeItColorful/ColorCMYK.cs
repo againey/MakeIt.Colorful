@@ -245,7 +245,7 @@ namespace Experilous.MakeItColorful
 		{
 			float c = Detail.ValueUtility.GetChroma(s, v);
 			float min = v - c;
-			return (c > 0f) ? (ColorCMYK)Detail.HueUtility.ToRGB(h, c, min, a) : new ColorCMYK(0f, 0f, 0f, 1f - min, a);
+			return (c > 0f) ? (ColorCMYK)Detail.HueUtility.ToRGB(Mathf.Repeat(h, 1), c, min, a) : new ColorCMYK(0f, 0f, 0f, 1f - min, a);
 		}
 
 		#endregion
@@ -294,7 +294,7 @@ namespace Experilous.MakeItColorful
 		public static ColorCMYK FromHCV(float h, float c, float v, float a)
 		{
 			float min = v - c;
-			return (c > 0f) ? (ColorCMYK)Detail.HueUtility.ToRGB(h, c, min, a) : new ColorCMYK(0f, 0f, 0f, 1f - min, a);
+			return (c > 0f) ? (ColorCMYK)Detail.HueUtility.ToRGB(Mathf.Repeat(h, 1), c, min, a) : new ColorCMYK(0f, 0f, 0f, 1f - min, a);
 		}
 
 		#endregion
@@ -344,7 +344,7 @@ namespace Experilous.MakeItColorful
 		{
 			float c = Detail.LightnessUtility.GetChroma(s, l);
 			float min = l - c * 0.5f;
-			return (c > 0f) ? (ColorCMYK)Detail.HueUtility.ToRGB(h, c, min, a) : new ColorCMYK(0f, 0f, 0f, 1f - min, a);
+			return (c > 0f) ? (ColorCMYK)Detail.HueUtility.ToRGB(Mathf.Repeat(h, 1), c, min, a) : new ColorCMYK(0f, 0f, 0f, 1f - min, a);
 		}
 
 		#endregion
@@ -393,7 +393,7 @@ namespace Experilous.MakeItColorful
 		public static ColorCMYK FromHCL(float h, float c, float l, float a)
 		{
 			float min = l - c * 0.5f;
-			return (c > 0f) ? (ColorCMYK)Detail.HueUtility.ToRGB(h, c, min, a) : new ColorCMYK(0f, 0f, 0f, 1f - min, a);
+			return (c > 0f) ? (ColorCMYK)Detail.HueUtility.ToRGB(Mathf.Repeat(h, 1), c, min, a) : new ColorCMYK(0f, 0f, 0f, 1f - min, a);
 		}
 
 		#endregion
@@ -444,7 +444,7 @@ namespace Experilous.MakeItColorful
 			float c = Detail.LumaUtility.GetChroma(h, s, y);
 			if (c > 0f)
 			{
-				Color rgb = Detail.HueUtility.ToRGB(h, c, a);
+				Color rgb = Detail.HueUtility.ToRGB(Mathf.Repeat(h, 1), c, a);
 				float min = y - Detail.LumaUtility.FromRGB(rgb.r, rgb.g, rgb.b);
 				rgb.r += min;
 				rgb.g += min;
@@ -504,7 +504,7 @@ namespace Experilous.MakeItColorful
 		{
 			if (c > 0f)
 			{
-				Color rgb = Detail.HueUtility.ToRGB(h, c, a);
+				Color rgb = Detail.HueUtility.ToRGB(Mathf.Repeat(h, 1), c, a);
 				float min = y - Detail.LumaUtility.FromRGB(rgb.r, rgb.g, rgb.b);
 				rgb.r += min;
 				rgb.g += min;

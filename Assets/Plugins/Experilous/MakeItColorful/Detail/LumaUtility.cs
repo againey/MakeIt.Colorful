@@ -35,7 +35,7 @@ namespace Experilous.MakeItColorful.Detail
 		public static float GetLumaAtMaxChroma(float h)
 		{
 			float r, g, b;
-			HueUtility.ToRGB(h, out r, out g, out b);
+			HueUtility.ToRGB(UnityEngine.Mathf.Repeat(h, 1), out r, out g, out b);
 			return FromRGB(r, g, b);
 		}
 

@@ -134,7 +134,7 @@ namespace Experilous.MakeItColorful
 			float c = Detail.LumaUtility.GetChroma(hsy.h, hsy.s, hsy.y);
 			if (c > 0f)
 			{
-				Color rgb = Detail.HueUtility.ToRGB(hsy.h, c, hsy.a);
+				Color rgb = Detail.HueUtility.ToRGB(Mathf.Repeat(hsy.h, 1f), c, hsy.a);
 				float min = hsy.y - Detail.LumaUtility.FromRGB(rgb.r, rgb.g, rgb.b);
 				rgb.r += min;
 				rgb.g += min;
@@ -321,7 +321,7 @@ namespace Experilous.MakeItColorful
 			if (c > 0f)
 			{
 				float r, g, b;
-				Detail.HueUtility.ToRGB(h, c, min, out r, out g, out b);
+				Detail.HueUtility.ToRGB(Mathf.Repeat(h, 1), c, min, out r, out g, out b);
 
 				ColorHSY hsy;
 				hsy.h = h;
@@ -386,7 +386,7 @@ namespace Experilous.MakeItColorful
 			if (c > 0f)
 			{
 				float r, g, b;
-				Detail.HueUtility.ToRGB(h, c, min, out r, out g, out b);
+				Detail.HueUtility.ToRGB(Mathf.Repeat(h, 1), c, min, out r, out g, out b);
 
 				ColorHSY hsy;
 				hsy.h = h;
@@ -452,7 +452,7 @@ namespace Experilous.MakeItColorful
 			if (c > 0f)
 			{
 				float r, g, b;
-				Detail.HueUtility.ToRGB(h, c, min, out r, out g, out b);
+				Detail.HueUtility.ToRGB(Mathf.Repeat(h, 1), c, min, out r, out g, out b);
 
 				ColorHSY hsy;
 				hsy.h = h;
@@ -517,7 +517,7 @@ namespace Experilous.MakeItColorful
 			if (c > 0f)
 			{
 				float r, g, b;
-				Detail.HueUtility.ToRGB(h, c, min, out r, out g, out b);
+				Detail.HueUtility.ToRGB(Mathf.Repeat(h, 1), c, min, out r, out g, out b);
 
 				ColorHSY hsy;
 				hsy.h = h;
