@@ -9,13 +9,14 @@ namespace Experilous.MakeItColorful
 	/// <summary>
 	/// Extensions to the standard <see cref="Color"/> struct for colors in the RGB color space.
 	/// </summary>
-	public static class ColorRGB
+	public static class ColorExtensions
 	{
 		#region Color Space Boundaries
 
 		/// <summary>
 		/// Indicates if the values for red, green, and blue together represent a valid color within the RGB color space.
 		/// </summary>
+		/// <param name="rgb">The RGB color instance to which this extension function will apply.</param>
 		/// <returns>Returns true if the color is valid, false if not.</returns>
 		public static bool IsValid(this Color rgb)
 		{
@@ -25,6 +26,7 @@ namespace Experilous.MakeItColorful
 		/// <summary>
 		/// Gets the nearest color that is within the RGB color space.
 		/// </summary>
+		/// <param name="rgb">The RGB color instance to which this extension function will apply.</param>
 		/// <returns>The nearest valid RGB color.</returns>
 		public static Color GetNearestValid(this Color rgb)
 		{
@@ -34,6 +36,7 @@ namespace Experilous.MakeItColorful
 		/// <summary>
 		/// Indicates if the color is canonical, or if there is a different representation of this color that is canonical.
 		/// </summary>
+		/// <param name="rgb">The RGB color instance to which this extension function will apply.</param>
 		/// <returns>Returns true if the color is canonical, false if there is a different representation that is canonical.</returns>
 		/// <remarks>
 		/// <para>An RGB color is always canonical, because there is never more than one representation of any color.</para>
@@ -46,6 +49,7 @@ namespace Experilous.MakeItColorful
 		/// <summary>
 		/// Gets the canonical representation of the color.
 		/// </summary>
+		/// <param name="rgb">The RGB color instance to which this extension function will apply.</param>
 		/// <returns>The canonical representation of the color.</returns>
 		/// <remarks>
 		/// <para>The canonical color representation, when converted to RGB and back, should not be any different from

@@ -1029,6 +1029,7 @@ namespace Experilous.MakeItColorful
 		/// <summary>
 		/// Indicates the value that the luma channel must have when the chroma channel is at its maximum value, if the color is to remain valid within the RGB color space.
 		/// </summary>
+		/// <param name="h">The hue value for which the luma channel range is to be returned.</param>
 		/// <returns>The luma channel at maximum chroma.</returns>
 		public static float GetLumaAtMaxChroma(float h)
 		{
