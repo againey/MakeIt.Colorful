@@ -745,8 +745,7 @@ MonoBehaviour:
   visualizationWidth: 512
   visualizationHeight: 512
   modelHueSliceCount: 60
-  modelChromaSliceCount: 9
-  modelValueSliceCount: 9
+  modelChromaValueSliceCount: 9
   modelWedgeAngle: 75
   modelMaterial: {fileID: 2100000, guid: 01ef96978b7b3fc42977c00d37e721c3, type: 2}
   modelCamera: {fileID: 1604798837}
