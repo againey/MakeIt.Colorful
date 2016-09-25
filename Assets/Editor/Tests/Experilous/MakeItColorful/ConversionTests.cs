@@ -74,7 +74,7 @@ namespace Experilous.MakeItColorful.Tests
 
 			if (type == typeof(Color))
 			{
-				var method = typeof(ColorRGB).GetMethod("GetNearestValid");
+				var method = typeof(ColorExtensions).GetMethod("GetNearestValid");
 
 				if (method == null)
 				{
