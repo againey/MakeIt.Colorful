@@ -1,0 +1,79 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<topic id="3358e8a8-72a8-49db-850a-91e04d276ca3" revisionNumber="1">
+	<developerConceptualDocument xmlns="http://ddue.schemas.microsoft.com/authoring/2003/5" xmlns:xlink="http://www.w3.org/1999/xlink">
+		<introduction>
+			<para>
+				Vividness refers generically to any measure of a color's purity,
+				colorfulness, or saturation.
+				<mediaLink>
+					<caption placement="after">An example of going from no vividness to full vividness.</caption>
+					<image placement="center" xlink:href="vividness"/>
+				</mediaLink>
+			</para>
+			<para>
+				There's more than one way to measure vividness, and these different
+				methods result in color spaces with different qualities.  Make It
+				Colorful includes two measures:  chroma and saturation.
+			</para>
+		</introduction>
+		<section address="chroma">
+			<title>Chroma</title>
+			<content>
+				<mediaLink>
+					<caption placement="after">Slices of the HCV, HCL, and HCY color spaces.  Chroma is the horizontal axis.</caption>
+					<image placement="center" xlink:href="chroma-slices"/>
+				</mediaLink>
+				<para>
+					Chroma is a fairly intuitive measure of vividness.  Black, white
+					and grays all have a chroma of 0, and all the pure colors on the
+					<link xlink:href="4c972cba-9fb1-41a2-a084-244dec5fbc98">hue</link>
+					spectrum have a chroma of 1.  Everything else falls somewhere
+					in between.
+				</para>
+				<para>
+					Make It Colorful supports three different color types that use
+					chroma: <codeEntityReference>T:Experilous.MakeItColorful.ColorHCV</codeEntityReference>,
+					<codeEntityReference>T:Experilous.MakeItColorful.ColorHCL</codeEntityReference>, and
+					<codeEntityReference>T:Experilous.MakeItColorful.ColorHCY</codeEntityReference>.
+				</para>
+				<para>
+					Although it is easy to understand, you'll notice in the color
+					space slices above that chroma-based color space bounds are not
+					simple squares, where any value for chroma and luminance are
+					valid.  Instead, there are some combinations of chroma and
+					luminance which are invalid, in that if the color were converted
+					to the RGB color space, at least one of the red, green, or blue
+					channels would be outside the range [0, 1].
+				</para>
+			</content>
+		</section>
+		<section address="saturation">
+			<title>Saturation</title>
+			<content>
+				<mediaLink>
+					<caption placement="after">Slices of the HSV, HSL, and HSY color spaces.  Saturation is the horizontal axis.</caption>
+					<image placement="center" xlink:href="saturation-slices"/>
+				</mediaLink>
+				<para>
+					Saturation is not strictly a single measurement.  Instead, each
+					measure of luminance defines its own measure of saturation, which
+					is based on the luminance at which the chroma value can be 1.
+					Using this information, saturation essentially stretches chroma
+					values out to fill the entire [0, 1] range.  The result is that
+					all combinations of saturation and luminance within the range
+					[0, 1] are valid.
+				</para>
+				<para>
+					Make It Colorful supports three different color types that use
+					chroma: <codeEntityReference>T:Experilous.MakeItColorful.ColorHSV</codeEntityReference>,
+					<codeEntityReference>T:Experilous.MakeItColorful.ColorHSL</codeEntityReference>, and
+					<codeEntityReference>T:Experilous.MakeItColorful.ColorHSY</codeEntityReference>.
+				</para>
+			</content>
+		</section>
+		<relatedTopics>
+			<link xlink:href="4c972cba-9fb1-41a2-a084-244dec5fbc98" /> <!-- Hue -->
+			<link xlink:href="b183794a-9aa9-406a-b60c-b8d4be83ff63" /> <!-- Luminance -->
+		</relatedTopics>
+	</developerConceptualDocument>
+</topic>
