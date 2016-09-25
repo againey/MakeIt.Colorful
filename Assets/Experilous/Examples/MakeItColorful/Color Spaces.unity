@@ -744,8 +744,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   visualizationWidth: 512
   visualizationHeight: 512
+  modelHueSliceCount: 60
+  modelChromaSliceCount: 9
+  modelValueSliceCount: 9
+  modelWedgeAngle: 75
+  modelMaterial: {fileID: 2100000, guid: 01ef96978b7b3fc42977c00d37e721c3, type: 2}
+  modelCamera: {fileID: 1604798837}
   updateSliceTextureDelay: .100000001
   updateLerpGradientTextureDelay: .00999999978
+  updateColorSpaceMeshDelay: .00999999978
   rgbToggle: {fileID: 517511696}
   cmyToggle: {fileID: 2048235520}
   cmykToggle: {fileID: 1928761671}
@@ -783,6 +790,7 @@ MonoBehaviour:
   lerpNearestToggle: {fileID: 1049404881}
   lerpForwardToggle: {fileID: 973702347}
   lerpBackwardToggle: {fileID: 336243083}
+  model: {fileID: 0}
 --- !u!4 &100380887
 Transform:
   m_ObjectHideFlags: 0
@@ -1072,7 +1080,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 4
+  m_RootOrder: 5
 --- !u!1 &255242439
 GameObject:
   m_ObjectHideFlags: 0
@@ -1287,7 +1295,7 @@ RectTransform:
   - {fileID: 402702137}
   - {fileID: 1533581808}
   m_Father: {fileID: 0}
-  m_RootOrder: 3
+  m_RootOrder: 4
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
@@ -6813,6 +6821,66 @@ MonoBehaviour:
   m_PreferredHeight: -1
   m_FlexibleWidth: -1
   m_FlexibleHeight: -1
+--- !u!1 &1604798833
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 4
+  m_Component:
+  - 4: {fileID: 1604798838}
+  - 20: {fileID: 1604798837}
+  m_Layer: 0
+  m_Name: Model Camera
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!20 &1604798837
+Camera:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1604798833}
+  m_Enabled: 0
+  serializedVersion: 2
+  m_ClearFlags: 2
+  m_BackGroundColor: {r: .627451003, g: .627451003, b: .627451003, a: 0}
+  m_NormalizedViewPortRect:
+    serializedVersion: 2
+    x: 0
+    y: 0
+    width: 1
+    height: 1
+  near clip plane: .5
+  far clip plane: 5
+  field of view: 60
+  orthographic: 1
+  orthographic size: 1
+  m_Depth: -1
+  m_CullingMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_RenderingPath: -1
+  m_TargetTexture: {fileID: 0}
+  m_TargetDisplay: 0
+  m_HDR: 0
+  m_OcclusionCulling: 1
+  m_StereoConvergence: 10
+  m_StereoSeparation: .0219999999
+--- !u!4 &1604798838
+Transform:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1604798833}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 2, y: 2.5, z: -3}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 2
 --- !u!1001 &1605168248
 Prefab:
   m_ObjectHideFlags: 0
@@ -7727,13 +7795,13 @@ Light:
   m_Enabled: 1
   serializedVersion: 6
   m_Type: 1
-  m_Color: {r: 1, g: .956862748, b: .839215696, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_Intensity: 1
   m_Range: 10
   m_SpotAngle: 30
   m_CookieSize: 10
   m_Shadows:
-    m_Type: 2
+    m_Type: 0
     m_Resolution: -1
     m_Strength: 1
     m_Bias: .0500000007
@@ -7756,12 +7824,12 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1840676533}
-  m_LocalRotation: {x: .408217937, y: -.234569728, z: .109381676, w: .875426054}
-  m_LocalPosition: {x: 0, y: 3, z: 0}
+  m_LocalRotation: {x: .25000006, y: .25000006, z: -.0669873208, w: .933012724}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 2
+  m_RootOrder: 3
 --- !u!1 &1858624098
 GameObject:
   m_ObjectHideFlags: 0
@@ -8194,7 +8262,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 22436480, guid: 07e6c11a124a3e04a96a3158593867ba, type: 2}
       propertyPath: m_AnchoredPosition.x
-      value: 371.120575
+      value: 371.120605
       objectReference: {fileID: 0}
     - target: {fileID: 22436480, guid: 07e6c11a124a3e04a96a3158593867ba, type: 2}
       propertyPath: m_AnchoredPosition.y
