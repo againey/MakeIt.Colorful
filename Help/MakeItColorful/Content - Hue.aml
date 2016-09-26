@@ -40,6 +40,12 @@
 		<relatedTopics>
 			<link xlink:href="3358e8a8-72a8-49db-850a-91e04d276ca3" /> <!-- Vividness -->
 			<link xlink:href="b183794a-9aa9-406a-b60c-b8d4be83ff63" /> <!-- Luminance -->
+			<codeEntityReference>T:Experilous.MakeItColorful.ColorHSV</codeEntityReference>
+			<codeEntityReference>T:Experilous.MakeItColorful.ColorHCV</codeEntityReference>
+			<codeEntityReference>T:Experilous.MakeItColorful.ColorHSL</codeEntityReference>
+			<codeEntityReference>T:Experilous.MakeItColorful.ColorHCL</codeEntityReference>
+			<codeEntityReference>T:Experilous.MakeItColorful.ColorHSY</codeEntityReference>
+			<codeEntityReference>T:Experilous.MakeItColorful.ColorHCY</codeEntityReference>
 		</relatedTopics>
 	</developerConceptualDocument>
 </topic>

@@ -92,6 +92,12 @@
 		<relatedTopics>
 			<link xlink:href="4c972cba-9fb1-41a2-a084-244dec5fbc98" /> <!-- Hue -->
 			<link xlink:href="3358e8a8-72a8-49db-850a-91e04d276ca3" /> <!-- Vividness -->
+			<codeEntityReference>T:Experilous.MakeItColorful.ColorHSV</codeEntityReference>
+			<codeEntityReference>T:Experilous.MakeItColorful.ColorHCV</codeEntityReference>
+			<codeEntityReference>T:Experilous.MakeItColorful.ColorHSL</codeEntityReference>
+			<codeEntityReference>T:Experilous.MakeItColorful.ColorHCL</codeEntityReference>
+			<codeEntityReference>T:Experilous.MakeItColorful.ColorHSY</codeEntityReference>
+			<codeEntityReference>T:Experilous.MakeItColorful.ColorHCY</codeEntityReference>
 		</relatedTopics>
 	</developerConceptualDocument>
 </topic>

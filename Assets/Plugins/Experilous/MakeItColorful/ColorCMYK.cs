@@ -572,7 +572,7 @@ namespace Experilous.MakeItColorful
 		public const int channelCount = 5;
 
 		/// <summary>
-		/// Provides access to the four color channels using a numeric zero-based index.
+		/// Provides access to the five color channels using a numeric zero-based index.
 		/// </summary>
 		/// <param name="index">The zero-based index for accessing cyan (0), magenta (1), yellow (2), key (3), or opacity (4).</param>
 		/// <returns>The color channel corresponding to the channel index specified.</returns>

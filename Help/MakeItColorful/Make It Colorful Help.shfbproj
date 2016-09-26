@@ -171,11 +171,16 @@
     <None Include="Content - Luminance.aml" />
     <None Include="Content - Vividness.aml" />
     <None Include="Content - Hue.aml" />
+    <None Include="Content - Subtractive Color Spaces.aml" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="chroma-slices.png">
       <ImageId>chroma-slices</ImageId>
       <AlternateText>chroma-slices</AlternateText>
+    </Image>
+    <Image Include="color-spaces-demo-scene.png">
+      <ImageId>color-spaces-demo-scene</ImageId>
+      <AlternateText>color-spaces-demo-scene</AlternateText>
     </Image>
     <Image Include="value-slices.png">
       <ImageId>value-slices</ImageId>
