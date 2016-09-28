@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <topic id="04f81f23-5976-42c4-be55-8d7c01831111" revisionNumber="1">
 	<developerConceptualDocument xmlns="http://ddue.schemas.microsoft.com/authoring/2003/5" xmlns:xlink="http://www.w3.org/1999/xlink">
-		<introduction>
+		<summary>
 			<para>
 				Most color spaces are additive or otherwise positively oriented;
 				they treat black as a sort of default color when the relevant components
@@ -16,7 +16,7 @@
 			<para>
 				Make It Colorful supports two such color spaces, CMY and CMYK.
 			</para>
-		</introduction>
+		</summary>
 		<section address="cmy">
 			<title>CMY (Cyan, Magenta, Yellow)</title>
 			<content>

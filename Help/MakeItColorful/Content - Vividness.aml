@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <topic id="3358e8a8-72a8-49db-850a-91e04d276ca3" revisionNumber="1">
 	<developerConceptualDocument xmlns="http://ddue.schemas.microsoft.com/authoring/2003/5" xmlns:xlink="http://www.w3.org/1999/xlink">
-		<introduction>
+		<summary>
 			<para>
 				Vividness refers generically to any measure of a color's purity,
 				colorfulness, or saturation.
@@ -15,7 +15,7 @@
 				methods result in color spaces with different qualities.  Make It
 				Colorful includes two measures:  chroma and saturation.
 			</para>
-		</introduction>
+		</summary>
 		<section address="chroma">
 			<title>Chroma</title>
 			<content>

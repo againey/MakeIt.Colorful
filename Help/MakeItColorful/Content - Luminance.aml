@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <topic id="b183794a-9aa9-406a-b60c-b8d4be83ff63" revisionNumber="1">
 	<developerConceptualDocument xmlns="http://ddue.schemas.microsoft.com/authoring/2003/5" xmlns:xlink="http://www.w3.org/1999/xlink">
-		<introduction>
+		<summary>
 			<para>
 				Luminance refers generically to any measure of a color's intensity
 				lightness, or brightness.
@@ -15,7 +15,7 @@
 				methods result in color spaces with different qualities.  Make It
 				Colorful includes three measures:  value, lightness, and luma.
 			</para>
-		</introduction>
+		</summary>
 		<section address="value">
 			<title>Value</title>
 			<content>
@@ -35,6 +35,11 @@
 				<para>
 					This behavior can seem unintuitive in certain cases.  For example,
 					it is odd that red and white have an equal value of 1.
+				</para>
+				<para>
+					Make It Colorful supports two different color types that use value:
+					<codeEntityReference>T:Experilous.MakeItColorful.ColorHSV</codeEntityReference> and
+					<codeEntityReference>T:Experilous.MakeItColorful.ColorHCV</codeEntityReference>.
 				</para>
 			</content>
 		</section>
@@ -57,6 +62,11 @@
 					This behavior provides a more sensible measure of luminance than
 					value, allowing for white to be represented as lighter than
 					solid colors such as red.
+				</para>
+				<para>
+					Make It Colorful supports two different color types that use lightness:
+					<codeEntityReference>T:Experilous.MakeItColorful.ColorHSL</codeEntityReference> and
+					<codeEntityReference>T:Experilous.MakeItColorful.ColorHCL</codeEntityReference>.
 				</para>
 			</content>
 		</section>
@@ -86,6 +96,11 @@
 					than blue (luma of 0.11).  This property is particularly valuable
 					when interpolating between two colors with different hues, to
 					avoid banding or jumps in apparent luminance.
+				</para>
+				<para>
+					Make It Colorful supports two different color types that use luma:
+					<codeEntityReference>T:Experilous.MakeItColorful.ColorHSY</codeEntityReference> and
+					<codeEntityReference>T:Experilous.MakeItColorful.ColorHCY</codeEntityReference>.
 				</para>
 			</content>
 		</section>

@@ -1,19 +1,22 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <topic id="1c2a6866-2869-4203-a950-4beed65c23c3" revisionNumber="1">
 	<developerConceptualDocument xmlns="http://ddue.schemas.microsoft.com/authoring/2003/5" xmlns:xlink="http://www.w3.org/1999/xlink">
-		<introduction>
+		<summary>
 			<para>
 				Welcome to the Make It Colorful User's Manual.  This document will
 				assist in integrating this collection of color space types into your
 				Unity project.
 			</para>
+		</summary>
+		<introduction>
+			<autoOutline />
 		</introduction>
-		<section>
+		<section address="offer">
 			<title>What does Make It Colorful offer?</title>
 			<content>
 				<para>
 					Make It Colorful is a collection of color types for use in your
-					Unity scripts.  Following the pattern provided by <codeInline>UnityEngine.Color</codeInline>,
+					Unity scripts.  Following the pattern provided by <codeEntityReference qualifyHint="true">T:UnityEngine.Color</codeEntityReference>,
 					these types are <codeInline>struct</codeInline>s exposing their
 					various color component fields, while also providing some useful
 					methods and operators.
@@ -23,7 +26,7 @@
 					making it simple to work with colors within that color space.
 					In addition, conversion functions exist to convert from any of
 					the available color spaces to any other, including the RGB color
-					space as represented by <codeInline>UnityEngine.Color</codeInline>.
+					space as represented by <codeEntityReference qualifyHint="true">T:UnityEngine.Color</codeEntityReference>.
 					For example, here is an easy way to get the RGB representation
 					of a particular hue:
 				</para>
@@ -72,7 +75,7 @@
 				</alert>
 			</content>
 		</section>
-		<section>
+		<section address="color-spaces">
 			<title>What color spaces are available?</title>
 			<content>
 				<para>
@@ -148,11 +151,11 @@
 				</para>
 			</content>
 		</section>
-		<section>
-			<title>Demo Scene</title>
+		<section address="example">
+			<title>Example Scene</title>
 			<content>
 				<para>
-					Make It Colorful includes a demo scene which will allow you to
+					Make It Colorful includes an example scene which will allow you to
 					explore the color spaces and their lerping behavior in more depth.
 				</para>
 				<mediaLink>

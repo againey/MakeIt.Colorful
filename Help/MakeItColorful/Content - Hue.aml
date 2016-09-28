@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <topic id="4c972cba-9fb1-41a2-a084-244dec5fbc98" revisionNumber="1">
 	<developerConceptualDocument xmlns="http://ddue.schemas.microsoft.com/authoring/2003/5" xmlns:xlink="http://www.w3.org/1999/xlink">
-		<introduction>
+		<summary>
 			<para>
 				Hue is a cyclic spectrum indicating a color's base from the variety
 				of pure colors of the color wheel.  These range from red, through
@@ -11,7 +11,7 @@
 					<image placement="center" xlink:href="hue"/>
 				</mediaLink>
 			</para>
-		</introduction>
+		</summary>
 		<section>
 			<title>Range and Values</title>
 			<content>
