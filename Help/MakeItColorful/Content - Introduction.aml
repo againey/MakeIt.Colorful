@@ -7,6 +7,22 @@
 				assist in integrating this collection of color space types into your
 				Unity project.
 			</para>
+			<alert type="note">
+				<para>
+					An online version of this documentation is available
+					<externalLink>
+						<linkText>here</linkText>
+						<linkAlternateText>Make It Colorful Online User's Manual at experilous.com</linkAlternateText>
+						<linkUri>http://experilous.com/1/product/make-it-colorful/1.0/documentation/html/1c2a6866-2869-4203-a950-4beed65c23c3.htm</linkUri>
+					</externalLink>,
+					and a downloadable archive for offline use can be acquired
+					<externalLink>
+						<linkText>here</linkText>
+						<linkAlternateText>Make It Colorful Downloadable User's Manual at experilous.com</linkAlternateText>
+						<linkUri>http://experilous.com/1/product/make-it-colorful/1.0/documentation/archive</linkUri>
+					</externalLink>.
+				</para>
+			</alert>
 		</summary>
 		<introduction>
 			<autoOutline />
@@ -154,6 +170,14 @@
 		<section address="example">
 			<title>Example Scene</title>
 			<content>
+				<para>
+					A web demo of this example can be found
+					<externalLink>
+						<linkText>here</linkText>
+						<linkAlternateText>Color Spaces Online WebGL Demo</linkAlternateText>
+						<linkUri>http://experilous.com/1/product/make-it-colorful/1.0/example/color-spaces/</linkUri>
+					</externalLink>.
+				</para>
 				<para>
 					Make It Colorful includes an example scene which will allow you to
 					explore the color spaces and their lerping behavior in more depth.

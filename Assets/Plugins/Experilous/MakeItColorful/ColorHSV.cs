@@ -5,6 +5,12 @@
 using UnityEngine;
 using System;
 
+#if UNITY_5_2 || UNITY_5_3_OR_NEWER
+using Math = UnityEngine.Mathf;
+#else
+using Math = Experilous.Numerics.Math;
+#endif
+
 namespace Experilous.MakeItColorful
 {
 	/// <summary>
@@ -665,9 +671,9 @@ namespace Experilous.MakeItColorful
 		{
 			return new ColorHSV(
 				Detail.HueUtility.LerpUnclamped(a.h, b.h, t),
-				Numerics.Math.LerpUnclamped(a.s, b.s, t),
-				Numerics.Math.LerpUnclamped(a.v, b.v, t),
-				Numerics.Math.LerpUnclamped(a.a, b.a, t));
+				Math.LerpUnclamped(a.s, b.s, t),
+				Math.LerpUnclamped(a.v, b.v, t),
+				Math.LerpUnclamped(a.a, b.a, t));
 		}
 
 		/// <summary>
@@ -703,9 +709,9 @@ namespace Experilous.MakeItColorful
 		{
 			return new ColorHSV(
 				Detail.HueUtility.LerpForwardUnclamped(a.h, b.h, t),
-				Numerics.Math.LerpUnclamped(a.s, b.s, t),
-				Numerics.Math.LerpUnclamped(a.v, b.v, t),
-				Numerics.Math.LerpUnclamped(a.a, b.a, t));
+				Math.LerpUnclamped(a.s, b.s, t),
+				Math.LerpUnclamped(a.v, b.v, t),
+				Math.LerpUnclamped(a.a, b.a, t));
 		}
 
 		/// <summary>
@@ -741,9 +747,9 @@ namespace Experilous.MakeItColorful
 		{
 			return new ColorHSV(
 				Detail.HueUtility.LerpBackwardUnclamped(a.h, b.h, t),
-				Numerics.Math.LerpUnclamped(a.s, b.s, t),
-				Numerics.Math.LerpUnclamped(a.v, b.v, t),
-				Numerics.Math.LerpUnclamped(a.a, b.a, t));
+				Math.LerpUnclamped(a.s, b.s, t),
+				Math.LerpUnclamped(a.v, b.v, t),
+				Math.LerpUnclamped(a.a, b.a, t));
 		}
 
 		#endregion

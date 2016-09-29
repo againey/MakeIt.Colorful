@@ -5,6 +5,12 @@
 using UnityEngine;
 using System;
 
+#if UNITY_5_2 || UNITY_5_3_OR_NEWER
+using Math = UnityEngine.Mathf;
+#else
+using Math = Experilous.Numerics.Math;
+#endif
+
 namespace Experilous.MakeItColorful
 {
 	/// <summary>
@@ -636,11 +642,11 @@ namespace Experilous.MakeItColorful
 		public static ColorCMYK LerpUnclamped(ColorCMYK a, ColorCMYK b, float t)
 		{
 			return new ColorCMYK(
-				Numerics.Math.LerpUnclamped(a.c, b.c, t),
-				Numerics.Math.LerpUnclamped(a.m, b.m, t),
-				Numerics.Math.LerpUnclamped(a.y, b.y, t),
-				Numerics.Math.LerpUnclamped(a.k, b.k, t),
-				Numerics.Math.LerpUnclamped(a.a, b.a, t));
+				Math.LerpUnclamped(a.c, b.c, t),
+				Math.LerpUnclamped(a.m, b.m, t),
+				Math.LerpUnclamped(a.y, b.y, t),
+				Math.LerpUnclamped(a.k, b.k, t),
+				Math.LerpUnclamped(a.a, b.a, t));
 		}
 
 		#endregion

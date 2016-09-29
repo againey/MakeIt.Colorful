@@ -4,6 +4,12 @@
 
 using UnityEngine;
 
+#if UNITY_5_2 || UNITY_5_3_OR_NEWER
+using Math = UnityEngine.Mathf;
+#else
+using Math = Experilous.Numerics.Math;
+#endif
+
 namespace Experilous.MakeItColorful.Detail
 {
 	public static class HueUtility
@@ -242,28 +248,28 @@ namespace Experilous.MakeItColorful.Detail
 			float delta = Mathf.Abs(b - a);
 			if (delta < 0.5f)
 			{
-				return Numerics.Math.LerpUnclamped(a, b, t);
+				return Math.LerpUnclamped(a, b, t);
 			}
 			else if (delta > 0.5f)
 			{
 				if (a < b)
 				{
-					return Mathf.Repeat(Numerics.Math.LerpUnclamped(a + 1f, b, t), 1f);
+					return Mathf.Repeat(Math.LerpUnclamped(a + 1f, b, t), 1f);
 				}
 				else
 				{
-					return Mathf.Repeat(Numerics.Math.LerpUnclamped(a, b + 1f, t), 1f);
+					return Mathf.Repeat(Math.LerpUnclamped(a, b + 1f, t), 1f);
 				}
 			}
 			else
 			{
 				if (a < b)
 				{
-					return Numerics.Math.LerpUnclamped(a, b, t);
+					return Math.LerpUnclamped(a, b, t);
 				}
 				else
 				{
-					return Mathf.Repeat(Numerics.Math.LerpUnclamped(a, b + 1f, t), 1f);
+					return Mathf.Repeat(Math.LerpUnclamped(a, b + 1f, t), 1f);
 				}
 			}
 		}
@@ -274,11 +280,11 @@ namespace Experilous.MakeItColorful.Detail
 			b = Mathf.Repeat(b, 1f);
 			if (a <= b)
 			{
-				return Numerics.Math.LerpUnclamped(a, b, t);
+				return Math.LerpUnclamped(a, b, t);
 			}
 			else
 			{
-				return Mathf.Repeat(Numerics.Math.LerpUnclamped(a, b + 1f, t), 1f);
+				return Mathf.Repeat(Math.LerpUnclamped(a, b + 1f, t), 1f);
 			}
 		}
 
@@ -288,11 +294,11 @@ namespace Experilous.MakeItColorful.Detail
 			b = Mathf.Repeat(b, 1f);
 			if (a >= b)
 			{
-				return Numerics.Math.LerpUnclamped(a, b, t);
+				return Math.LerpUnclamped(a, b, t);
 			}
 			else
 			{
-				return Mathf.Repeat(Numerics.Math.LerpUnclamped(a + 1f, b, t), 1f);
+				return Mathf.Repeat(Math.LerpUnclamped(a + 1f, b, t), 1f);
 			}
 		}
 	}

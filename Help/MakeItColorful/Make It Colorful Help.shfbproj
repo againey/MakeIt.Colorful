@@ -145,8 +145,9 @@
   <PropertyGroup>
     <PreBuildEvent>
     </PreBuildEvent>
-    <PostBuildEvent>
-    </PostBuildEvent>
+    <PostBuildEvent>G:\Software\Applications\7-Zip\7z a Build\archive.7z -m0=lzma -mx=9 -aoa -t7z Build\* -x!archive.7z
+copy /Y /B "Build\archive.7z" "..\..\Assets\Experilous\Documentation\Make It Colorful - User's Manual.7z"
+copy /Y /B "archive.php" "Build\archive.php"</PostBuildEvent>
     <RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
   </PropertyGroup>
   <ItemGroup>
