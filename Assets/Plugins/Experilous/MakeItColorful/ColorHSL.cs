@@ -89,7 +89,7 @@ namespace Experilous.MakeItColorful
 		/// </summary>
 		/// <param name="rgb">The RGB color to convert to HSL.</param>
 		/// <returns>The color converted to the HSL color space.</returns>
-		public static explicit operator ColorHSL(Color rgb)
+		public static implicit operator ColorHSL(Color rgb)
 		{
 			return FromRGB(rgb.r, rgb.g, rgb.b, rgb.a);
 		}
@@ -135,7 +135,7 @@ namespace Experilous.MakeItColorful
 		/// </summary>
 		/// <param name="hsl">The HSL color to convert to RGB.</param>
 		/// <returns>The color converted to the RGB color space.</returns>
-		public static explicit operator Color(ColorHSL hsl)
+		public static implicit operator Color(ColorHSL hsl)
 		{
 			float c = Detail.LightnessUtility.GetChroma(hsl.s, hsl.l);
 			float min = hsl.l - c * 0.5f;

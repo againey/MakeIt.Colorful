@@ -89,7 +89,7 @@ namespace Experilous.MakeItColorful
 		/// </summary>
 		/// <param name="rgb">The RGB color to convert to HCY.</param>
 		/// <returns>The color converted to the HCY color space.</returns>
-		public static explicit operator ColorHCY(Color rgb)
+		public static implicit operator ColorHCY(Color rgb)
 		{
 			return FromRGB(rgb.r, rgb.g, rgb.b, rgb.a);
 		}
@@ -133,7 +133,7 @@ namespace Experilous.MakeItColorful
 		/// </summary>
 		/// <param name="hcy">The HCY color to convert to RGB.</param>
 		/// <returns>The color converted to the RGB color space.</returns>
-		public static explicit operator Color(ColorHCY hcy)
+		public static implicit operator Color(ColorHCY hcy)
 		{
 			if (hcy.c > 0f)
 			{

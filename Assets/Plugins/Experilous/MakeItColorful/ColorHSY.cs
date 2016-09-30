@@ -89,7 +89,7 @@ namespace Experilous.MakeItColorful
 		/// </summary>
 		/// <param name="rgb">The RGB color to convert to HSY.</param>
 		/// <returns>The color converted to the HSY color space.</returns>
-		public static explicit operator ColorHSY(Color rgb)
+		public static implicit operator ColorHSY(Color rgb)
 		{
 			return FromRGB(rgb.r, rgb.g, rgb.b, rgb.a);
 		}
@@ -135,7 +135,7 @@ namespace Experilous.MakeItColorful
 		/// </summary>
 		/// <param name="hsy">The HSY color to convert to RGB.</param>
 		/// <returns>The color converted to the RGB color space.</returns>
-		public static explicit operator Color(ColorHSY hsy)
+		public static implicit operator Color(ColorHSY hsy)
 		{
 			float c = Detail.LumaUtility.GetChroma(hsy.h, hsy.s, hsy.y);
 			if (c > 0f)

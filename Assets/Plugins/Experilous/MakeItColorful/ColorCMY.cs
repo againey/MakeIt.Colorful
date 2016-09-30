@@ -88,7 +88,7 @@ namespace Experilous.MakeItColorful
 		/// </summary>
 		/// <param name="rgb">The RGB color to convert to CMY.</param>
 		/// <returns>The color converted to the CMY color space.</returns>
-		public static explicit operator ColorCMY(Color rgb)
+		public static implicit operator ColorCMY(Color rgb)
 		{
 			return FromRGB(rgb.r, rgb.g, rgb.b, rgb.a);
 		}
@@ -123,7 +123,7 @@ namespace Experilous.MakeItColorful
 		/// </summary>
 		/// <param name="cmy">The CMY color to convert to RGB.</param>
 		/// <returns>The color converted to the RGB color space.</returns>
-		public static explicit operator Color(ColorCMY cmy)
+		public static implicit operator Color(ColorCMY cmy)
 		{
 			return new Color(1f - cmy.c, 1f - cmy.m, 1f - cmy.y, cmy.a);
 		}
@@ -430,7 +430,7 @@ namespace Experilous.MakeItColorful
 				rgb.r += min;
 				rgb.g += min;
 				rgb.b += min;
-				return (ColorCMY)rgb;
+				return rgb;
  			}
 			else
 			{
@@ -490,7 +490,7 @@ namespace Experilous.MakeItColorful
 				rgb.r += min;
 				rgb.g += min;
 				rgb.b += min;
-				return (ColorCMY)rgb;
+				return rgb;
  			}
 			else
 			{

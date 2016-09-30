@@ -89,7 +89,7 @@ namespace Experilous.MakeItColorful
 		/// </summary>
 		/// <param name="rgb">The RGB color to convert to HCV.</param>
 		/// <returns>The color converted to the HCV color space.</returns>
-		public static explicit operator ColorHCV(Color rgb)
+		public static implicit operator ColorHCV(Color rgb)
 		{
 			return FromRGB(rgb.r, rgb.g, rgb.b, rgb.a);
 		}
@@ -133,7 +133,7 @@ namespace Experilous.MakeItColorful
 		/// </summary>
 		/// <param name="hcv">The HCV color to convert to RGB.</param>
 		/// <returns>The color converted to the RGB color space.</returns>
-		public static explicit operator Color(ColorHCV hcv)
+		public static implicit operator Color(ColorHCV hcv)
 		{
 			float min = hcv.v - hcv.c;
 			return (hcv.c > 0f) ? Detail.HueUtility.ToRGB(Mathf.Repeat(hcv.h, 1f), hcv.c, min, hcv.a) : new Color(min, min, min, hcv.a);

@@ -667,7 +667,7 @@ namespace Experilous.Examples.MakeItColorful
 			if (hsyToggle.isOn) ToggleHSY(true);
 			if (hcyToggle.isOn) ToggleHCY(true);
 
-			SetActiveColor((Color)new ColorHSV(hueSlider.value, 1f, 1f));
+			SetActiveColor(new ColorHSV(hueSlider.value, 1f, 1f));
 			hueSliderHandle.color = activeColor;
 
 			_updateSliceTextureQueue = 0f;
@@ -709,7 +709,7 @@ namespace Experilous.Examples.MakeItColorful
 
 		public void OnHueSliderChanged(float hue)
 		{
-			hueSliderHandle.color = (Color)(new ColorHSV(hue, 1f, 1f));
+			hueSliderHandle.color = new ColorHSV(hue, 1f, 1f);
 
 			if (_onHueChanged != null)
 			{
@@ -938,7 +938,7 @@ namespace Experilous.Examples.MakeItColorful
 			ExecuteFromScript(() =>
 			{
 				var color = (ColorCMY)new ColorHSV(hue, 1f, 1f);
-				SetActiveColor((Color)color);
+				SetActiveColor(color);
 
 				cmyCyanSlider.value = color.c;
 				cmyMagentaSlider.value = color.m;
@@ -954,7 +954,7 @@ namespace Experilous.Examples.MakeItColorful
 			ExecuteFromScript(() =>
 			{
 				var color = new ColorCMY(cmyCyanSlider.value, cmyMagentaSlider.value, cmyYellowSlider.value);
-				SetActiveColor((Color)color);
+				SetActiveColor(color);
 				var hcv = (ColorHCV)color;
 				if (hcv.c > 0f) hueSlider.value = hcv.h;
 
@@ -1040,7 +1040,7 @@ namespace Experilous.Examples.MakeItColorful
 			ExecuteFromScript(() =>
 			{
 				var color = (ColorCMYK)new ColorHSV(hue, 1f, 1f);
-				SetActiveColor((Color)color);
+				SetActiveColor(color);
 
 				cmykCyanSlider.value = color.c;
 				cmykMagentaSlider.value = color.m;
@@ -1057,7 +1057,7 @@ namespace Experilous.Examples.MakeItColorful
 			ExecuteFromScript(() =>
 			{
 				var color = new ColorCMYK(cmykCyanSlider.value, cmykMagentaSlider.value, cmykYellowSlider.value, cmykKeySlider.value);
-				SetActiveColor((Color)color);
+				SetActiveColor(color);
 				var hcv = (ColorHCV)color;
 				if (hcv.c > 0f) hueSlider.value = hcv.h;
 
@@ -1096,7 +1096,7 @@ namespace Experilous.Examples.MakeItColorful
 			{
 				var hsv = (ColorHSV)activeColor;
 				hsv.h = hue;
-				SetActiveColor((Color)hsv);
+				SetActiveColor(hsv);
 				QueueUpdateSliceTexture(_getSliceColor);
 				QueueUpdateColorSpaceMesh(HSV_UpdateColorSpaceMesh);
 			});
@@ -1111,21 +1111,21 @@ namespace Experilous.Examples.MakeItColorful
 		{
 			y0 = 0f;
 			y1 = 1f;
-			color0 = (Color)new ColorHSV(h, s, 0f);
-			color1 = (Color)new ColorHSV(h, s, 1f);
+			color0 = new ColorHSV(h, s, 0f);
+			color1 = new ColorHSV(h, s, 1f);
 		}
 
 		private static void HSV_GetColorSpaceModelSidesInfo(float h, float v, out Color color)
 		{
-			color = (Color)new ColorHSV(h, 1f, v);
+			color = new ColorHSV(h, 1f, v);
 		}
 
 		private static void HSV_GetColorSpaceModelSliceInfo(float h0, float h1, float s, float v, out float y0, out float y1, out Color color0, out Color color1)
 		{
 			y0 = v;
 			y1 = v;
-			color0 = (Color)new ColorHSV(h0, s, v);
-			color1 = (Color)new ColorHSV(h1, s, v);
+			color0 = new ColorHSV(h0, s, v);
+			color1 = new ColorHSV(h1, s, v);
 		}
 
 		private void HSV_BuildLerpGradient()
@@ -1179,7 +1179,7 @@ namespace Experilous.Examples.MakeItColorful
 			{
 				var hcv = (ColorHCV)activeColor;
 				hcv.h = hue;
-				SetActiveColor((Color)hcv);
+				SetActiveColor(hcv);
 				QueueUpdateSliceTexture(_getSliceColor);
 				QueueUpdateColorSpaceMesh(HCV_UpdateColorSpaceMesh);
 			});
@@ -1193,8 +1193,8 @@ namespace Experilous.Examples.MakeItColorful
 		private static void HCV_GetColorSpaceModelCapsInfo(float h, float c, out float y0, out float y1, out Color color0, out Color color1)
 		{
 			ColorHCV.GetMinMaxValue(c, out y0, out y1);
-			color0 = (Color)new ColorHCV(h, c, y0);
-			color1 = (Color)new ColorHCV(h, c, y1);
+			color0 = new ColorHCV(h, c, y0);
+			color1 = new ColorHCV(h, c, y1);
 		}
 
 		private static void HCV_GetColorSpaceModelSliceInfo(float h0, float h1, float c, float v, out float y0, out float y1, out Color color0, out Color color1)
@@ -1204,8 +1204,8 @@ namespace Experilous.Examples.MakeItColorful
 			ColorHCV.GetMinMaxValue(c, out lMin, out lMax);
 			y0 = y1 = Mathf.Lerp(lMin, lMax, v);
 
-			color0 = (Color)new ColorHCV(h0, c, y0);
-			color1 = (Color)new ColorHCV(h1, c, y1);
+			color0 = new ColorHCV(h0, c, y0);
+			color1 = new ColorHCV(h1, c, y1);
 		}
 
 		private void HCV_BuildLerpGradient()
@@ -1253,7 +1253,7 @@ namespace Experilous.Examples.MakeItColorful
 			{
 				var hsl = (ColorHSL)activeColor;
 				hsl.h = hue;
-				SetActiveColor((Color)hsl);
+				SetActiveColor(hsl);
 				QueueUpdateSliceTexture(_getSliceColor);
 				QueueUpdateColorSpaceMesh(HSL_UpdateColorSpaceMesh);
 				HSL_UpdateColorSpaceMesh();
@@ -1269,21 +1269,21 @@ namespace Experilous.Examples.MakeItColorful
 		{
 			y0 = 0f;
 			y1 = 1f;
-			color0 = (Color)new ColorHSL(h, s, 0f);
-			color1 = (Color)new ColorHSL(h, s, 1f);
+			color0 = new ColorHSL(h, s, 0f);
+			color1 = new ColorHSL(h, s, 1f);
 		}
 
 		private static void HSL_GetColorSpaceModelSidesInfo(float h, float l, out Color color)
 		{
-			color = (Color)new ColorHSL(h, 1f, l);
+			color = new ColorHSL(h, 1f, l);
 		}
 
 		private static void HSL_GetColorSpaceModelSliceInfo(float h0, float h1, float s, float l, out float y0, out float y1, out Color color0, out Color color1)
 		{
 			y0 = l;
 			y1 = l;
-			color0 = (Color)new ColorHSL(h0, s, l);
-			color1 = (Color)new ColorHSL(h1, s, l);
+			color0 = new ColorHSL(h0, s, l);
+			color1 = new ColorHSL(h1, s, l);
 		}
 
 		private void HSL_BuildLerpGradient()
@@ -1337,7 +1337,7 @@ namespace Experilous.Examples.MakeItColorful
 			{
 				var hcl = (ColorHCL)activeColor;
 				hcl.h = hue;
-				SetActiveColor((Color)hcl);
+				SetActiveColor(hcl);
 				QueueUpdateSliceTexture(_getSliceColor);
 				QueueUpdateColorSpaceMesh(HCL_UpdateColorSpaceMesh);
 			});
@@ -1351,8 +1351,8 @@ namespace Experilous.Examples.MakeItColorful
 		private static void HCL_GetColorSpaceModelCapsInfo(float h, float c, out float y0, out float y1, out Color color0, out Color color1)
 		{
 			ColorHCL.GetMinMaxLightness(c, out y0, out y1);
-			color0 = (Color)new ColorHCL(h, c, y0);
-			color1 = (Color)new ColorHCL(h, c, y1);
+			color0 = new ColorHCL(h, c, y0);
+			color1 = new ColorHCL(h, c, y1);
 		}
 
 		private static void HCL_GetColorSpaceModelSliceInfo(float h0, float h1, float c, float v, out float y0, out float y1, out Color color0, out Color color1)
@@ -1362,8 +1362,8 @@ namespace Experilous.Examples.MakeItColorful
 			ColorHCL.GetMinMaxLightness(c, out lMin, out lMax);
 			y0 = y1 = Mathf.Lerp(lMin, lMax, v);
 
-			color0 = (Color)new ColorHCL(h0, c, y0);
-			color1 = (Color)new ColorHCL(h1, c, y1);
+			color0 = new ColorHCL(h0, c, y0);
+			color1 = new ColorHCL(h1, c, y1);
 		}
 
 		private void HCL_BuildLerpGradient()
@@ -1411,7 +1411,7 @@ namespace Experilous.Examples.MakeItColorful
 			{
 				var hsy = (ColorHSY)activeColor;
 				hsy.h = hue;
-				SetActiveColor((Color)hsy);
+				SetActiveColor(hsy);
 				QueueUpdateSliceTexture(_getSliceColor);
 				QueueUpdateColorSpaceMesh(HSY_UpdateColorSpaceMesh);
 			});
@@ -1426,21 +1426,21 @@ namespace Experilous.Examples.MakeItColorful
 		{
 			y0 = 0f;
 			y1 = 1f;
-			color0 = (Color)new ColorHSY(h, s, 0f);
-			color1 = (Color)new ColorHSY(h, s, 1f);
+			color0 = new ColorHSY(h, s, 0f);
+			color1 = new ColorHSY(h, s, 1f);
 		}
 
 		private static void HSY_GetColorSpaceModelSidesInfo(float h, float y, out Color color)
 		{
-			color = (Color)new ColorHSY(h, 1f, y);
+			color = new ColorHSY(h, 1f, y);
 		}
 
 		private static void HSY_GetColorSpaceModelSliceInfo(float h0, float h1, float s, float y, out float y0, out float y1, out Color color0, out Color color1)
 		{
 			y0 = y;
 			y1 = y;
-			color0 = (Color)new ColorHSY(h0, s, y);
-			color1 = (Color)new ColorHSY(h1, s, y);
+			color0 = new ColorHSY(h0, s, y);
+			color1 = new ColorHSY(h1, s, y);
 		}
 
 		private void HSY_BuildLerpGradient()
@@ -1494,7 +1494,7 @@ namespace Experilous.Examples.MakeItColorful
 			{
 				var hcy = (ColorHCY)_baseColor;
 				hcy.h = hue;
-				SetActiveColor((Color)hcy, false);
+				SetActiveColor(hcy, false);
 				QueueUpdateSliceTexture(_getSliceColor);
 				QueueUpdateColorSpaceMesh(HCY_UpdateColorSpaceMesh);
 			});
@@ -1508,8 +1508,8 @@ namespace Experilous.Examples.MakeItColorful
 		private static void HCY_GetColorSpaceModelCapsInfo(float h, float c, out float y0, out float y1, out Color color0, out Color color1)
 		{
 			ColorHCY.GetMinMaxLuma(h, c, out y0, out y1);
-			color0 = (Color)new ColorHCY(h, c, y0);
-			color1 = (Color)new ColorHCY(h, c, y1);
+			color0 = new ColorHCY(h, c, y0);
+			color1 = new ColorHCY(h, c, y1);
 		}
 
 		private static void HCY_GetColorSpaceModelSliceInfo(float h0, float h1, float c, float v, out float y0, out float y1, out Color color0, out Color color1)
@@ -1521,8 +1521,8 @@ namespace Experilous.Examples.MakeItColorful
 			ColorHCY.GetMinMaxLuma(h1, c, out yMin, out yMax);
 			y1 = Mathf.Lerp(yMin, yMax, v);
 
-			color0 = (Color)new ColorHCY(h0, c, y0);
-			color1 = (Color)new ColorHCY(h1, c, y1);
+			color0 = new ColorHCY(h0, c, y0);
+			color1 = new ColorHCY(h1, c, y1);
 		}
 
 		private void HCY_BuildLerpGradient()

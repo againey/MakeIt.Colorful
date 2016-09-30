@@ -89,7 +89,7 @@ namespace Experilous.MakeItColorful
 		/// </summary>
 		/// <param name="rgb">The RGB color to convert to HCL.</param>
 		/// <returns>The color converted to the HCL color space.</returns>
-		public static explicit operator ColorHCL(Color rgb)
+		public static implicit operator ColorHCL(Color rgb)
 		{
 			return FromRGB(rgb.r, rgb.g, rgb.b, rgb.a);
 		}
@@ -133,7 +133,7 @@ namespace Experilous.MakeItColorful
 		/// </summary>
 		/// <param name="hcl">The HCL color to convert to RGB.</param>
 		/// <returns>The color converted to the RGB color space.</returns>
-		public static explicit operator Color(ColorHCL hcl)
+		public static implicit operator Color(ColorHCL hcl)
 		{
 			float min = hcl.l - hcl.c * 0.5f;
 			return (hcl.c > 0f) ? Detail.HueUtility.ToRGB(Mathf.Repeat(hcl.h, 1f), hcl.c, min, hcl.a) : new Color(min, min, min, hcl.a);
