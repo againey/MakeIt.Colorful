@@ -21,7 +21,7 @@ namespace Experilous.MakeItColorful.Tests
 			var methods = second.GetMethods(BindingFlags.Public | BindingFlags.Static);
 			foreach (var method in methods)
 			{
-				if (method.IsSpecialName && method.Name == "op_Explicit")
+				if (method.IsSpecialName && (method.Name == "op_Implicit" || method.Name == "op_Explicit"))
 				{
 					if (method.ReturnType == second || method.ReturnType == third)
 					{

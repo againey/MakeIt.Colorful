@@ -10,7 +10,12 @@ namespace Experilous.MakeItColorful.Tests
 {
 	class GetNearestValidTests
 	{
-		private static void AssertNearest(Color expected, Color original, float margin, bool isValid = false)
+		private static void AssertNearest(Color expected, Color original, float margin)
+		{
+			AssertNearest(expected, original, margin, false);
+		}
+
+		private static void AssertNearest(Color expected, Color original, float margin, bool isValid)
 		{
 			Assert.AreEqual(isValid, original.IsValid(), original.ToString());
 			var nearest = original.GetNearestValid();
@@ -56,7 +61,12 @@ namespace Experilous.MakeItColorful.Tests
 			AssertNearest(new Color(0.875f, 0.625f, 0.375f, 0.25f), new Color(0.875f, 0.625f, 0.375f, 0.25f), 0.0001f, true);
 		}
 
-		private static void AssertNearest(ColorCMY expected, ColorCMY original, float margin, bool isValid = false)
+		private static void AssertNearest(ColorCMY expected, ColorCMY original, float margin)
+		{
+			AssertNearest(expected, original, margin, false);
+		}
+
+		private static void AssertNearest(ColorCMY expected, ColorCMY original, float margin, bool isValid)
 		{
 			Assert.AreEqual(isValid, original.IsValid(), original.ToString());
 			var nearest = original.GetNearestValid();
@@ -102,7 +112,12 @@ namespace Experilous.MakeItColorful.Tests
 			AssertNearest(new ColorCMY(0.875f, 0.625f, 0.375f, 0.25f), new ColorCMY(0.875f, 0.625f, 0.375f, 0.25f), 0.0001f, true);
 		}
 
-		private static void AssertNearest(ColorCMYK expected, ColorCMYK original, float margin, bool isValid = false)
+		private static void AssertNearest(ColorCMYK expected, ColorCMYK original, float margin)
+		{
+			AssertNearest(expected, original, margin, false);
+		}
+
+		private static void AssertNearest(ColorCMYK expected, ColorCMYK original, float margin, bool isValid)
 		{
 			Assert.AreEqual(isValid, original.IsValid(), original.ToString());
 			var nearest = original.GetNearestValid();
@@ -207,7 +222,12 @@ namespace Experilous.MakeItColorful.Tests
 			AssertNearest(new ColorCMYK(0.625f, 0.375f, 0.875f, 0.125f, 0.25f), new ColorCMYK(0.625f, 0.375f, 0.875f, 0.125f, 0.25f), 0.0001f, true);
 		}
 
-		private static void AssertNearest(ColorHSV expected, ColorHSV original, float margin, bool isValid = false)
+		private static void AssertNearest(ColorHSV expected, ColorHSV original, float margin)
+		{
+			AssertNearest(expected, original, margin, false);
+		}
+
+		private static void AssertNearest(ColorHSV expected, ColorHSV original, float margin, bool isValid)
 		{
 			Assert.AreEqual(isValid, original.IsValid(), original.ToString());
 			var nearest = original.GetNearestValid();
@@ -252,7 +272,12 @@ namespace Experilous.MakeItColorful.Tests
 			AssertNearest(new ColorHSV(0.875f, 1f, 1f, 0.25f), new ColorHSV(1.875f, 2f, 2f, 0.25f), 0.0001f);
 		}
 
-		private static void AssertNearest(ColorHCV expected, ColorHCV original, float margin, bool isValid = false)
+		private static void AssertNearest(ColorHCV expected, ColorHCV original, float margin)
+		{
+			AssertNearest(expected, original, margin, false);
+		}
+
+		private static void AssertNearest(ColorHCV expected, ColorHCV original, float margin, bool isValid)
 		{
 			Assert.AreEqual(isValid, original.IsValid(), original.ToString());
 			var nearest = original.GetNearestValid();
@@ -303,7 +328,12 @@ namespace Experilous.MakeItColorful.Tests
 			AssertNearest(new ColorHCV(0.875f, 0.5f, 0.5f, 0.25f), new ColorHCV(1.875f, 0.5f, 0.5f, 0.25f), 0.0001f, true);
 		}
 
-		private static void AssertNearest(ColorHSL expected, ColorHSL original, float margin, bool isValid = false)
+		private static void AssertNearest(ColorHSL expected, ColorHSL original, float margin)
+		{
+			AssertNearest(expected, original, margin, false);
+		}
+
+		private static void AssertNearest(ColorHSL expected, ColorHSL original, float margin, bool isValid)
 		{
 			Assert.AreEqual(isValid, original.IsValid(), original.ToString());
 			var nearest = original.GetNearestValid();
@@ -348,7 +378,12 @@ namespace Experilous.MakeItColorful.Tests
 			AssertNearest(new ColorHSL(0.875f, 1f, 1f, 0.25f), new ColorHSL(1.875f, 2f, 2f, 0.25f), 0.0001f);
 		}
 
-		private static void AssertNearest(ColorHCL expected, ColorHCL original, float margin, bool isValid = false)
+		private static void AssertNearest(ColorHCL expected, ColorHCL original, float margin)
+		{
+			AssertNearest(expected, original, margin, false);
+		}
+
+		private static void AssertNearest(ColorHCL expected, ColorHCL original, float margin, bool isValid)
 		{
 			Assert.AreEqual(isValid, original.IsValid(), original.ToString());
 			var nearest = original.GetNearestValid();
@@ -405,7 +440,12 @@ namespace Experilous.MakeItColorful.Tests
 			AssertNearest(new ColorHCL(0.875f, 0.5f, 0.5f, 0.25f), new ColorHCL(1.875f, 0.5f, 0.5f, 0.25f), 0.0001f, true);
 		}
 
-		private static void AssertNearest(ColorHSY expected, ColorHSY original, float margin, bool isValid = false)
+		private static void AssertNearest(ColorHSY expected, ColorHSY original, float margin)
+		{
+			AssertNearest(expected, original, margin, false);
+		}
+
+		private static void AssertNearest(ColorHSY expected, ColorHSY original, float margin, bool isValid)
 		{
 			Assert.AreEqual(isValid, original.IsValid(), original.ToString());
 			var nearest = original.GetNearestValid();
@@ -450,7 +490,12 @@ namespace Experilous.MakeItColorful.Tests
 			AssertNearest(new ColorHSY(0.875f, 1f, 1f, 0.25f), new ColorHSY(1.875f, 2f, 2f, 0.25f), 0.0001f);
 		}
 
-		private static void AssertNearest(ColorHCY expected, ColorHCY original, float margin, bool isValid = false)
+		private static void AssertNearest(ColorHCY expected, ColorHCY original, float margin)
+		{
+			AssertNearest(expected, original, margin, false);
+		}
+
+		private static void AssertNearest(ColorHCY expected, ColorHCY original, float margin, bool isValid)
 		{
 			Assert.AreEqual(isValid, original.IsValid(), original.ToString());
 			var nearest = original.GetNearestValid();
