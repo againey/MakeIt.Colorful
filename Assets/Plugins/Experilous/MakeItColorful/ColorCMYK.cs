@@ -797,7 +797,7 @@ namespace Experilous.MakeItColorful
 		#region Color Space Boundaries
 
 		/// <summary>
-		/// Indicates if the values for cyan, magenta, and yellow together represent a valid color within the RGB color space.
+		/// Indicates if the values for cyan, magenta, yellow, and key together represent a valid color within the RGB color space.
 		/// </summary>
 		/// <returns>Returns true if the color is valid, false if not.</returns>
 		public bool IsValid()
