@@ -11,7 +11,7 @@ namespace Experilous.MakeItColorful
 	/// Property drawer for the ColorHCY color space struct.  Defers to the standard Unity Editor color field UI.
 	/// </summary>
 	[CustomPropertyDrawer(typeof(ColorHCY))]
-	public class ColorHCYEditor : PropertyDrawer
+	public class ColorHCYPropertyDrawer : PropertyDrawer
 	{
 		/// <inheritdoc />
 		public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)

@@ -8,28 +8,26 @@ using UnityEditor;
 namespace Experilous.MakeItColorful
 {
 	/// <summary>
-	/// Property drawer for the ColorCMYK color space struct.  Defers to the standard Unity Editor color field UI.
+	/// Property drawer for the ColorHSV color space struct.  Defers to the standard Unity Editor color field UI.
 	/// </summary>
-	[CustomPropertyDrawer(typeof(ColorCMYK))]
-	public class ColorCMYKEditor : PropertyDrawer
+	[CustomPropertyDrawer(typeof(ColorHSV))]
+	public class ColorHSVPropertyDrawer : PropertyDrawer
 	{
 		/// <inheritdoc />
 		public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
 		{
 			EditorGUI.BeginProperty(position, label, property);
 			position = EditorGUI.PrefixLabel(position, GUIUtility.GetControlID(FocusType.Passive), label);
-			var c = property.FindPropertyRelative("c");
-			var m = property.FindPropertyRelative("m");
-			var y = property.FindPropertyRelative("y");
-			var k = property.FindPropertyRelative("k");
+			var h = property.FindPropertyRelative("h");
+			var s = property.FindPropertyRelative("s");
+			var v = property.FindPropertyRelative("v");
 			var a = property.FindPropertyRelative("a");
-			var cmy = new ColorCMYK(c.floatValue, m.floatValue, y.floatValue, k.floatValue, a.floatValue);
-			cmy = EditorGUI.ColorField(position, cmy);
-			c.floatValue = cmy.c;
-			m.floatValue = cmy.m;
-			y.floatValue = cmy.y;
-			k.floatValue = cmy.k;
-			a.floatValue = cmy.a;
+			var hcy = new ColorHSV(h.floatValue, s.floatValue, v.floatValue, a.floatValue);
+			hcy = EditorGUI.ColorField(position, hcy);
+			h.floatValue = hcy.h;
+			s.floatValue = hcy.s;
+			v.floatValue = hcy.v;
+			a.floatValue = hcy.a;
 			EditorGUI.EndProperty();
 		}
 	}

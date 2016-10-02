@@ -8,10 +8,10 @@ using UnityEditor;
 namespace Experilous.MakeItColorful
 {
 	/// <summary>
-	/// Property drawer for the ColorHSL color space struct.  Defers to the standard Unity Editor color field UI.
+	/// Property drawer for the ColorHCL color space struct.  Defers to the standard Unity Editor color field UI.
 	/// </summary>
-	[CustomPropertyDrawer(typeof(ColorHSL))]
-	public class ColorHSLEditor : PropertyDrawer
+	[CustomPropertyDrawer(typeof(ColorHCL))]
+	public class ColorHCLPropertyDrawer : PropertyDrawer
 	{
 		/// <inheritdoc />
 		public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
@@ -19,13 +19,13 @@ namespace Experilous.MakeItColorful
 			EditorGUI.BeginProperty(position, label, property);
 			position = EditorGUI.PrefixLabel(position, GUIUtility.GetControlID(FocusType.Passive), label);
 			var h = property.FindPropertyRelative("h");
-			var s = property.FindPropertyRelative("s");
+			var c = property.FindPropertyRelative("c");
 			var l = property.FindPropertyRelative("l");
 			var a = property.FindPropertyRelative("a");
-			var hcy = new ColorHSL(h.floatValue, s.floatValue, l.floatValue, a.floatValue);
+			var hcy = new ColorHCL(h.floatValue, c.floatValue, l.floatValue, a.floatValue);
 			hcy = EditorGUI.ColorField(position, hcy);
 			h.floatValue = hcy.h;
-			s.floatValue = hcy.s;
+			c.floatValue = hcy.c;
 			l.floatValue = hcy.l;
 			a.floatValue = hcy.a;
 			EditorGUI.EndProperty();

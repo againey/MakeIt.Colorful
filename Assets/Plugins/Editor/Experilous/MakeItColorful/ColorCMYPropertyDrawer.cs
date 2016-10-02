@@ -8,26 +8,26 @@ using UnityEditor;
 namespace Experilous.MakeItColorful
 {
 	/// <summary>
-	/// Property drawer for the ColorHSY color space struct.  Defers to the standard Unity Editor color field UI.
+	/// Property drawer for the ColorCMY color space struct.  Defers to the standard Unity Editor color field UI.
 	/// </summary>
-	[CustomPropertyDrawer(typeof(ColorHSY))]
-	public class ColorHSYEditor : PropertyDrawer
+	[CustomPropertyDrawer(typeof(ColorCMY))]
+	public class ColorCMYPropertyDrawer : PropertyDrawer
 	{
 		/// <inheritdoc />
 		public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
 		{
 			EditorGUI.BeginProperty(position, label, property);
 			position = EditorGUI.PrefixLabel(position, GUIUtility.GetControlID(FocusType.Passive), label);
-			var h = property.FindPropertyRelative("h");
-			var s = property.FindPropertyRelative("s");
+			var c = property.FindPropertyRelative("c");
+			var m = property.FindPropertyRelative("m");
 			var y = property.FindPropertyRelative("y");
 			var a = property.FindPropertyRelative("a");
-			var hcy = new ColorHSY(h.floatValue, s.floatValue, y.floatValue, a.floatValue);
-			hcy = EditorGUI.ColorField(position, hcy);
-			h.floatValue = hcy.h;
-			s.floatValue = hcy.s;
-			y.floatValue = hcy.y;
-			a.floatValue = hcy.a;
+			var cmy = new ColorCMY(c.floatValue, m.floatValue, y.floatValue, a.floatValue);
+			cmy = EditorGUI.ColorField(position, cmy);
+			c.floatValue = cmy.c;
+			m.floatValue = cmy.m;
+			y.floatValue = cmy.y;
+			a.floatValue = cmy.a;
 			EditorGUI.EndProperty();
 		}
 	}
