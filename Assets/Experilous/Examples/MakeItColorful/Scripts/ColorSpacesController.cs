@@ -20,9 +20,9 @@ namespace Experilous.Examples.MakeItColorful
 		public float modelWedgeAngle = 90;
 		public Material modelMaterial;
 		public Camera modelCamera;
+		public Camera sliceCamera;
 
 		[Header("Timing")]
-		public float updateSliceTextureDelay = 0.1f;
 		public float updateLerpGradientTextureDelay = 0.01f;
 		public float updateColorSpaceMeshDelay = 0.01f;
 
@@ -82,14 +82,12 @@ namespace Experilous.Examples.MakeItColorful
 		private System.Action _updateColorSpaceMesh;
 
 		private int _inScript = 0;
-		private float _updateSliceTextureQueue = float.NaN;
 		private float _updateLerpGradientTextureQueue = float.NaN;
 		private float _updateColorSpaceMeshQueue = float.NaN;
 
-		private Color[] _sliceColors;
-		private Texture2D _sliceTexture;
 		private Texture2D _lerpGradientTexture;
 		private RenderTexture _modelTexture;
+		private RenderTexture _sliceTexture;
 
 		private Mesh _colorSpaceCapsMesh;
 		private Mesh _colorSpaceSidesMesh;
@@ -125,6 +123,8 @@ namespace Experilous.Examples.MakeItColorful
 		private Toggle _cmykYellowSliceToggle;
 
 		private Color _baseColor;
+
+		private const float _hueToRadians = Mathf.PI * 2f;
 
 		private Color activeColor
 		{
@@ -216,40 +216,6 @@ namespace Experilous.Examples.MakeItColorful
 			texture.Apply(false, false);
 		}
 
-		private static void BuildSliceTextureColors(int width, int height, Color[] colors, System.Func<float, float, Color> getColor)
-		{
-			float rx = width - 1f;
-			float ry = height - 1f;
-
-			for (int y = 0, i = 0; y < height; ++y)
-			{
-				float fy = y / ry;
-				for (int x = 0; x < width; ++x, ++i)
-				{
-					float fx = x / rx;
-					colors[i] = getColor(fx, fy);
-				}
-			}
-		}
-
-		private void UpdateSliceTexture(System.Func<float, float, Color> getColor)
-		{
-			BuildSliceTextureColors(visualizationWidth, visualizationHeight, _sliceColors, _getSliceColor);
-
-			_sliceTexture.SetPixels(_sliceColors);
-			_sliceTexture.Apply();
-		}
-
-		private void QueueUpdateSliceTexture(System.Func<float, float, Color> getColor)
-		{
-			if (getColor == null) return;
-			_getSliceColor = getColor;
-			if (float.IsNaN(_updateSliceTextureQueue))
-			{
-				_updateSliceTextureQueue = updateSliceTextureDelay;
-			}
-		}
-
 		private void QueueUpdateLerpGradientTexture(System.Action updateLerpGradientTexture)
 		{
 			if (updateLerpGradientTexture == null) return;
@@ -296,31 +262,34 @@ namespace Experilous.Examples.MakeItColorful
 
 		private void RenderColorSpaceMesh(GetColorSpaceModelCapsInfo getCapsInfo, GetColorSpaceModelSidesInfo getSidesInfo, GetColorSpaceModelSliceInfo getSliceInfo)
 		{
-			float hueToRadians = Mathf.PI * 2f;
 			int halfVertexCount = _colorSpaceCapsVertices.Length / 2;
-			for (int i = 0; i < halfVertexCount; ++i)
+
+			if (getCapsInfo != null)
 			{
-				Vector2 hc = _colorSpaceCapsHueChroma[i];
-				float h = Mathf.Repeat(hc.x + hueSlider.value, 1f);
-				float c = hc.y;
-				float r = hc.x * hueToRadians;
-				float x = Mathf.Cos(r) * c;
-				float z = Mathf.Sin(r) * c;
+				for (int i = 0; i < halfVertexCount; ++i)
+				{
+					Vector2 hc = _colorSpaceCapsHueChroma[i];
+					float h = Mathf.Repeat(hc.x + hueSlider.value, 1f);
+					float c = hc.y;
+					float r = hc.x * _hueToRadians;
+					float x = Mathf.Cos(r) * c;
+					float z = Mathf.Sin(r) * c;
 
-				float y0, y1;
-				Color color0, color1;
-				getCapsInfo(h, c, out y0, out y1, out color0, out color1);
+					float y0, y1;
+					Color color0, color1;
+					getCapsInfo(h, c, out y0, out y1, out color0, out color1);
 
-				_colorSpaceCapsVertices[i] = new Vector3(x, y0, z);
-				_colorSpaceCapsColors[i] = color0;
-				_colorSpaceCapsVertices[i + halfVertexCount] = new Vector3(x, y1, z);
-				_colorSpaceCapsColors[i + halfVertexCount] = color1;
+					_colorSpaceCapsVertices[i] = new Vector3(x, y0, z);
+					_colorSpaceCapsColors[i] = color0;
+					_colorSpaceCapsVertices[i + halfVertexCount] = new Vector3(x, y1, z);
+					_colorSpaceCapsColors[i + halfVertexCount] = color1;
+				}
+
+				_colorSpaceCapsMesh.vertices = _colorSpaceCapsVertices;
+				_colorSpaceCapsMesh.colors = _colorSpaceCapsColors;
+				_colorSpaceCapsMesh.RecalculateNormals();
+				_colorSpaceCapsMesh.UploadMeshData(false);
 			}
-
-			_colorSpaceCapsMesh.vertices = _colorSpaceCapsVertices;
-			_colorSpaceCapsMesh.colors = _colorSpaceCapsColors;
-			_colorSpaceCapsMesh.RecalculateNormals();
-			_colorSpaceCapsMesh.UploadMeshData(false);
 
 			if (getSidesInfo != null)
 			{
@@ -329,7 +298,7 @@ namespace Experilous.Examples.MakeItColorful
 					Vector2 hv = _colorSpaceSidesHueValue[i];
 					float h = Mathf.Repeat(hv.x + hueSlider.value, 1f);
 					float v = hv.y;
-					float r = hv.x * hueToRadians;
+					float r = hv.x * _hueToRadians;
 					float x = Mathf.Cos(r);
 					float z = Mathf.Sin(r);
 
@@ -344,10 +313,13 @@ namespace Experilous.Examples.MakeItColorful
 				_colorSpaceSidesMesh.colors = _colorSpaceSidesColors;
 				_colorSpaceSidesMesh.RecalculateNormals();
 				_colorSpaceSidesMesh.UploadMeshData(false);
+			}
 
+			if (getSidesInfo != null || getCapsInfo == null)
+			{
 				float h0 = hueSlider.value;
 				float h1 = Mathf.Repeat(hueSlider.value - modelWedgeAngle / 360f, 1f);
-				float r1 = -modelWedgeAngle / 360f * hueToRadians;
+				float r1 = -modelWedgeAngle / 360f * _hueToRadians;
 				float cos1 = Mathf.Cos(r1);
 				float sin1 = Mathf.Sin(r1);
 				halfVertexCount = _colorSpaceRectangularSliceVertices.Length / 2;
@@ -376,7 +348,7 @@ namespace Experilous.Examples.MakeItColorful
 			{
 				float h0 = hueSlider.value;
 				float h1 = Mathf.Repeat(hueSlider.value - modelWedgeAngle / 360f, 1f);
-				float r1 = -modelWedgeAngle / 360f * hueToRadians;
+				float r1 = -modelWedgeAngle / 360f * _hueToRadians;
 				float cos1 = Mathf.Cos(r1);
 				float sin1 = Mathf.Sin(r1);
 				halfVertexCount = _colorSpaceTriangularSliceVertices.Length / 2;
@@ -403,35 +375,37 @@ namespace Experilous.Examples.MakeItColorful
 			}
 
 			modelCamera.enabled = true;
+			sliceCamera.enabled = true;
 			Graphics.DrawMesh(_colorSpaceCapsMesh, Matrix4x4.identity, modelMaterial, 0, modelCamera, 0, null, false, false);
 			if (getSidesInfo != null)
 			{
 				Graphics.DrawMesh(_colorSpaceSidesMesh, Matrix4x4.identity, modelMaterial, 0, modelCamera, 0, null, false, false);
+			}
+
+			if (getSidesInfo != null || getCapsInfo == null)
+			{
 				Graphics.DrawMesh(_colorSpaceRectangularSliceMesh, Matrix4x4.identity, modelMaterial, 0, modelCamera, 0, null, false, false);
+				Graphics.DrawMesh(_colorSpaceRectangularSliceMesh, Matrix4x4.identity, modelMaterial, 0, sliceCamera, 0, null, false, false);
 			}
 			else
 			{
 				Graphics.DrawMesh(_colorSpaceTriangularSliceMesh, Matrix4x4.identity, modelMaterial, 0, modelCamera, 0, null, false, false);
+				Graphics.DrawMesh(_colorSpaceTriangularSliceMesh, Matrix4x4.identity, modelMaterial, 0, sliceCamera, 0, null, false, false);
 			}
 
-			StartCoroutine(DisableModelCamera());
+			StartCoroutine(DisableRenderTextureCameras());
 		}
 
-		private System.Collections.IEnumerator DisableModelCamera()
+		private System.Collections.IEnumerator DisableRenderTextureCameras()
 		{
 			yield return new WaitForEndOfFrame();
 			modelCamera.enabled = false;
+			sliceCamera.enabled = false;
 		}
 
 		protected void Awake()
 		{
 			hueSliderBackground.texture = BuildHueTexture(2048);
-
-			_sliceColors = new Color[visualizationWidth * visualizationHeight];
-			_sliceTexture = new Texture2D(visualizationWidth, visualizationHeight, TextureFormat.ARGB32, true);
-			_sliceTexture.filterMode = FilterMode.Bilinear;
-			_sliceTexture.wrapMode = TextureWrapMode.Clamp;
-			sliceVisualizationImage.texture = _sliceTexture;
 
 			_lerpGradientTexture = BuildLerpTexture(2048, false);
 			lerpGradientImage.texture = _lerpGradientTexture;
@@ -642,6 +616,13 @@ namespace Experilous.Examples.MakeItColorful
 			modelCamera.targetTexture = _modelTexture;
 			modelCamera.transform.LookAt(_colorSpaceCapsMesh.bounds.center);
 
+			_sliceTexture = new RenderTexture(visualizationWidth, visualizationHeight, 16, RenderTextureFormat.ARGB32);
+			_sliceTexture.filterMode = FilterMode.Bilinear;
+			_sliceTexture.wrapMode = TextureWrapMode.Clamp;
+			sliceVisualizationImage.texture = _sliceTexture;
+			sliceCamera.targetTexture = _sliceTexture;
+			sliceCamera.transform.LookAt(new Vector3(0.5f, 0.5f, 0f));
+
 			_rgbRedSliceToggle = rgbRedSlider.GetComponent<ColorGradientSlider>().slice;
 			_rgbGreenSliceToggle = rgbGreenSlider.GetComponent<ColorGradientSlider>().slice;
 			_rgbBlueSliceToggle = rgbBlueSlider.GetComponent<ColorGradientSlider>().slice;
@@ -670,22 +651,11 @@ namespace Experilous.Examples.MakeItColorful
 			SetActiveColor(new ColorHSV(hueSlider.value, 1f, 1f));
 			hueSliderHandle.color = activeColor;
 
-			_updateSliceTextureQueue = 0f;
 			_updateLerpGradientTextureQueue = 0f;
 		}
 
 		protected void Update()
 		{
-			if (!float.IsNaN(_updateSliceTextureQueue))
-			{
-				_updateSliceTextureQueue -= Time.deltaTime;
-				if (_updateSliceTextureQueue <= 0f)
-				{
-					UpdateSliceTexture(_getSliceColor);
-					_updateSliceTextureQueue = float.NaN;
-				}
-			}
-
 			if (!float.IsNaN(_updateLerpGradientTextureQueue))
 			{
 				_updateLerpGradientTextureQueue -= Time.deltaTime;
@@ -728,7 +698,6 @@ namespace Experilous.Examples.MakeItColorful
 
 		private void UpdateHueSlice(Color color)
 		{
-			QueueUpdateSliceTexture(_getSliceColor);
 			UpdateHueSlider(color);
 		}
 
@@ -784,6 +753,7 @@ namespace Experilous.Examples.MakeItColorful
 				_updateLerpGradientTexture = RGB_BuildLerpGradient;
 				QueueUpdateLerpGradientTexture(_updateLerpGradientTexture);
 				_onActiveColorChanged(activeColor);
+				RGB_UpdateColorSpaceMesh();
 			}
 		}
 
@@ -821,7 +791,7 @@ namespace Experilous.Examples.MakeItColorful
 				if (hcv.c > 0f) hueSlider.value = hcv.h;
 
 				SetRgbSlice();
-				QueueUpdateSliceTexture(_getSliceColor);
+				QueueUpdateColorSpaceMesh(RGB_UpdateColorSpaceMesh);
 			});
 		}
 
@@ -830,7 +800,7 @@ namespace Experilous.Examples.MakeItColorful
 			if (isOn)
 			{
 				SetRgbSlice();
-				QueueUpdateSliceTexture(_getSliceColor);
+				QueueUpdateColorSpaceMesh(RGB_UpdateColorSpaceMesh);
 			}
 		}
 
@@ -846,8 +816,20 @@ namespace Experilous.Examples.MakeItColorful
 				rgbBlueSlider.value = color.b;
 
 				SetRgbSlice();
-				QueueUpdateSliceTexture(_getSliceColor);
+				QueueUpdateColorSpaceMesh(RGB_UpdateColorSpaceMesh);
 			});
+		}
+
+		private void RGB_UpdateColorSpaceMesh()
+		{
+			RenderColorSpaceMesh(null, null, RGB_GetColorSpaceModelSliceInfo);
+		}
+
+		private void RGB_GetColorSpaceModelSliceInfo(float h0, float h1, float a, float b, out float y0, out float y1, out Color color0, out Color color1)
+		{
+			y0 = b;
+			y1 = b;
+			color0 = color1 = _getSliceColor(a, b);
 		}
 
 		public void OnRgbComponentSliderChanged()
@@ -860,7 +842,7 @@ namespace Experilous.Examples.MakeItColorful
 				if (hcv.c > 0f) hueSlider.value = hcv.h;
 
 				SetRgbSlice();
-				QueueUpdateSliceTexture(_getSliceColor);
+				QueueUpdateColorSpaceMesh(RGB_UpdateColorSpaceMesh);
 			});
 		}
 
@@ -882,6 +864,7 @@ namespace Experilous.Examples.MakeItColorful
 				_updateLerpGradientTexture = CMY_BuildLerpGradient;
 				QueueUpdateLerpGradientTexture(_updateLerpGradientTexture);
 				_onActiveColorChanged(activeColor);
+				CMY_UpdateColorSpaceMesh();
 			}
 		}
 
@@ -920,7 +903,7 @@ namespace Experilous.Examples.MakeItColorful
 				if (hcv.c > 0f) hueSlider.value = hcv.h;
 
 				SetCmySlice();
-				QueueUpdateSliceTexture(_getSliceColor);
+				QueueUpdateColorSpaceMesh(CMY_UpdateColorSpaceMesh);
 			});
 		}
 
@@ -929,7 +912,7 @@ namespace Experilous.Examples.MakeItColorful
 			if (isOn)
 			{
 				SetCmySlice();
-				QueueUpdateSliceTexture(_getSliceColor);
+				QueueUpdateColorSpaceMesh(CMY_UpdateColorSpaceMesh);
 			}
 		}
 
@@ -945,8 +928,20 @@ namespace Experilous.Examples.MakeItColorful
 				cmyYellowSlider.value = color.y;
 
 				SetCmySlice();
-				QueueUpdateSliceTexture(_getSliceColor);
+				QueueUpdateColorSpaceMesh(CMY_UpdateColorSpaceMesh);
 			});
+		}
+
+		private void CMY_UpdateColorSpaceMesh()
+		{
+			RenderColorSpaceMesh(null, null, CMY_GetColorSpaceModelSliceInfo);
+		}
+
+		private void CMY_GetColorSpaceModelSliceInfo(float h0, float h1, float a, float b, out float y0, out float y1, out Color color0, out Color color1)
+		{
+			y0 = b;
+			y1 = b;
+			color0 = color1 = _getSliceColor(a, b);
 		}
 
 		public void OnCmyComponentSliderChanged()
@@ -959,7 +954,7 @@ namespace Experilous.Examples.MakeItColorful
 				if (hcv.c > 0f) hueSlider.value = hcv.h;
 
 				SetCmySlice();
-				QueueUpdateSliceTexture(_getSliceColor);
+				QueueUpdateColorSpaceMesh(CMY_UpdateColorSpaceMesh);
 			});
 		}
 
@@ -982,6 +977,7 @@ namespace Experilous.Examples.MakeItColorful
 				_updateLerpGradientTexture = CMYK_BuildLerpGradient;
 				QueueUpdateLerpGradientTexture(_updateLerpGradientTexture);
 				_onActiveColorChanged(activeColor);
+				CMYK_UpdateColorSpaceMesh();
 			}
 		}
 
@@ -1022,7 +1018,7 @@ namespace Experilous.Examples.MakeItColorful
 				if (hcv.c > 0f) hueSlider.value = hcv.h;
 
 				SetCmykSlice();
-				QueueUpdateSliceTexture(_getSliceColor);
+				QueueUpdateColorSpaceMesh(CMYK_UpdateColorSpaceMesh);
 			});
 		}
 
@@ -1031,7 +1027,7 @@ namespace Experilous.Examples.MakeItColorful
 			if (isOn)
 			{
 				SetCmykSlice();
-				QueueUpdateSliceTexture(_getSliceColor);
+				QueueUpdateColorSpaceMesh(CMYK_UpdateColorSpaceMesh);
 			}
 		}
 
@@ -1048,8 +1044,20 @@ namespace Experilous.Examples.MakeItColorful
 				cmykKeySlider.value = color.k;
 
 				SetCmykSlice();
-				QueueUpdateSliceTexture(_getSliceColor);
+				QueueUpdateColorSpaceMesh(CMYK_UpdateColorSpaceMesh);
 			});
+		}
+
+		private void CMYK_UpdateColorSpaceMesh()
+		{
+			RenderColorSpaceMesh(null, null, CMYK_GetColorSpaceModelSliceInfo);
+		}
+
+		private void CMYK_GetColorSpaceModelSliceInfo(float h0, float h1, float a, float b, out float y0, out float y1, out Color color0, out Color color1)
+		{
+			y0 = b;
+			y1 = b;
+			color0 = color1 = _getSliceColor(a, b);
 		}
 
 		public void OnCmykComponentSliderChanged()
@@ -1062,7 +1070,7 @@ namespace Experilous.Examples.MakeItColorful
 				if (hcv.c > 0f) hueSlider.value = hcv.h;
 
 				SetCmykSlice();
-				QueueUpdateSliceTexture(_getSliceColor);
+				QueueUpdateColorSpaceMesh(CMYK_UpdateColorSpaceMesh);
 			});
 		}
 
@@ -1097,7 +1105,6 @@ namespace Experilous.Examples.MakeItColorful
 				var hsv = (ColorHSV)activeColor;
 				hsv.h = hue;
 				SetActiveColor(hsv);
-				QueueUpdateSliceTexture(_getSliceColor);
 				QueueUpdateColorSpaceMesh(HSV_UpdateColorSpaceMesh);
 			});
 		}
@@ -1180,7 +1187,6 @@ namespace Experilous.Examples.MakeItColorful
 				var hcv = (ColorHCV)activeColor;
 				hcv.h = hue;
 				SetActiveColor(hcv);
-				QueueUpdateSliceTexture(_getSliceColor);
 				QueueUpdateColorSpaceMesh(HCV_UpdateColorSpaceMesh);
 			});
 		}
@@ -1254,7 +1260,6 @@ namespace Experilous.Examples.MakeItColorful
 				var hsl = (ColorHSL)activeColor;
 				hsl.h = hue;
 				SetActiveColor(hsl);
-				QueueUpdateSliceTexture(_getSliceColor);
 				QueueUpdateColorSpaceMesh(HSL_UpdateColorSpaceMesh);
 				HSL_UpdateColorSpaceMesh();
 			});
@@ -1338,7 +1343,6 @@ namespace Experilous.Examples.MakeItColorful
 				var hcl = (ColorHCL)activeColor;
 				hcl.h = hue;
 				SetActiveColor(hcl);
-				QueueUpdateSliceTexture(_getSliceColor);
 				QueueUpdateColorSpaceMesh(HCL_UpdateColorSpaceMesh);
 			});
 		}
@@ -1412,7 +1416,6 @@ namespace Experilous.Examples.MakeItColorful
 				var hsy = (ColorHSY)activeColor;
 				hsy.h = hue;
 				SetActiveColor(hsy);
-				QueueUpdateSliceTexture(_getSliceColor);
 				QueueUpdateColorSpaceMesh(HSY_UpdateColorSpaceMesh);
 			});
 		}
@@ -1495,7 +1498,6 @@ namespace Experilous.Examples.MakeItColorful
 				var hcy = (ColorHCY)_baseColor;
 				hcy.h = hue;
 				SetActiveColor(hcy, false);
-				QueueUpdateSliceTexture(_getSliceColor);
 				QueueUpdateColorSpaceMesh(HCY_UpdateColorSpaceMesh);
 			});
 		}
