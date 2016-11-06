@@ -682,7 +682,7 @@ namespace Experilous.MakeItColorful
 		/// ordinary non-circular values.  Instead of doing a straight mathematical linear interpolation, the distance
 		/// from the first hue to the second is checked in both the forward and backward directions, and the interpolation
 		/// is performed in whichever direction is shortest.  If the two hues are exact polar opposites and thus equally
-		/// far in both directions, the interpolation is always TODO currently not what I want.</para>
+		/// far in both directions, the interpolation is always in the positive direction.</para>
 		/// </remarks>
 		/// <seealso cref="LerpUnclamped(ColorHCY, ColorHCY, float)"/>
 		/// <seealso cref="LerpForward(ColorHCY, ColorHCY, float)"/>
@@ -704,7 +704,7 @@ namespace Experilous.MakeItColorful
 		/// ordinary non-circular values.  Instead of doing a straight mathematical linear interpolation, the distance
 		/// from the first hue to the second is checked in both the forward and backward directions, and the interpolation
 		/// is performed in whichever direction is shortest.  If the two hues are exact polar opposites and thus equally
-		/// far in both directions, the interpolation is always TODO currently not what I want.</para>
+		/// far in both directions, the interpolation is always in the positive direction.</para>
 		/// <para>When specifying a <paramref name="t"/> value outside the range [0, 1], the resulting color may no longer be
 		/// within the valid range of the color space, even if the two original colors are within the valid range.</para>
 		/// </remarks>
