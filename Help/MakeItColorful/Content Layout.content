@@ -1,0 +1,9 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Topics>
+  <Topic id="1c2a6866-2869-4203-a950-4beed65c23c3" visible="True" isDefault="true" title="Introduction" />
+  <Topic id="4c972cba-9fb1-41a2-a084-244dec5fbc98" visible="True" title="Hue" />
+  <Topic id="3358e8a8-72a8-49db-850a-91e04d276ca3" visible="True" title="Vividness" />
+  <Topic id="b183794a-9aa9-406a-b60c-b8d4be83ff63" visible="True" title="Luminance" />
+  <Topic id="04f81f23-5976-42c4-be55-8d7c01831111" visible="True" title="Subtractive Color Spaces" />
+  <Topic id="6930ebf6-a198-4030-a111-b05134ed2e06" visible="True" isSelected="true" apiParentMode="InsertAfter" title="Examples" />
+</Topics>
