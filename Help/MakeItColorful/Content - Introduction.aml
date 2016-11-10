@@ -165,6 +165,14 @@
 						</definition>
 					</definitionTable>
 				</para>
+				<alert type="note">
+					<para>
+						The Make It Colorful library is located within the
+						<codeEntityReference qualifyHint="true">N:Experilous.MakeItColorful</codeEntityReference>
+						namespace.  Be sure to put the appropriate <codeInline>using</codeInline> directive at
+						the top of your scripts, or explicitly qualify type names within your code.
+					</para>
+				</alert>
 			</content>
 		</section>
 		<relatedTopics>
