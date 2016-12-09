@@ -16,7 +16,7 @@ namespace Experilous.MakeItColorful
 	/// <summary>
 	/// A color struct for storing and maniputing colors in the CMY (cyan, magenta, and yellow) color space.
 	/// </summary>
-	[Serializable] public struct ColorCMY
+	[Serializable] public struct ColorCMY : IEquatable<ColorCMY>, IComparable<ColorCMY>
 	{
 		#region Fields and Direct Constructors
 
@@ -725,6 +725,18 @@ namespace Experilous.MakeItColorful
 		/// <returns>Returns true if both colors are equal, false otherwise.</returns>
 		/// <remarks>This function checks for perfect bitwise equality.  If any of the channels differ by even the smallest amount,
 		/// then this function will return false.</remarks>
+		public bool Equals(ColorCMY other)
+		{
+			return this == other;
+		}
+
+		/// <summary>
+		/// Checks if the color is equal to a specified color.
+		/// </summary>
+		/// <param name="other">The other color to which the color is to be compared.</param>
+		/// <returns>Returns true if both colors are equal, false otherwise.</returns>
+		/// <remarks>This function checks for perfect bitwise equality.  If any of the channels differ by even the smallest amount,
+		/// then this function will return false.</remarks>
 		public override bool Equals(object other)
 		{
 			return other is ColorCMY && this == (ColorCMY)other;
@@ -762,6 +774,82 @@ namespace Experilous.MakeItColorful
 		public static bool operator !=(ColorCMY lhs, ColorCMY rhs)
 		{
 			return lhs.c != rhs.c || lhs.m != rhs.m || lhs.y != rhs.y || lhs.a != rhs.a;
+		}
+
+		/// <summary>
+		/// Determines the ordering of this color with the specified color.
+		/// </summary>
+		/// <param name="other">The other color to compare against this one.</param>
+		/// <returns>Returns -1 if this color is ordered before the other color, +1 if it is ordered after the other color, and 0 if neither is ordered before the other.</returns>
+		public int CompareTo(ColorCMY other)
+		{
+			return Detail.OrderUtility.Compare(c, m, y, a, other.c, other.m, other.y, other.a);
+		}
+
+		/// <summary>
+		/// Determines the ordering of the first color in relation to the second color.
+		/// </summary>
+		/// <param name="lhs">The first color compare.</param>
+		/// <param name="rhs">The second color compare.</param>
+		/// <returns>Returns -1 if the first color is ordered before the second color, +1 if it is ordered after the second color, and 0 if neither is ordered before the other.</returns>
+		public int Compare(ColorCMY lhs, ColorCMY rhs)
+		{
+			return Detail.OrderUtility.Compare(lhs.c, lhs.m, lhs.y, lhs.a, rhs.c, rhs.m, rhs.y, rhs.a);
+		}
+
+		/// <summary>
+		/// Checks if the first color is lexicographically ordered before the second color.
+		/// </summary>
+		/// <param name="lhs">The first color compare.</param>
+		/// <param name="rhs">The second color compare.</param>
+		/// <returns>Returns true if the first color is lexicographically ordered before the second color, false otherwise.</returns>
+		public static bool AreOrdered(ColorCMY lhs, ColorCMY rhs)
+		{
+			return Detail.OrderUtility.AreOrdered(lhs.c, lhs.m, lhs.y, lhs.a, rhs.c, rhs.m, rhs.y, rhs.a);
+		}
+
+		/// <summary>
+		/// Checks if the first color is lexicographically ordered before the second color.
+		/// </summary>
+		/// <param name="lhs">The first color compare.</param>
+		/// <param name="rhs">The second color compare.</param>
+		/// <returns>Returns true if the first color is lexicographically ordered before the second color, false otherwise.</returns>
+		public static bool operator < (ColorCMY lhs, ColorCMY rhs)
+		{
+			return AreOrdered(lhs, rhs);
+		}
+
+		/// <summary>
+		/// Checks if the first color is not lexicographically ordered after the second color.
+		/// </summary>
+		/// <param name="lhs">The first color compare.</param>
+		/// <param name="rhs">The second color compare.</param>
+		/// <returns>Returns true if the first color is not lexicographically ordered after the second color, false otherwise.</returns>
+		public static bool operator <= (ColorCMY lhs, ColorCMY rhs)
+		{
+			return !AreOrdered(rhs, lhs);
+		}
+
+		/// <summary>
+		/// Checks if the first color is lexicographically ordered after the second color.
+		/// </summary>
+		/// <param name="lhs">The first color compare.</param>
+		/// <param name="rhs">The second color compare.</param>
+		/// <returns>Returns true if the first color is lexicographically ordered after the second color, false otherwise.</returns>
+		public static bool operator > (ColorCMY lhs, ColorCMY rhs)
+		{
+			return AreOrdered(rhs, lhs);
+		}
+
+		/// <summary>
+		/// Checks if the first color is not lexicographically ordered before the second color.
+		/// </summary>
+		/// <param name="lhs">The first color compare.</param>
+		/// <param name="rhs">The second color compare.</param>
+		/// <returns>Returns true if the first color is not lexicographically ordered before the second color, false otherwise.</returns>
+		public static bool operator >= (ColorCMY lhs, ColorCMY rhs)
+		{
+			return !AreOrdered(lhs, rhs);
 		}
 
 		#endregion

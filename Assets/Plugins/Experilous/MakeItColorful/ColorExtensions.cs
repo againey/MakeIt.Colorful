@@ -85,5 +85,41 @@ namespace Experilous.MakeItColorful
 		public static Color Transparent(this Color rgb) { return new Color(rgb.r, rgb.g, rgb.b, 0f); }
 
 		#endregion
+
+		#region Comparisons
+
+		/// <summary>
+		/// Determines the ordering of this color with the specified color.
+		/// </summary>
+		/// <param name="other">The other color to compare against this one.</param>
+		/// <returns>Returns -1 if this color is ordered before the other color, +1 if it is ordered after the other color, and 0 if neither is ordered before the other.</returns>
+		public static int CompareTo(this Color rgb, Color other)
+		{
+			return Detail.OrderUtility.Compare(rgb.r, rgb.g, rgb.b, rgb.a, other.r, other.g, other.b, other.a);
+		}
+
+		/// <summary>
+		/// Determines the ordering of the first color in relation to the second color.
+		/// </summary>
+		/// <param name="lhs">The first color compare.</param>
+		/// <param name="rhs">The second color compare.</param>
+		/// <returns>Returns -1 if the first color is ordered before the second color, +1 if it is ordered after the second color, and 0 if neither is ordered before the other.</returns>
+		public static int Compare(Color lhs, Color rhs)
+		{
+			return Detail.OrderUtility.Compare(lhs.r, lhs.g, lhs.b, lhs.a, rhs.r, rhs.g, rhs.b, rhs.a);
+		}
+
+		/// <summary>
+		/// Checks if the first color is lexicographically ordered before the second color.
+		/// </summary>
+		/// <param name="lhs">The first color compare.</param>
+		/// <param name="rhs">The second color compare.</param>
+		/// <returns>Returns true if the first color is lexicographically ordered before the second color, false otherwise.</returns>
+		public static bool AreOrdered(Color lhs, Color rhs)
+		{
+			return Detail.OrderUtility.AreOrdered(lhs.r, lhs.g, lhs.b, lhs.a, rhs.r, rhs.g, rhs.b, rhs.a);
+		}
+
+		#endregion
 	}
 }
