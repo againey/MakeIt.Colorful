@@ -627,6 +627,29 @@ namespace Experilous.MakeItColorful
 
 		#endregion
 
+		#region Opacity Operations
+
+		/// <summary>
+		/// Gets the fully opaque variant of the current color.
+		/// </summary>
+		/// <returns>Returns a copy of the current color, but with opacity set to 1.</returns>
+		public ColorHSL Opaque() { return new ColorHSL(h, s, l, 1f); }
+
+		/// <summary>
+		/// Gets a partially translucent variant of the current color.
+		/// </summary>
+		/// <param name="a">The desired opacity for the returned color.</param>
+		/// <returns>Returns a copy of the current color, but with opacity set to the provided value.</returns>
+		public ColorHSL Translucent(float a) { return new ColorHSL(h, s, l, a); }
+
+		/// <summary>
+		/// Gets the fully transparent variant of the current color.
+		/// </summary>
+		/// <returns>Returns a copy of the current color, but with opacity set to 0.</returns>
+		public ColorHSL Transparent() { return new ColorHSL(h, s, l, 0f); }
+
+		#endregion
+
 		#region Lerp
 
 		/// <summary>

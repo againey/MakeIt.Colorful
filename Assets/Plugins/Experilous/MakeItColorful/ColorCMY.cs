@@ -585,6 +585,29 @@ namespace Experilous.MakeItColorful
 
 		#endregion
 
+		#region Opacity Operations
+
+		/// <summary>
+		/// Gets the fully opaque variant of the current color.
+		/// </summary>
+		/// <returns>Returns a copy of the current color, but with opacity set to 1.</returns>
+		public ColorCMY Opaque() { return new ColorCMY(c, m, y, 1f); }
+
+		/// <summary>
+		/// Gets a partially translucent variant of the current color.
+		/// </summary>
+		/// <param name="a">The desired opacity for the returned color.</param>
+		/// <returns>Returns a copy of the current color, but with opacity set to the provided value.</returns>
+		public ColorCMY Translucent(float a) { return new ColorCMY(c, m, y, a); }
+
+		/// <summary>
+		/// Gets the fully transparent variant of the current color.
+		/// </summary>
+		/// <returns>Returns a copy of the current color, but with opacity set to 0.</returns>
+		public ColorCMY Transparent() { return new ColorCMY(c, m, y, 0f); }
+
+		#endregion
+
 		#region Lerp
 
 		/// <summary>

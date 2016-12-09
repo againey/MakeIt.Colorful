@@ -612,6 +612,29 @@ namespace Experilous.MakeItColorful
 
 		#endregion
 
+		#region Opacity Operations
+
+		/// <summary>
+		/// Gets the fully opaque variant of the current color.
+		/// </summary>
+		/// <returns>Returns a copy of the current color, but with opacity set to 1.</returns>
+		public ColorCMYK Opaque() { return new ColorCMYK(c, m, y, k, 1f); }
+
+		/// <summary>
+		/// Gets a partially translucent variant of the current color.
+		/// </summary>
+		/// <param name="a">The desired opacity for the returned color.</param>
+		/// <returns>Returns a copy of the current color, but with opacity set to the provided value.</returns>
+		public ColorCMYK Translucent(float a) { return new ColorCMYK(c, m, y, k, a); }
+
+		/// <summary>
+		/// Gets the fully transparent variant of the current color.
+		/// </summary>
+		/// <returns>Returns a copy of the current color, but with opacity set to 0.</returns>
+		public ColorCMYK Transparent() { return new ColorCMYK(c, m, y, k, 0f); }
+
+		#endregion
+
 		#region Lerp
 
 		/// <summary>
