@@ -1066,5 +1066,64 @@ namespace Experilous.MakeItColorful
 		}
 
 		#endregion
+
+		#region Color Constants
+
+		/// <summary>
+		/// Completely transparent black.  HCYA is (0, 0, 0, 0).
+		/// </summary>
+		public static ColorHCY clear { get { return new ColorHCY(0f, 0f, 0f, 0f); } }
+
+		/// <summary>
+		/// Solid black.  HCYA is (0, 0, 0, 1).
+		/// </summary>
+		public static ColorHCY black { get { return new ColorHCY(0f, 0f, 0f, 1f); } }
+
+		/// <summary>
+		/// Solid gray.  HCYA is (0, 0, 1/2, 1).
+		/// </summary>
+		public static ColorHCY gray { get { return new ColorHCY(0f, 0f, 0.5f, 1f); } }
+
+		/// <summary>
+		/// Solid gray, with English spelling.  HCYA is (0, 0, 1/2, 1).
+		/// </summary>
+		public static ColorHCY grey { get { return new ColorHCY(0f, 0f, 0.5f, 1f); } }
+
+		/// <summary>
+		/// Solid white.  HCYA is (0, 0, 1, 1).
+		/// </summary>
+		public static ColorHCY white { get { return new ColorHCY(0f, 0f, 1f, 1f); } }
+
+		/// <summary>
+		/// Solid red.  HCYA is (0, 1, 0.30, 1).
+		/// </summary>
+		public static ColorHCY red { get { return new ColorHCY(0f, 1f, Detail.LumaUtility.rWeight, 1f); } }
+
+		/// <summary>
+		/// Solid yellow.  HCYA is (1/6, 1, 0.89, 1).
+		/// </summary>
+		public static ColorHCY yellow { get { return new ColorHCY(120f / 360f, 1f, Detail.LumaUtility.rWeight + Detail.LumaUtility.gWeight, 1f); } }
+
+		/// <summary>
+		/// Solid green.  HCYA is (1/3, 1, 0.59, 1).
+		/// </summary>
+		public static ColorHCY green { get { return new ColorHCY(120f / 360f, 1f, Detail.LumaUtility.gWeight, 1f); } }
+
+		/// <summary>
+		/// Solic cyan.  HCYA is (1/2, 1, 0.70, 1).
+		/// </summary>
+		public static ColorHCY cyan { get { return new ColorHCY(240f / 360f, 1f, Detail.LumaUtility.gWeight + Detail.LumaUtility.bWeight, 1f); } }
+
+		/// <summary>
+		/// Solid blue.  HCYA is (2/3, 1, 0.11, 1).
+		/// </summary>
+		public static ColorHCY blue { get { return new ColorHCY(240f / 360f, 1f, Detail.LumaUtility.bWeight, 1f); } }
+
+		/// <summary>
+		/// Solid magenta.  HCYA is (5/6, 1, 0.41, 1).
+		/// </summary>
+		public static ColorHCY magenta { get { return new ColorHCY(300f / 360f, 1f, Detail.LumaUtility.bWeight + Detail.LumaUtility.rWeight, 1f); } }
+
+		#endregion
 	}
 }

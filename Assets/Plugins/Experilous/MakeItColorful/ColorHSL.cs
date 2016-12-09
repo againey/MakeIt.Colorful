@@ -955,5 +955,64 @@ namespace Experilous.MakeItColorful
 		}
 
 		#endregion
+
+		#region Color Constants
+
+		/// <summary>
+		/// Completely transparent black.  HSLA is (0, 0, 0, 0).
+		/// </summary>
+		public static ColorHSL clear { get { return new ColorHSL(0f, 0f, 0f, 0f); } }
+
+		/// <summary>
+		/// Solid black.  HSLA is (0, 0, 0, 1).
+		/// </summary>
+		public static ColorHSL black { get { return new ColorHSL(0f, 0f, 0f, 1f); } }
+
+		/// <summary>
+		/// Solid gray.  HSLA is (0, 0, 1/2, 1).
+		/// </summary>
+		public static ColorHSL gray { get { return new ColorHSL(0f, 0f, 0.5f, 1f); } }
+
+		/// <summary>
+		/// Solid gray, with English spelling.  HSLA is (0, 0, 1/2, 1).
+		/// </summary>
+		public static ColorHSL grey { get { return new ColorHSL(0f, 0f, 0.5f, 1f); } }
+
+		/// <summary>
+		/// Solid white.  HSLA is (0, 0, 1, 1).
+		/// </summary>
+		public static ColorHSL white { get { return new ColorHSL(0f, 0f, 1f, 1f); } }
+
+		/// <summary>
+		/// Solid red.  HSLA is (0, 1, 1/2, 1).
+		/// </summary>
+		public static ColorHSL red { get { return new ColorHSL(0f, 1f, 0.5f, 1f); } }
+
+		/// <summary>
+		/// Solid yellow.  HSLA is (1/6, 1, 1/2, 1).
+		/// </summary>
+		public static ColorHSL yellow { get { return new ColorHSL(120f / 360f, 1f, 0.5f, 1f); } }
+
+		/// <summary>
+		/// Solid green.  HSLA is (1/3, 1, 1/2, 1).
+		/// </summary>
+		public static ColorHSL green { get { return new ColorHSL(120f / 360f, 1f, 0.5f, 1f); } }
+
+		/// <summary>
+		/// Solic cyan.  HSLA is (1/2, 1, 1/2, 1).
+		/// </summary>
+		public static ColorHSL cyan { get { return new ColorHSL(240f / 360f, 1f, 0.5f, 1f); } }
+
+		/// <summary>
+		/// Solid blue.  HSLA is (2/3, 1, 1/2, 1).
+		/// </summary>
+		public static ColorHSL blue { get { return new ColorHSL(240f / 360f, 1f, 0.5f, 1f); } }
+
+		/// <summary>
+		/// Solid magenta.  HSLA is (5/6, 1, 1/2, 1).
+		/// </summary>
+		public static ColorHSL magenta { get { return new ColorHSL(300f / 360f, 1f, 0.5f, 1f); } }
+
+		#endregion
 	}
 }

@@ -988,5 +988,64 @@ namespace Experilous.MakeItColorful
 		}
 
 		#endregion
+
+		#region Color Constants
+
+		/// <summary>
+		/// Completely transparent black.  HCVA is (0, 0, 0, 0).
+		/// </summary>
+		public static ColorHCV clear { get { return new ColorHCV(0f, 0f, 0f, 0f); } }
+
+		/// <summary>
+		/// Solid black.  HCVA is (0, 0, 0, 1).
+		/// </summary>
+		public static ColorHCV black { get { return new ColorHCV(0f, 0f, 0f, 1f); } }
+
+		/// <summary>
+		/// Solid gray.  HCVA is (0, 0, 1/2, 1).
+		/// </summary>
+		public static ColorHCV gray { get { return new ColorHCV(0f, 0f, 0.5f, 1f); } }
+
+		/// <summary>
+		/// Solid gray, with English spelling.  HCVA is (0, 0, 1/2, 1).
+		/// </summary>
+		public static ColorHCV grey { get { return new ColorHCV(0f, 0f, 0.5f, 1f); } }
+
+		/// <summary>
+		/// Solid white.  HCVA is (0, 0, 1, 1).
+		/// </summary>
+		public static ColorHCV white { get { return new ColorHCV(0f, 0f, 1f, 1f); } }
+
+		/// <summary>
+		/// Solid red.  HCVA is (0, 1, 1, 1).
+		/// </summary>
+		public static ColorHCV red { get { return new ColorHCV(0f, 1f, 1f, 1f); } }
+
+		/// <summary>
+		/// Solid yellow.  HCVA is (1/6, 1, 1, 1).
+		/// </summary>
+		public static ColorHCV yellow { get { return new ColorHCV(120f / 360f, 1f, 1f, 1f); } }
+
+		/// <summary>
+		/// Solid green.  HCVA is (1/3, 1, 1, 1).
+		/// </summary>
+		public static ColorHCV green { get { return new ColorHCV(120f / 360f, 1f, 1f, 1f); } }
+
+		/// <summary>
+		/// Solic cyan.  HCVA is (1/2, 1, 1, 1).
+		/// </summary>
+		public static ColorHCV cyan { get { return new ColorHCV(240f / 360f, 1f, 1f, 1f); } }
+
+		/// <summary>
+		/// Solid blue.  HCVA is (2/3, 1, 1, 1).
+		/// </summary>
+		public static ColorHCV blue { get { return new ColorHCV(240f / 360f, 1f, 1f, 1f); } }
+
+		/// <summary>
+		/// Solid magenta.  HCVA is (5/6, 1, 1, 1).
+		/// </summary>
+		public static ColorHCV magenta { get { return new ColorHCV(300f / 360f, 1f, 1f, 1f); } }
+
+		#endregion
 	}
 }

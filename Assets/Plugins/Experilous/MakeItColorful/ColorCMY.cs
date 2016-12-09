@@ -813,5 +813,64 @@ namespace Experilous.MakeItColorful
 		}
 
 		#endregion
+
+		#region Color Constants
+
+		/// <summary>
+		/// Completely transparent black.  CMYA is (1, 1, 1, 0).
+		/// </summary>
+		public static ColorCMY clear { get { return new ColorCMY(1f, 1f, 1f, 0f); } }
+
+		/// <summary>
+		/// Solid black.  CMYA is (1, 1, 1, 1).
+		/// </summary>
+		public static ColorCMY black { get { return new ColorCMY(1f, 1f, 1f, 1f); } }
+
+		/// <summary>
+		/// Solid gray.  CMYA is (1/2, 1/2, 1/2, 1).
+		/// </summary>
+		public static ColorCMY gray { get { return new ColorCMY(0.5f, 0.5f, 0.5f, 1f); } }
+
+		/// <summary>
+		/// Solid gray, with English spelling.  CMYA is (1/2, 1/2, 1/2, 1).
+		/// </summary>
+		public static ColorCMY grey { get { return new ColorCMY(0.5f, 0.5f, 0.5f, 1f); } }
+
+		/// <summary>
+		/// Solid white.  CMYA is (0, 0, 0, 1).
+		/// </summary>
+		public static ColorCMY white { get { return new ColorCMY(0f, 0f, 0f, 1f); } }
+
+		/// <summary>
+		/// Solid red.  CMYA is (0, 1, 1, 1).
+		/// </summary>
+		public static ColorCMY red { get { return new ColorCMY(0f, 1f, 1f, 1f); } }
+
+		/// <summary>
+		/// Solid yellow.  CMYA is (0, 0, 1, 1).
+		/// </summary>
+		public static ColorCMY yellow { get { return new ColorCMY(0f, 0f, 1f, 1f); } }
+
+		/// <summary>
+		/// Solid green.  CMYA is (1, 0, 1, 1).
+		/// </summary>
+		public static ColorCMY green { get { return new ColorCMY(1f, 0f, 1f, 1f); } }
+
+		/// <summary>
+		/// Solic cyan.  CMYA is (1, 0, 0, 1).
+		/// </summary>
+		public static ColorCMY cyan { get { return new ColorCMY(1f, 0f, 0f, 1f); } }
+
+		/// <summary>
+		/// Solid blue.  CMYA is (1, 1, 0, 1).
+		/// </summary>
+		public static ColorCMY blue { get { return new ColorCMY(1f, 1f, 0f, 1f); } }
+
+		/// <summary>
+		/// Solid magenta.  CMYA is (0, 1, 0, 1).
+		/// </summary>
+		public static ColorCMY magenta { get { return new ColorCMY(0f, 1f, 0f, 1f); } }
+
+		#endregion
 	}
 }

@@ -848,5 +848,64 @@ namespace Experilous.MakeItColorful
 		}
 
 		#endregion
+
+		#region Color Constants
+
+		/// <summary>
+		/// Completely transparent black.  CMYKA is (0, 0, 0, 1, 0).
+		/// </summary>
+		public static ColorCMYK clear { get { return new ColorCMYK(0f, 0f, 0f, 1f, 0f); } }
+
+		/// <summary>
+		/// Solid black.  CMYKA is (0, 0, 0, 1, 1).
+		/// </summary>
+		public static ColorCMYK black { get { return new ColorCMYK(0f, 0f, 0f, 1f, 1f); } }
+
+		/// <summary>
+		/// Solid gray.  CMYKA is (0, 0, 0, 1/2, 1).
+		/// </summary>
+		public static ColorCMYK gray { get { return new ColorCMYK(0f, 0f, 0f, 0.5f, 1f); } }
+
+		/// <summary>
+		/// Solid gray, with English spelling.  CMYKA is (0, 0, 0, 1/2, 1).
+		/// </summary>
+		public static ColorCMYK grey { get { return new ColorCMYK(0f, 0f, 0f, 0.5f, 1f); } }
+
+		/// <summary>
+		/// Solid white.  CMYKA is (0, 0, 0, 0, 1).
+		/// </summary>
+		public static ColorCMYK white { get { return new ColorCMYK(0f, 0f, 0f, 0f, 1f); } }
+
+		/// <summary>
+		/// Solid red.  CMYKA is (0, 1, 1, 0, 1).
+		/// </summary>
+		public static ColorCMYK red { get { return new ColorCMYK(0f, 1f, 1f, 0f, 1f); } }
+
+		/// <summary>
+		/// Solid yellow.  CMYKA is (0, 0, 1, 0, 1).
+		/// </summary>
+		public static ColorCMYK yellow { get { return new ColorCMYK(0f, 0f, 1f, 0f, 1f); } }
+
+		/// <summary>
+		/// Solid green.  CMYKA is (1, 0, 1, 0, 1).
+		/// </summary>
+		public static ColorCMYK green { get { return new ColorCMYK(1f, 0f, 1f, 0f, 1f); } }
+
+		/// <summary>
+		/// Solic cyan.  CMYKA is (1, 0, 0, 0, 1).
+		/// </summary>
+		public static ColorCMYK cyan { get { return new ColorCMYK(1f, 0f, 0f, 0f, 1f); } }
+
+		/// <summary>
+		/// Solid blue.  CMYKA is (1, 1, 0, 0, 1).
+		/// </summary>
+		public static ColorCMYK blue { get { return new ColorCMYK(1f, 1f, 0f, 0f, 1f); } }
+
+		/// <summary>
+		/// Solid magenta.  CMYKA is (0, 1, 0, 0, 1).
+		/// </summary>
+		public static ColorCMYK magenta { get { return new ColorCMYK(0f, 1f, 0f, 0f, 1f); } }
+
+		#endregion
 	}
 }

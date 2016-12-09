@@ -952,5 +952,64 @@ namespace Experilous.MakeItColorful
 		}
 
 		#endregion
+
+		#region Color Constants
+
+		/// <summary>
+		/// Completely transparent black.  HSVA is (0, 0, 0, 0).
+		/// </summary>
+		public static ColorHSV clear { get { return new ColorHSV(0f, 0f, 0f, 0f); } }
+
+		/// <summary>
+		/// Solid black.  HSVA is (0, 0, 0, 1).
+		/// </summary>
+		public static ColorHSV black { get { return new ColorHSV(0f, 0f, 0f, 1f); } }
+
+		/// <summary>
+		/// Solid gray.  HSVA is (0, 0, 1/2, 1).
+		/// </summary>
+		public static ColorHSV gray { get { return new ColorHSV(0f, 0f, 0.5f, 1f); } }
+
+		/// <summary>
+		/// Solid gray, with English spelling.  HSVA is (0, 0, 1/2, 1).
+		/// </summary>
+		public static ColorHSV grey { get { return new ColorHSV(0f, 0f, 0.5f, 1f); } }
+
+		/// <summary>
+		/// Solid white.  HSVA is (0, 0, 1, 1).
+		/// </summary>
+		public static ColorHSV white { get { return new ColorHSV(0f, 0f, 1f, 1f); } }
+
+		/// <summary>
+		/// Solid red.  HSVA is (0, 1, 1, 1).
+		/// </summary>
+		public static ColorHSV red { get { return new ColorHSV(0f, 1f, 1f, 1f); } }
+
+		/// <summary>
+		/// Solid yellow.  HSVA is (1/6, 1, 1, 1).
+		/// </summary>
+		public static ColorHSV yellow { get { return new ColorHSV(120f / 360f, 1f, 1f, 1f); } }
+
+		/// <summary>
+		/// Solid green.  HSVA is (1/3, 1, 1, 1).
+		/// </summary>
+		public static ColorHSV green { get { return new ColorHSV(120f / 360f, 1f, 1f, 1f); } }
+
+		/// <summary>
+		/// Solic cyan.  HSVA is (1/2, 1, 1, 1).
+		/// </summary>
+		public static ColorHSV cyan { get { return new ColorHSV(240f / 360f, 1f, 1f, 1f); } }
+
+		/// <summary>
+		/// Solid blue.  HSVA is (2/3, 1, 1, 1).
+		/// </summary>
+		public static ColorHSV blue { get { return new ColorHSV(240f / 360f, 1f, 1f, 1f); } }
+
+		/// <summary>
+		/// Solid magenta.  HSVA is (5/6, 1, 1, 1).
+		/// </summary>
+		public static ColorHSV magenta { get { return new ColorHSV(300f / 360f, 1f, 1f, 1f); } }
+
+		#endregion
 	}
 }
