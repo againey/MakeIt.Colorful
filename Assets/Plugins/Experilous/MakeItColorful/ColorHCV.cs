@@ -1051,6 +1051,24 @@ namespace Experilous.MakeItColorful
 		}
 
 		/// <summary>
+		/// Gets an HCL color that is also valid within the RGB color space, using <paramref name="chromaBias"/> to determine how to preserve chroma or luma.
+		/// </summary>
+		/// <param name="chromaBias">The bias value for favoring the preservation of chroma over lightness.  Will be clamped to the range [0, 1].  When 0, lightness is unchanged if possible, changing only chroma.  When 1, chroma is unchanged if possible, changing only lightness.</param>
+		/// <returns>A valid HCL color with chroma and luma adjusted into the valid range if necessary, according to the weighting of <paramref name="chromaBias"/>.</returns>
+		public ColorHCV GetValid(float chromaBias = 0f)
+		{
+			if (c <= v)
+			{
+				return new ColorHCV(Mathf.Repeat(h, 1f), Mathf.Clamp01(c), Mathf.Clamp01(v), Mathf.Clamp01(a));
+			}
+			else
+			{
+				float cv = Mathf.Clamp01(Mathf.Lerp(v, c, chromaBias));
+				return new ColorHCV(Mathf.Repeat(h, 1f), cv, cv, Mathf.Clamp01(a));
+			}
+		}
+
+		/// <summary>
 		/// Indicates if the color is canonical, or if there is a different representation of this color that is canonical.
 		/// </summary>
 		/// <returns>Returns true if the color is canonical, false if there is a different representation that is canonical.</returns>

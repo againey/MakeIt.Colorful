@@ -1064,6 +1064,55 @@ namespace Experilous.MakeItColorful
 		}
 
 		/// <summary>
+		/// Gets an HCL color that is also valid within the RGB color space, using <paramref name="chromaBias"/> to determine how to preserve chroma or luma.
+		/// </summary>
+		/// <param name="chromaBias">The bias value for favoring the preservation of chroma over lightness.  Will be clamped to the range [0, 1].  When 0, lightness is unchanged if possible, changing only chroma.  When 1, chroma is unchanged if possible, changing only lightness.</param>
+		/// <returns>A valid HCL color with chroma and luma adjusted into the valid range if necessary, according to the weighting of <paramref name="chromaBias"/>.</returns>
+		public ColorHCL GetValid(float chromaBias = 0f)
+		{
+			if (this.l <= 0.5f)
+			{
+				float cMax = this.l / 0.5f;
+				if (this.c <= cMax)
+				{
+					return new ColorHCL(Mathf.Repeat(this.h, 1f), Mathf.Max(0f, this.c), Mathf.Max(0f, this.l), Mathf.Clamp01(a));
+				}
+				else
+				{
+					float yMin = this.c * 0.5f;
+
+					chromaBias = Mathf.Clamp01(chromaBias);
+					float lightnessBias = 1f - chromaBias;
+
+					float c = this.c * chromaBias + cMax * lightnessBias;
+					float y = yMin * chromaBias + this.l * lightnessBias;
+
+					return new ColorHCL(Mathf.Repeat(this.h, 1f), Mathf.Clamp01(c), Mathf.Clamp01(y), Mathf.Clamp01(a));
+				}
+			}
+			else
+			{
+				float cMax = (1f - this.l) / 0.5f;
+				if (this.c <= cMax)
+				{
+					return new ColorHCL(Mathf.Repeat(this.h, 1f), Mathf.Max(0f, this.c), Mathf.Min(this.l, 1f), Mathf.Clamp01(a));
+				}
+				else
+				{
+					float yMax = (1f - this.c) * 0.5f + 0.5f;
+
+					chromaBias = Mathf.Clamp01(chromaBias);
+					float lightnessBias = 1f - chromaBias;
+
+					float c = this.c * chromaBias + cMax * lightnessBias;
+					float y = yMax * chromaBias + this.l * lightnessBias;
+
+					return new ColorHCL(Mathf.Repeat(this.h, 1f), Mathf.Clamp01(c), Mathf.Clamp01(y), Mathf.Clamp01(a));
+				}
+			}
+		}
+
+		/// <summary>
 		/// Indicates if the color is canonical, or if there is a different representation of this color that is canonical.
 		/// </summary>
 		/// <returns>Returns true if the color is canonical, false if there is a different representation that is canonical.</returns>

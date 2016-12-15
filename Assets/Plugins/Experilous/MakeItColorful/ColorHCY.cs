@@ -1093,8 +1093,8 @@ namespace Experilous.MakeItColorful
 		{
 			float h = Mathf.Repeat(this.h, 1f);
 			float yMid = GetLumaAtMaxChroma(h);
-			float maxChroma = (this.y <= yMid) ? this.y / yMid : (1f - this.y) / (1f - yMid);
-			if (this.c <= maxChroma)
+			float cMax = (this.y <= yMid) ? this.y / yMid : (1f - this.y) / (1f - yMid);
+			if (this.c <= cMax)
 			{
 				return new ColorHCY(h, Mathf.Max(0f, this.c), Mathf.Clamp01(this.y), Mathf.Clamp01(a));
 			}
@@ -1124,6 +1124,57 @@ namespace Experilous.MakeItColorful
 				else
 				{
 					return new ColorHCY(h, 1f, yMid, Mathf.Clamp01(a));
+				}
+			}
+		}
+
+		/// <summary>
+		/// Gets an HCY color that is also valid within the RGB color space, using <paramref name="chromaBias"/> to determine how to preserve chroma or luma.
+		/// </summary>
+		/// <param name="chromaBias">The bias value for favoring the preservation of chroma over luma.  Will be clamped to the range [0, 1].  When 0, luma is unchanged if possible, changing only chroma.  When 1, chroma is unchanged if possible, changing only luma.</param>
+		/// <returns>A valid HCY color with chroma and luma adjusted into the valid range if necessary, according to the weighting of <paramref name="chromaBias"/>.</returns>
+		public ColorHCY GetValid(float chromaBias = 0f)
+		{
+			float h = Mathf.Repeat(this.h, 1f);
+			float yMid = GetLumaAtMaxChroma(h);
+			if (this.y <= yMid)
+			{
+				float cMax = this.y / yMid;
+				if (this.c <= cMax)
+				{
+					return new ColorHCY(h, Mathf.Max(0f, this.c), Mathf.Max(0f, this.y), Mathf.Clamp01(a));
+				}
+				else
+				{
+					float yMin = this.c * yMid;
+
+					chromaBias = Mathf.Clamp01(chromaBias);
+					float lumaBias = 1f - chromaBias;
+
+					float c = this.c * chromaBias + cMax * lumaBias;
+					float y = yMin * chromaBias + this.y * lumaBias;
+
+					return new ColorHCY(h, Mathf.Clamp01(c), Mathf.Clamp01(y), Mathf.Clamp01(a));
+				}
+			}
+			else
+			{
+				float cMax = (1f - this.y) / (1f - yMid);
+				if (this.c <= cMax)
+				{
+					return new ColorHCY(h, Mathf.Max(0f, this.c), Mathf.Min(this.y, 1f), Mathf.Clamp01(a));
+				}
+				else
+				{
+					float yMax = (1f - this.c) * (1f - yMid) + yMid;
+
+					chromaBias = Mathf.Clamp01(chromaBias);
+					float lumaBias = 1f - chromaBias;
+
+					float c = this.c * chromaBias + cMax * lumaBias;
+					float y = yMax * chromaBias + this.y * lumaBias;
+
+					return new ColorHCY(h, Mathf.Clamp01(c), Mathf.Clamp01(y), Mathf.Clamp01(a));
 				}
 			}
 		}
