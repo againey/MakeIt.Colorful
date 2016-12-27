@@ -593,7 +593,7 @@ namespace Experilous.MakeItColorful
 					case 2: return y;
 					case 3: return k;
 					case 4: return a;
-					default: throw new ArgumentOutOfRangeException();
+					default: throw new ArgumentOutOfRangeException("index", index, "The index must be in the range [0, 4].");
 				}
 			}
 			set
@@ -605,7 +605,7 @@ namespace Experilous.MakeItColorful
 					case 2: y = value; break;
 					case 3: k = value; break;
 					case 4: a = value; break;
-					default: throw new ArgumentOutOfRangeException();
+					default: throw new ArgumentOutOfRangeException("index", index, "The index must be in the range [0, 4].");
 				}
 			}
 		}
