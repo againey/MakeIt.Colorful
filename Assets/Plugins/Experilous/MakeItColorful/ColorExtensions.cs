@@ -68,12 +68,14 @@ namespace Experilous.MakeItColorful
 		/// <summary>
 		/// Gets the fully opaque variant of the current color.
 		/// </summary>
+		/// <param name="rgb">The RGB color instance to which this extension function will apply.</param>
 		/// <returns>Returns a copy of the current color, but with opacity set to 1.</returns>
 		public static Color Opaque(this Color rgb) { return new Color(rgb.r, rgb.g, rgb.b, 1f); }
 
 		/// <summary>
 		/// Gets a partially translucent variant of the current color.
 		/// </summary>
+		/// <param name="rgb">The RGB color instance to which this extension function will apply.</param>
 		/// <param name="a">The desired opacity for the returned color.</param>
 		/// <returns>Returns a copy of the current color, but with opacity set to the provided value.</returns>
 		public static Color Translucent(this Color rgb, float a) { return new Color(rgb.r, rgb.g, rgb.b, a); }
@@ -81,6 +83,7 @@ namespace Experilous.MakeItColorful
 		/// <summary>
 		/// Gets the fully transparent variant of the current color.
 		/// </summary>
+		/// <param name="rgb">The RGB color instance to which this extension function will apply.</param>
 		/// <returns>Returns a copy of the current color, but with opacity set to 0.</returns>
 		public static Color Transparent(this Color rgb) { return new Color(rgb.r, rgb.g, rgb.b, 0f); }
 
@@ -91,6 +94,7 @@ namespace Experilous.MakeItColorful
 		/// <summary>
 		/// Gets the hue of the color.
 		/// </summary>
+		/// <param name="rgb">The RGB color instance to which this extension function will apply.</param>
 		/// <returns>The color's hue.</returns>
 		public static float GetHue(this Color rgb)
 		{
@@ -102,6 +106,7 @@ namespace Experilous.MakeItColorful
 		/// <summary>
 		/// Gets the chroma of the color.
 		/// </summary>
+		/// <param name="rgb">The RGB color instance to which this extension function will apply.</param>
 		/// <returns>The color's chroma.</returns>
 		public static float GetChroma(this Color rgb)
 		{
@@ -113,6 +118,7 @@ namespace Experilous.MakeItColorful
 		/// <summary>
 		/// Gets the intensity of the color.
 		/// </summary>
+		/// <param name="rgb">The RGB color instance to which this extension function will apply.</param>
 		/// <returns>The color's intensity.</returns>
 		public static float GetIntensity(this Color rgb)
 		{
@@ -122,6 +128,7 @@ namespace Experilous.MakeItColorful
 		/// <summary>
 		/// Gets the value of the color.
 		/// </summary>
+		/// <param name="rgb">The RGB color instance to which this extension function will apply.</param>
 		/// <returns>The color's value.</returns>
 		public static float GetValue(this Color rgb)
 		{
@@ -131,6 +138,7 @@ namespace Experilous.MakeItColorful
 		/// <summary>
 		/// Gets the lightness of the color.
 		/// </summary>
+		/// <param name="rgb">The RGB color instance to which this extension function will apply.</param>
 		/// <returns>The color's lightness.</returns>
 		public static float GetLightness(this Color rgb)
 		{
@@ -142,6 +150,7 @@ namespace Experilous.MakeItColorful
 		/// <summary>
 		/// Gets the luma (apparent brightness) of the color.
 		/// </summary>
+		/// <param name="rgb">The RGB color instance to which this extension function will apply.</param>
 		/// <returns>The color's luma.</returns>
 		public static float GetLuma(this Color rgb)
 		{
@@ -155,6 +164,7 @@ namespace Experilous.MakeItColorful
 		/// <summary>
 		/// Determines the ordering of this color with the specified color.
 		/// </summary>
+		/// <param name="rgb">The RGB color instance to which this extension function will apply.</param>
 		/// <param name="other">The other color to compare against this one.</param>
 		/// <returns>Returns -1 if this color is ordered before the other color, +1 if it is ordered after the other color, and 0 if neither is ordered before the other.</returns>
 		public static int CompareTo(this Color rgb, Color other)
