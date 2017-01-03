@@ -925,6 +925,70 @@ namespace Experilous.MakeItColorful
 
 		#endregion
 
+		#region Attributes
+
+		/// <summary>
+		/// Gets the hue of the color.
+		/// </summary>
+		/// <returns>The color's hue.</returns>
+		public float GetHue()
+		{
+			float min = Mathf.Min(Mathf.Min(c, m), y);
+			float max = Mathf.Max(Mathf.Max(c, m), y);
+			return Detail.HueUtility.FromCMY(c, m, y, min, max - min);
+		}
+
+		/// <summary>
+		/// Gets the chroma of the color.
+		/// </summary>
+		/// <returns>The color's chroma.</returns>
+		public float GetChroma()
+		{
+			float min = Mathf.Min(Mathf.Min(c, m), y);
+			float max = Mathf.Max(Mathf.Max(c, m), y);
+			return max - min;
+		}
+
+		/// <summary>
+		/// Gets the intensity of the color.
+		/// </summary>
+		/// <returns>The color's intensity.</returns>
+		public float GetIntensity()
+		{
+			return 1f - (c + m + y) / 3f;
+		}
+
+		/// <summary>
+		/// Gets the value of the color.
+		/// </summary>
+		/// <returns>The color's value.</returns>
+		public float GetValue()
+		{
+			return 1f - Mathf.Min(Mathf.Min(c, m), y);
+		}
+
+		/// <summary>
+		/// Gets the lightness of the color.
+		/// </summary>
+		/// <returns>The color's lightness.</returns>
+		public float GetLightness()
+		{
+			float min = Mathf.Min(Mathf.Min(c, m), y);
+			float max = Mathf.Max(Mathf.Max(c, m), y);
+			return (min + max) / 2f;
+		}
+
+		/// <summary>
+		/// Gets the luma (apparent brightness) of the color.
+		/// </summary>
+		/// <returns>The color's luma.</returns>
+		public float GetLuma()
+		{
+			return Detail.LumaUtility.FromCMY(c, m, y);
+		}
+
+		#endregion
+
 		#region Color Constants
 
 		/// <summary>

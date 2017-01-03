@@ -86,6 +86,70 @@ namespace Experilous.MakeItColorful
 
 		#endregion
 
+		#region Attributes
+
+		/// <summary>
+		/// Gets the hue of the color.
+		/// </summary>
+		/// <returns>The color's hue.</returns>
+		public static float GetHue(this Color rgb)
+		{
+			float min = Mathf.Min(Mathf.Min(rgb.r, rgb.g), rgb.b);
+			float max = Mathf.Max(Mathf.Max(rgb.r, rgb.g), rgb.b);
+			return Detail.HueUtility.FromRGB(rgb.r, rgb.g, rgb.b, max, max - min);
+		}
+
+		/// <summary>
+		/// Gets the chroma of the color.
+		/// </summary>
+		/// <returns>The color's chroma.</returns>
+		public static float GetChroma(this Color rgb)
+		{
+			float min = Mathf.Min(Mathf.Min(rgb.r, rgb.g), rgb.b);
+			float max = Mathf.Max(Mathf.Max(rgb.r, rgb.g), rgb.b);
+			return max - min;
+		}
+
+		/// <summary>
+		/// Gets the intensity of the color.
+		/// </summary>
+		/// <returns>The color's intensity.</returns>
+		public static float GetIntensity(this Color rgb)
+		{
+			return (rgb.r + rgb.g + rgb.b) / 3f;
+		}
+
+		/// <summary>
+		/// Gets the value of the color.
+		/// </summary>
+		/// <returns>The color's value.</returns>
+		public static float GetValue(this Color rgb)
+		{
+			return Mathf.Max(Mathf.Max(rgb.r, rgb.g), rgb.b);
+		}
+
+		/// <summary>
+		/// Gets the lightness of the color.
+		/// </summary>
+		/// <returns>The color's lightness.</returns>
+		public static float GetLightness(this Color rgb)
+		{
+			float min = Mathf.Min(Mathf.Min(rgb.r, rgb.g), rgb.b);
+			float max = Mathf.Max(Mathf.Max(rgb.r, rgb.g), rgb.b);
+			return (min + max) / 2f;
+		}
+
+		/// <summary>
+		/// Gets the luma (apparent brightness) of the color.
+		/// </summary>
+		/// <returns>The color's luma.</returns>
+		public static float GetLuma(this Color rgb)
+		{
+			return Detail.LumaUtility.FromRGB(rgb.r, rgb.g, rgb.b);
+		}
+
+		#endregion
+
 		#region Comparisons
 
 		/// <summary>
