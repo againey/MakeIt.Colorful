@@ -79,38 +79,39 @@
     <VisibleItems>Attributes, ExplicitInterfaceImplementations, InheritedMembers, Protected, ProtectedInternalAsProtected</VisibleItems>
     <ApiFilter>
       <Filter entryType="Namespace" fullName="" isExposed="False" />
-<Filter entryType="Namespace" fullName="Experilous" isExposed="False" />
-<Filter entryType="Namespace" fullName="Experilous.Containers" isExposed="False" />
-<Filter entryType="Namespace" fullName="Experilous.Core" isExposed="False" />
-<Filter entryType="Namespace" fullName="Experilous.Examples.MakeItColorful" isExposed="False" />
-<Filter entryType="Namespace" fullName="Experilous.Examples.MakeItRandom" isExposed="False" />
-<Filter entryType="Namespace" fullName="Experilous.Examples.MakeItTile" isExposed="False" />
-<Filter entryType="Namespace" fullName="Experilous.Examples.MakeItWrap" isExposed="False" />
-<Filter entryType="Namespace" fullName="Experilous.Examples.Shared" isExposed="False" />
-<Filter entryType="Namespace" fullName="Experilous.Internal" isExposed="False" />
-<Filter entryType="Namespace" fullName="Experilous.MakeItColorful.Detail" isExposed="False" />
-<Filter entryType="Namespace" fullName="Experilous.MakeItGenerate" isExposed="False" />
-<Filter entryType="Namespace" fullName="Experilous.MakeItRandom" isExposed="False" />
-<Filter entryType="Namespace" fullName="Experilous.MakeItRandom.Detail" isExposed="False" />
-<Filter entryType="Namespace" fullName="Experilous.MakeItTile" isExposed="False" />
-<Filter entryType="Namespace" fullName="Experilous.MakeItWrap" isExposed="False" />
-<Filter entryType="Namespace" fullName="Experilous.Numerics" isExposed="False" />
-<Filter entryType="Namespace" fullName="UnityEditor" isExposed="True">
-  <Filter entryType="Class" fullName="UnityEditor.Editor" filterName="Editor" isExposed="False" />
-  <Filter entryType="Class" fullName="UnityEditor.EditorWindow" filterName="EditorWindow" isExposed="False" />
-  <Filter entryType="Class" fullName="UnityEditor.PropertyDrawer" filterName="PropertyDrawer" isExposed="False" />
-</Filter>
-<Filter entryType="Namespace" fullName="UnityEngine" isExposed="True">
-  <Filter entryType="Class" fullName="UnityEngine.Behaviour" filterName="Behaviour" isExposed="False" />
-  <Filter entryType="Class" fullName="UnityEngine.Component" filterName="Component" isExposed="False" />
-  <Filter entryType="Class" fullName="UnityEngine.MonoBehaviour" filterName="MonoBehaviour" isExposed="False" />
-  <Filter entryType="Class" fullName="UnityEngine.Object" filterName="Object" isExposed="False" />
-  <Filter entryType="Class" fullName="UnityEngine.ScriptableObject" filterName="ScriptableObject" isExposed="False" />
-</Filter>
-<Filter entryType="Namespace" fullName="UnityEngine.Events" isExposed="True">
-  <Filter entryType="Class" fullName="UnityEngine.Events.UnityEvent`2" filterName="UnityEvent`2" isExposed="False" />
-  <Filter entryType="Class" fullName="UnityEngine.Events.UnityEventBase" filterName="UnityEventBase" isExposed="False" />
-</Filter></ApiFilter>
+      <Filter entryType="Namespace" fullName="Experilous" isExposed="False" />
+      <Filter entryType="Namespace" fullName="Experilous.Containers" isExposed="False" />
+      <Filter entryType="Namespace" fullName="Experilous.Core" isExposed="False" />
+      <Filter entryType="Namespace" fullName="Experilous.Examples.MakeItColorful" isExposed="False" />
+      <Filter entryType="Namespace" fullName="Experilous.Examples.MakeItRandom" isExposed="False" />
+      <Filter entryType="Namespace" fullName="Experilous.Examples.MakeItTile" isExposed="False" />
+      <Filter entryType="Namespace" fullName="Experilous.Examples.MakeItWrap" isExposed="False" />
+      <Filter entryType="Namespace" fullName="Experilous.Examples.Shared" isExposed="False" />
+      <Filter entryType="Namespace" fullName="Experilous.Internal" isExposed="False" />
+      <Filter entryType="Namespace" fullName="Experilous.MakeItColorful.Detail" isExposed="False" />
+      <Filter entryType="Namespace" fullName="Experilous.MakeItGenerate" isExposed="False" />
+      <Filter entryType="Namespace" fullName="Experilous.MakeItRandom" isExposed="False" />
+      <Filter entryType="Namespace" fullName="Experilous.MakeItRandom.Detail" isExposed="False" />
+      <Filter entryType="Namespace" fullName="Experilous.MakeItTile" isExposed="False" />
+      <Filter entryType="Namespace" fullName="Experilous.MakeItWrap" isExposed="False" />
+      <Filter entryType="Namespace" fullName="Experilous.Numerics" isExposed="False" />
+      <Filter entryType="Namespace" fullName="UnityEditor" isExposed="True">
+        <Filter entryType="Class" fullName="UnityEditor.Editor" filterName="Editor" isExposed="False" />
+        <Filter entryType="Class" fullName="UnityEditor.EditorWindow" filterName="EditorWindow" isExposed="False" />
+        <Filter entryType="Class" fullName="UnityEditor.PropertyDrawer" filterName="PropertyDrawer" isExposed="False" />
+      </Filter>
+      <Filter entryType="Namespace" fullName="UnityEngine" isExposed="True">
+        <Filter entryType="Class" fullName="UnityEngine.Behaviour" filterName="Behaviour" isExposed="False" />
+        <Filter entryType="Class" fullName="UnityEngine.Component" filterName="Component" isExposed="False" />
+        <Filter entryType="Class" fullName="UnityEngine.MonoBehaviour" filterName="MonoBehaviour" isExposed="False" />
+        <Filter entryType="Class" fullName="UnityEngine.Object" filterName="Object" isExposed="False" />
+        <Filter entryType="Class" fullName="UnityEngine.ScriptableObject" filterName="ScriptableObject" isExposed="False" />
+      </Filter>
+      <Filter entryType="Namespace" fullName="UnityEngine.Events" isExposed="True">
+        <Filter entryType="Class" fullName="UnityEngine.Events.UnityEvent`2" filterName="UnityEvent`2" isExposed="False" />
+        <Filter entryType="Class" fullName="UnityEngine.Events.UnityEventBase" filterName="UnityEventBase" isExposed="False" />
+      </Filter>
+    </ApiFilter>
     <ComponentPath>..\Temp\UnityVS_bin\Debug\</ComponentPath>
     <ProjectSummary>
     </ProjectSummary>
@@ -177,6 +178,7 @@ copy /Y /B "archive.php" "Build\archive.php"</PostBuildEvent>
     <None Include="Content - Hue.aml" />
     <None Include="Content - Subtractive Color Spaces.aml" />
     <None Include="Content - Examples.aml" />
+    <None Include="Content - Version History.aml" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="chroma-slices.png">
