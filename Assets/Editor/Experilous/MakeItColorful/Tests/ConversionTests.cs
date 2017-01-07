@@ -209,7 +209,11 @@ namespace Experilous.MakeItColorful.Tests
 
 		private TColor[] CreateColorTestArray<TColor>(ColorFactory4<TColor> constructor, int randomColorCount)
 		{
+#if UNITY_5_4_OR_NEWER
 			URnd.InitState(23498234);
+#else
+			URnd.seed = 23498234;
+#endif
 			Func<float> rndChannel = () => URnd.Range(0, 11) * 0.1f;
 			Func<TColor> rndColor = () => constructor(rndChannel(), rndChannel(), rndChannel(), rndChannel());
 			int colorCount = 21 + randomColorCount;
@@ -244,7 +248,11 @@ namespace Experilous.MakeItColorful.Tests
 
 		private TColor[] CreateColorTestArray<TColor>(ColorFactory5<TColor> constructor, int randomColorCount)
 		{
+#if UNITY_5_4_OR_NEWER
 			URnd.InitState(23498234);
+#else
+			URnd.seed = 23498234;
+#endif
 			Func<float> rndChannel = () => URnd.Range(0, 11) * 0.1f;
 			Func<TColor> rndColor = () => constructor(rndChannel(), rndChannel(), rndChannel(), rndChannel(), rndChannel());
 			int colorCount = 31 + randomColorCount;
