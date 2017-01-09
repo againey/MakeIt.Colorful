@@ -26,7 +26,7 @@ namespace Experilous.MakeItColorful.Tests
 			Assert.AreEqual(expected.a, nearest.a, message);
 		}
 
-		[Test]
+		[TestCase(Category = "Normal")]
 		public void GetNearestValid_RGB()
 		{
 			AssertNearest(new Color(0f, 0f, 0f, 0.25f), new Color(-1f, -1f, -1f, 0.25f), 0.0001f);
@@ -77,7 +77,7 @@ namespace Experilous.MakeItColorful.Tests
 			Assert.AreEqual(expected.a, nearest.a, message);
 		}
 
-		[Test]
+		[TestCase(Category = "Normal")]
 		public void GetNearestValid_CMY()
 		{
 			AssertNearest(new ColorCMY(0f, 0f, 0f, 0.25f), new ColorCMY(-1f, -1f, -1f, 0.25f), 0.0001f);
@@ -129,7 +129,7 @@ namespace Experilous.MakeItColorful.Tests
 			Assert.AreEqual(expected.a, nearest.a, message);
 		}
 
-		[Test]
+		[TestCase(Category = "Normal")]
 		public void GetNearestValid_CMYK()
 		{
 			AssertNearest(new ColorCMYK(0f, 0f, 0f, 0f, 0.25f), new ColorCMYK(-1f, -1f, -1f, -1f, 0.25f), 0.0001f);
@@ -238,7 +238,7 @@ namespace Experilous.MakeItColorful.Tests
 			Assert.AreEqual(expected.a, nearest.a, message);
 		}
 
-		[Test]
+		[TestCase(Category = "Normal")]
 		public void GetNearestValid_HSV()
 		{
 			AssertNearest(new ColorHSV(0.875f, 0f, 0f, 0.25f), new ColorHSV(-0.125f, -1f, -1f, 0.25f), 0.0001f);
@@ -288,7 +288,7 @@ namespace Experilous.MakeItColorful.Tests
 			Assert.AreEqual(expected.a, nearest.a, message);
 		}
 
-		[Test]
+		[TestCase(Category = "Normal")]
 		public void GetNearestValid_HCV()
 		{
 			AssertNearest(new ColorHCV(0.875f, 0f, 0f, 0.25f), new ColorHCV(-0.125f, -1f, -0.5f, 0.25f), 0.0001f);
@@ -344,7 +344,7 @@ namespace Experilous.MakeItColorful.Tests
 			Assert.AreEqual(expected.a, nearest.a, message);
 		}
 
-		[Test]
+		[TestCase(Category = "Normal")]
 		public void GetNearestValid_HSL()
 		{
 			AssertNearest(new ColorHSL(0.875f, 0f, 0f, 0.25f), new ColorHSL(-0.125f, -1f, -1f, 0.25f), 0.0001f);
@@ -394,7 +394,7 @@ namespace Experilous.MakeItColorful.Tests
 			Assert.AreEqual(expected.a, nearest.a, message);
 		}
 
-		[Test]
+		[TestCase(Category = "Normal")]
 		public void GetNearestValid_HCL()
 		{
 			AssertNearest(new ColorHCL(0.875f, 0f, 0f, 0.25f), new ColorHCL(-0.125f, -1f, -0.125f, 0.25f), 0.0001f);
@@ -456,7 +456,7 @@ namespace Experilous.MakeItColorful.Tests
 			Assert.AreEqual(expected.a, nearest.a, message);
 		}
 
-		[Test]
+		[TestCase(Category = "Normal")]
 		public void GetNearestValid_HSY()
 		{
 			AssertNearest(new ColorHSY(0.875f, 0f, 0f, 0.25f), new ColorHSY(-0.125f, -1f, -1f, 0.25f), 0.0001f);
@@ -506,7 +506,7 @@ namespace Experilous.MakeItColorful.Tests
 			Assert.AreEqual(expected.a, nearest.a, message);
 		}
 
-		[Test]
+		[TestCase(Category = "Normal")]
 		public void GetNearestValid_HCY()
 		{
 			float hueAtHalfLuma = (0.5f - Detail.LumaUtility.rWeight) / (Detail.LumaUtility.gWeight * 6f);
