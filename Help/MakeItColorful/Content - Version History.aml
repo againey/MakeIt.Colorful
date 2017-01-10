@@ -10,7 +10,7 @@
 				<section>
 					<content>
 						<para>
-							An minor update with miscellaneous additions to improve overall utility.
+							A minor update with miscellaneous additions to improve overall utility.
 						</para>
 					</content>
 				</section>
@@ -32,7 +32,7 @@
 									<listItem>luma (apparent brightness)</listItem>
 								</list>
 							</listItem>
-							<listItem>Added GetValid(chromaBias) for chroma-based color types, to choose how the degree to which chroma or luminance is preserved when correcting invalid colors.</listItem>
+							<listItem>Added GetValid(chromaBias) for chroma-based color types, to choose the degree to which chroma or luminance is preserved when correcting invalid colors.</listItem>
 						</list>
 					</content>
 				</section>
