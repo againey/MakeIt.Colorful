@@ -3,7 +3,7 @@
 	<developerConceptualDocument xmlns="http://ddue.schemas.microsoft.com/authoring/2003/5" xmlns:xlink="http://www.w3.org/1999/xlink">
 		<summary>
 			<para>
-				Luminance refers generically to any measure of a color's intensity
+				Luminance refers generically to any measure of a color's intensity,
 				lightness, or brightness.
 				<mediaLink>
 					<caption placement="after">An example of going from no luminance to full luminance.</caption>

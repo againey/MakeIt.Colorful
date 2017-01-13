@@ -62,5 +62,138 @@ namespace Experilous.MakeItColorful
 		}
 
 		#endregion
+
+		#region Opacity Operations
+
+		/// <summary>
+		/// Gets the fully opaque variant of the current color.
+		/// </summary>
+		/// <param name="rgb">The RGB color instance to which this extension function will apply.</param>
+		/// <returns>Returns a copy of the current color, but with opacity set to 1.</returns>
+		public static Color Opaque(this Color rgb) { return new Color(rgb.r, rgb.g, rgb.b, 1f); }
+
+		/// <summary>
+		/// Gets a partially translucent variant of the current color.
+		/// </summary>
+		/// <param name="rgb">The RGB color instance to which this extension function will apply.</param>
+		/// <param name="a">The desired opacity for the returned color.</param>
+		/// <returns>Returns a copy of the current color, but with opacity set to the provided value.</returns>
+		public static Color Translucent(this Color rgb, float a) { return new Color(rgb.r, rgb.g, rgb.b, a); }
+
+		/// <summary>
+		/// Gets the fully transparent variant of the current color.
+		/// </summary>
+		/// <param name="rgb">The RGB color instance to which this extension function will apply.</param>
+		/// <returns>Returns a copy of the current color, but with opacity set to 0.</returns>
+		public static Color Transparent(this Color rgb) { return new Color(rgb.r, rgb.g, rgb.b, 0f); }
+
+		#endregion
+
+		#region Attributes
+
+		/// <summary>
+		/// Gets the hue of the color.
+		/// </summary>
+		/// <param name="rgb">The RGB color instance to which this extension function will apply.</param>
+		/// <returns>The color's hue.</returns>
+		public static float GetHue(this Color rgb)
+		{
+			float min = Mathf.Min(Mathf.Min(rgb.r, rgb.g), rgb.b);
+			float max = Mathf.Max(Mathf.Max(rgb.r, rgb.g), rgb.b);
+			return Detail.HueUtility.FromRGB(rgb.r, rgb.g, rgb.b, max, max - min);
+		}
+
+		/// <summary>
+		/// Gets the chroma of the color.
+		/// </summary>
+		/// <param name="rgb">The RGB color instance to which this extension function will apply.</param>
+		/// <returns>The color's chroma.</returns>
+		public static float GetChroma(this Color rgb)
+		{
+			float min = Mathf.Min(Mathf.Min(rgb.r, rgb.g), rgb.b);
+			float max = Mathf.Max(Mathf.Max(rgb.r, rgb.g), rgb.b);
+			return max - min;
+		}
+
+		/// <summary>
+		/// Gets the intensity of the color.
+		/// </summary>
+		/// <param name="rgb">The RGB color instance to which this extension function will apply.</param>
+		/// <returns>The color's intensity.</returns>
+		public static float GetIntensity(this Color rgb)
+		{
+			return (rgb.r + rgb.g + rgb.b) / 3f;
+		}
+
+		/// <summary>
+		/// Gets the value of the color.
+		/// </summary>
+		/// <param name="rgb">The RGB color instance to which this extension function will apply.</param>
+		/// <returns>The color's value.</returns>
+		public static float GetValue(this Color rgb)
+		{
+			return Mathf.Max(Mathf.Max(rgb.r, rgb.g), rgb.b);
+		}
+
+		/// <summary>
+		/// Gets the lightness of the color.
+		/// </summary>
+		/// <param name="rgb">The RGB color instance to which this extension function will apply.</param>
+		/// <returns>The color's lightness.</returns>
+		public static float GetLightness(this Color rgb)
+		{
+			float min = Mathf.Min(Mathf.Min(rgb.r, rgb.g), rgb.b);
+			float max = Mathf.Max(Mathf.Max(rgb.r, rgb.g), rgb.b);
+			return (min + max) / 2f;
+		}
+
+		/// <summary>
+		/// Gets the luma (apparent brightness) of the color.
+		/// </summary>
+		/// <param name="rgb">The RGB color instance to which this extension function will apply.</param>
+		/// <returns>The color's luma.</returns>
+		public static float GetLuma(this Color rgb)
+		{
+			return Detail.LumaUtility.FromRGB(rgb.r, rgb.g, rgb.b);
+		}
+
+		#endregion
+
+		#region Comparisons
+
+		/// <summary>
+		/// Determines the ordering of this color with the specified color.
+		/// </summary>
+		/// <param name="rgb">The RGB color instance to which this extension function will apply.</param>
+		/// <param name="other">The other color to compare against this one.</param>
+		/// <returns>Returns -1 if this color is ordered before the other color, +1 if it is ordered after the other color, and 0 if neither is ordered before the other.</returns>
+		public static int CompareTo(this Color rgb, Color other)
+		{
+			return Detail.OrderUtility.Compare(rgb.r, rgb.g, rgb.b, rgb.a, other.r, other.g, other.b, other.a);
+		}
+
+		/// <summary>
+		/// Determines the ordering of the first color in relation to the second color.
+		/// </summary>
+		/// <param name="lhs">The first color compare.</param>
+		/// <param name="rhs">The second color compare.</param>
+		/// <returns>Returns -1 if the first color is ordered before the second color, +1 if it is ordered after the second color, and 0 if neither is ordered before the other.</returns>
+		public static int Compare(Color lhs, Color rhs)
+		{
+			return Detail.OrderUtility.Compare(lhs.r, lhs.g, lhs.b, lhs.a, rhs.r, rhs.g, rhs.b, rhs.a);
+		}
+
+		/// <summary>
+		/// Checks if the first color is lexicographically ordered before the second color.
+		/// </summary>
+		/// <param name="lhs">The first color compare.</param>
+		/// <param name="rhs">The second color compare.</param>
+		/// <returns>Returns true if the first color is lexicographically ordered before the second color, false otherwise.</returns>
+		public static bool AreOrdered(Color lhs, Color rhs)
+		{
+			return Detail.OrderUtility.AreOrdered(lhs.r, lhs.g, lhs.b, lhs.a, rhs.r, rhs.g, rhs.b, rhs.a);
+		}
+
+		#endregion
 	}
 }

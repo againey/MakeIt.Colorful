@@ -16,7 +16,7 @@ namespace Experilous.MakeItColorful
 	/// <summary>
 	/// A color struct for storing and maniputing colors in the HSV (hue, saturation, and value) color space.
 	/// </summary>
-	[Serializable] public struct ColorHSV
+	[Serializable] public struct ColorHSV : IEquatable<ColorHSV>, IComparable<ColorHSV>
 	{
 		#region Fields and Direct Constructors
 
@@ -606,7 +606,7 @@ namespace Experilous.MakeItColorful
 					case 1: return s;
 					case 2: return v;
 					case 3: return a;
-					default: throw new ArgumentOutOfRangeException();
+					default: throw new ArgumentOutOfRangeException("index", index, "The index must be in the range [0, 3].");
 				}
 			}
 			set
@@ -617,10 +617,33 @@ namespace Experilous.MakeItColorful
 					case 1: s = value; break;
 					case 2: v = value; break;
 					case 3: a = value; break;
-					default: throw new ArgumentOutOfRangeException();
+					default: throw new ArgumentOutOfRangeException("index", index, "The index must be in the range [0, 3].");
 				}
 			}
 		}
+
+		#endregion
+
+		#region Opacity Operations
+
+		/// <summary>
+		/// Gets the fully opaque variant of the current color.
+		/// </summary>
+		/// <returns>Returns a copy of the current color, but with opacity set to 1.</returns>
+		public ColorHSV Opaque() { return new ColorHSV(h, s, v, 1f); }
+
+		/// <summary>
+		/// Gets a partially translucent variant of the current color.
+		/// </summary>
+		/// <param name="a">The desired opacity for the returned color.</param>
+		/// <returns>Returns a copy of the current color, but with opacity set to the provided value.</returns>
+		public ColorHSV Translucent(float a) { return new ColorHSV(h, s, v, a); }
+
+		/// <summary>
+		/// Gets the fully transparent variant of the current color.
+		/// </summary>
+		/// <returns>Returns a copy of the current color, but with opacity set to 0.</returns>
+		public ColorHSV Transparent() { return new ColorHSV(h, s, v, 0f); }
 
 		#endregion
 
@@ -834,6 +857,19 @@ namespace Experilous.MakeItColorful
 		/// <remarks>This function checks for perfect bitwise equality.  If any of the channels differ by even the smallest amount,
 		/// or if the two hue values are equivalent but one or both are outside of the normal range of [0, 1), then this function
 		/// will return false.</remarks>
+		public bool Equals(ColorHSV other)
+		{
+			return this == other;
+		}
+
+		/// <summary>
+		/// Checks if the color is equal to a specified color.
+		/// </summary>
+		/// <param name="other">The other color to which the color is to be compared.</param>
+		/// <returns>Returns true if both colors are equal, false otherwise.</returns>
+		/// <remarks>This function checks for perfect bitwise equality.  If any of the channels differ by even the smallest amount,
+		/// or if the two hue values are equivalent but one or both are outside of the normal range of [0, 1), then this function
+		/// will return false.</remarks>
 		public override bool Equals(object other)
 		{
 			return other is ColorHSV && this == (ColorHSV)other;
@@ -874,6 +910,96 @@ namespace Experilous.MakeItColorful
 		public static bool operator !=(ColorHSV lhs, ColorHSV rhs)
 		{
 			return lhs.h != rhs.h || lhs.s != rhs.s || lhs.v != rhs.v || lhs.a != rhs.a;
+		}
+
+		/// <summary>
+		/// Determines the ordering of this color with the specified color.
+		/// </summary>
+		/// <param name="other">The other color to compare against this one.</param>
+		/// <returns>Returns -1 if this color is ordered before the other color, +1 if it is ordered after the other color, and 0 if neither is ordered before the other.</returns>
+		public int CompareTo(ColorHSV other)
+		{
+			return Detail.OrderUtility.Compare(h, s, v, a, other.h, other.s, other.v, other.a);
+		}
+
+		/// <summary>
+		/// Determines the ordering of the first color in relation to the second color.
+		/// </summary>
+		/// <param name="lhs">The first color compare.</param>
+		/// <param name="rhs">The second color compare.</param>
+		/// <returns>Returns -1 if the first color is ordered before the second color, +1 if it is ordered after the second color, and 0 if neither is ordered before the other.</returns>
+		public int Compare(ColorHSV lhs, ColorHSV rhs)
+		{
+			return Detail.OrderUtility.Compare(lhs.h, lhs.s, lhs.v, lhs.a, rhs.h, rhs.s, rhs.v, rhs.a);
+		}
+
+		/// <summary>
+		/// Checks if the first color is lexicographically ordered before the second color.
+		/// </summary>
+		/// <param name="lhs">The first color compare.</param>
+		/// <param name="rhs">The second color compare.</param>
+		/// <returns>Returns true if the first color is lexicographically ordered before the second color, false otherwise.</returns>
+		/// <remarks>No checks are performed to make sure that both colors are canonical.  If this is important, ensure that you are
+		/// passing it canonical colors, or use the comparison operators which will do so for you.</remarks>
+		public static bool AreOrdered(ColorHSV lhs, ColorHSV rhs)
+		{
+			return Detail.OrderUtility.AreOrdered(lhs.h, lhs.s, lhs.v, lhs.a, rhs.h, rhs.s, rhs.v, rhs.a);
+		}
+
+		/// <summary>
+		/// Checks if the first color is lexicographically ordered before the second color.
+		/// </summary>
+		/// <param name="lhs">The first color compare.</param>
+		/// <param name="rhs">The second color compare.</param>
+		/// <returns>Returns true if the first color is lexicographically ordered before the second color, false otherwise.</returns>
+		/// <remarks>This operator gets the canonical representation of both colors before performing the lexicographical comparison.
+		/// If you already know that the colors are canonical, specifically want to compare non-canonical colors, or wish to avoid
+		/// excessive computations, use <see cref="AreOrdered(ColorHSV, ColorHSV)"/> instead.</remarks>
+		public static bool operator < (ColorHSV lhs, ColorHSV rhs)
+		{
+			return AreOrdered(lhs.GetCanonical(), rhs.GetCanonical());
+		}
+
+		/// <summary>
+		/// Checks if the first color is not lexicographically ordered after the second color.
+		/// </summary>
+		/// <param name="lhs">The first color compare.</param>
+		/// <param name="rhs">The second color compare.</param>
+		/// <returns>Returns true if the first color is not lexicographically ordered after the second color, false otherwise.</returns>
+		/// <remarks>This operator gets the canonical representation of both colors before performing the lexicographical comparison.
+		/// If you already know that the colors are canonical, specifically want to compare non-canonical colors, or wish to avoid
+		/// excessive computations, use <see cref="AreOrdered(ColorHSV, ColorHSV)"/> instead.</remarks>
+		public static bool operator <= (ColorHSV lhs, ColorHSV rhs)
+		{
+			return !AreOrdered(rhs.GetCanonical(), lhs.GetCanonical());
+		}
+
+		/// <summary>
+		/// Checks if the first color is lexicographically ordered after the second color.
+		/// </summary>
+		/// <param name="lhs">The first color compare.</param>
+		/// <param name="rhs">The second color compare.</param>
+		/// <returns>Returns true if the first color is lexicographically ordered after the second color, false otherwise.</returns>
+		/// <remarks>This operator gets the canonical representation of both colors before performing the lexicographical comparison.
+		/// If you already know that the colors are canonical, specifically want to compare non-canonical colors, or wish to avoid
+		/// excessive computations, use <see cref="AreOrdered(ColorHSV, ColorHSV)"/> instead.</remarks>
+		public static bool operator > (ColorHSV lhs, ColorHSV rhs)
+		{
+			return AreOrdered(rhs.GetCanonical(), lhs.GetCanonical());
+		}
+
+		/// <summary>
+		/// Checks if the first color is not lexicographically ordered before the second color.
+		/// </summary>
+		/// <param name="lhs">The first color compare.</param>
+		/// <param name="rhs">The second color compare.</param>
+		/// <returns>Returns true if the first color is not lexicographically ordered before the second color, false otherwise.</returns>
+		/// <remarks>This operator gets the canonical representation of both colors before performing the lexicographical comparison.
+		/// If you already know that the colors are canonical, specifically want to compare non-canonical colors, or wish to avoid
+		/// excessive computations, use <see cref="AreOrdered(ColorHSV, ColorHSV)"/> instead.</remarks>
+		public static bool operator >= (ColorHSV lhs, ColorHSV rhs)
+		{
+			return !AreOrdered(lhs.GetCanonical(), rhs.GetCanonical());
 		}
 
 		#endregion
@@ -950,6 +1076,144 @@ namespace Experilous.MakeItColorful
 			if (s == 0f | v == 0f) return new ColorHSV(0f, 0f, v, a);
 			return new ColorHSV(Mathf.Repeat(h, 1f), s, v, a);
 		}
+
+		#endregion
+
+		#region Attributes
+
+		/// <summary>
+		/// Gets the hue of the color.
+		/// </summary>
+		/// <returns>The color's hue.</returns>
+		public float GetHue()
+		{
+			return h;
+		}
+
+		/// <summary>
+		/// Gets the chroma of the color.
+		/// </summary>
+		/// <returns>The color's chroma.</returns>
+		public float GetChroma()
+		{
+			return Detail.ValueUtility.GetChroma(s, v);
+		}
+
+		/// <summary>
+		/// Gets the intensity of the color.
+		/// </summary>
+		/// <returns>The color's intensity.</returns>
+		public float GetIntensity()
+		{
+			float c = Detail.ValueUtility.GetChroma(s, v);
+			if (c > 0f)
+			{
+				float r, g, b;
+				Detail.HueUtility.ToRGB(Mathf.Repeat(h, 1), c, v - c, out r, out g, out b);
+				return (r + g + b) / 3f;
+			}
+			else
+			{
+				return v;
+			}
+		}
+
+		/// <summary>
+		/// Gets the value of the color.
+		/// </summary>
+		/// <returns>The color's value.</returns>
+		public float GetValue()
+		{
+			return v;
+		}
+
+		/// <summary>
+		/// Gets the lightness of the color.
+		/// </summary>
+		/// <returns>The color's lightness.</returns>
+		public float GetLightness()
+		{
+			float c = Detail.ValueUtility.GetChroma(s, v);
+			return v - c * 0.5f;
+		}
+
+		/// <summary>
+		/// Gets the luma (apparent brightness) of the color.
+		/// </summary>
+		/// <returns>The color's luma.</returns>
+		public float GetLuma()
+		{
+			float c = Detail.ValueUtility.GetChroma(s, v);
+			if (c > 0f)
+			{
+				float r, g, b;
+				Detail.HueUtility.ToRGB(Mathf.Repeat(h, 1), c, v - c, out r, out g, out b);
+				return Detail.LumaUtility.FromRGB(r, g, b);
+			}
+			else
+			{
+				return v;
+			}
+		}
+
+		#endregion
+
+		#region Color Constants
+
+		/// <summary>
+		/// Completely transparent black.  HSVA is (0, 0, 0, 0).
+		/// </summary>
+		public static ColorHSV clear { get { return new ColorHSV(0f, 0f, 0f, 0f); } }
+
+		/// <summary>
+		/// Solid black.  HSVA is (0, 0, 0, 1).
+		/// </summary>
+		public static ColorHSV black { get { return new ColorHSV(0f, 0f, 0f, 1f); } }
+
+		/// <summary>
+		/// Solid gray.  HSVA is (0, 0, 1/2, 1).
+		/// </summary>
+		public static ColorHSV gray { get { return new ColorHSV(0f, 0f, 0.5f, 1f); } }
+
+		/// <summary>
+		/// Solid gray, with English spelling.  HSVA is (0, 0, 1/2, 1).
+		/// </summary>
+		public static ColorHSV grey { get { return new ColorHSV(0f, 0f, 0.5f, 1f); } }
+
+		/// <summary>
+		/// Solid white.  HSVA is (0, 0, 1, 1).
+		/// </summary>
+		public static ColorHSV white { get { return new ColorHSV(0f, 0f, 1f, 1f); } }
+
+		/// <summary>
+		/// Solid red.  HSVA is (0, 1, 1, 1).
+		/// </summary>
+		public static ColorHSV red { get { return new ColorHSV(0f, 1f, 1f, 1f); } }
+
+		/// <summary>
+		/// Solid yellow.  HSVA is (1/6, 1, 1, 1).
+		/// </summary>
+		public static ColorHSV yellow { get { return new ColorHSV(120f / 360f, 1f, 1f, 1f); } }
+
+		/// <summary>
+		/// Solid green.  HSVA is (1/3, 1, 1, 1).
+		/// </summary>
+		public static ColorHSV green { get { return new ColorHSV(120f / 360f, 1f, 1f, 1f); } }
+
+		/// <summary>
+		/// Solic cyan.  HSVA is (1/2, 1, 1, 1).
+		/// </summary>
+		public static ColorHSV cyan { get { return new ColorHSV(240f / 360f, 1f, 1f, 1f); } }
+
+		/// <summary>
+		/// Solid blue.  HSVA is (2/3, 1, 1, 1).
+		/// </summary>
+		public static ColorHSV blue { get { return new ColorHSV(240f / 360f, 1f, 1f, 1f); } }
+
+		/// <summary>
+		/// Solid magenta.  HSVA is (5/6, 1, 1, 1).
+		/// </summary>
+		public static ColorHSV magenta { get { return new ColorHSV(300f / 360f, 1f, 1f, 1f); } }
 
 		#endregion
 	}
