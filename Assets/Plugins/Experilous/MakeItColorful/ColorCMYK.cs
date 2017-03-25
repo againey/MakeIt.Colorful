@@ -16,7 +16,7 @@ namespace Experilous.MakeItColorful
 	/// <summary>
 	/// A color struct for storing and maniputing colors in the CMYK (cyan, magenta, yellow, and key) color space.
 	/// </summary>
-	[Serializable] public struct ColorCMYK
+	[Serializable] public struct ColorCMYK : IEquatable<ColorCMYK>, IComparable<ColorCMYK>
 	{
 		#region Fields and Direct Constructors
 
@@ -593,7 +593,7 @@ namespace Experilous.MakeItColorful
 					case 2: return y;
 					case 3: return k;
 					case 4: return a;
-					default: throw new ArgumentOutOfRangeException();
+					default: throw new ArgumentOutOfRangeException("index", index, "The index must be in the range [0, 4].");
 				}
 			}
 			set
@@ -605,10 +605,33 @@ namespace Experilous.MakeItColorful
 					case 2: y = value; break;
 					case 3: k = value; break;
 					case 4: a = value; break;
-					default: throw new ArgumentOutOfRangeException();
+					default: throw new ArgumentOutOfRangeException("index", index, "The index must be in the range [0, 4].");
 				}
 			}
 		}
+
+		#endregion
+
+		#region Opacity Operations
+
+		/// <summary>
+		/// Gets the fully opaque variant of the current color.
+		/// </summary>
+		/// <returns>Returns a copy of the current color, but with opacity set to 1.</returns>
+		public ColorCMYK Opaque() { return new ColorCMYK(c, m, y, k, 1f); }
+
+		/// <summary>
+		/// Gets a partially translucent variant of the current color.
+		/// </summary>
+		/// <param name="a">The desired opacity for the returned color.</param>
+		/// <returns>Returns a copy of the current color, but with opacity set to the provided value.</returns>
+		public ColorCMYK Translucent(float a) { return new ColorCMYK(c, m, y, k, a); }
+
+		/// <summary>
+		/// Gets the fully transparent variant of the current color.
+		/// </summary>
+		/// <returns>Returns a copy of the current color, but with opacity set to 0.</returns>
+		public ColorCMYK Transparent() { return new ColorCMYK(c, m, y, k, 0f); }
 
 		#endregion
 
@@ -730,6 +753,18 @@ namespace Experilous.MakeItColorful
 		/// <returns>Returns true if both colors are equal, false otherwise.</returns>
 		/// <remarks>This function checks for perfect bitwise equality.  If any of the channels differ by even the smallest amount,
 		/// then this function will return false.</remarks>
+		public bool Equals(ColorCMYK other)
+		{
+			return this == other;
+		}
+
+		/// <summary>
+		/// Checks if the color is equal to a specified color.
+		/// </summary>
+		/// <param name="other">The other color to which the color is to be compared.</param>
+		/// <returns>Returns true if both colors are equal, false otherwise.</returns>
+		/// <remarks>This function checks for perfect bitwise equality.  If any of the channels differ by even the smallest amount,
+		/// then this function will return false.</remarks>
 		public override bool Equals(object other)
 		{
 			return other is ColorCMYK && this == (ColorCMYK)other;
@@ -767,6 +802,96 @@ namespace Experilous.MakeItColorful
 		public static bool operator !=(ColorCMYK lhs, ColorCMYK rhs)
 		{
 			return lhs.c != rhs.c || lhs.m != rhs.m || lhs.y != rhs.y || lhs.k != rhs.k || lhs.a != rhs.a;
+		}
+
+		/// <summary>
+		/// Determines the ordering of this color with the specified color.
+		/// </summary>
+		/// <param name="other">The other color to compare against this one.</param>
+		/// <returns>Returns -1 if this color is ordered before the other color, +1 if it is ordered after the other color, and 0 if neither is ordered before the other.</returns>
+		public int CompareTo(ColorCMYK other)
+		{
+			return Detail.OrderUtility.Compare(c, m, y, k, a, other.c, other.m, other.y, other.k, other.a);
+		}
+
+		/// <summary>
+		/// Determines the ordering of the first color in relation to the second color.
+		/// </summary>
+		/// <param name="lhs">The first color compare.</param>
+		/// <param name="rhs">The second color compare.</param>
+		/// <returns>Returns -1 if the first color is ordered before the second color, +1 if it is ordered after the second color, and 0 if neither is ordered before the other.</returns>
+		public int Compare(ColorCMYK lhs, ColorCMYK rhs)
+		{
+			return Detail.OrderUtility.Compare(lhs.c, lhs.m, lhs.y, lhs.k, lhs.a, rhs.c, rhs.m, rhs.y, rhs.k, rhs.a);
+		}
+
+		/// <summary>
+		/// Checks if the first color is lexicographically ordered before the second color.
+		/// </summary>
+		/// <param name="lhs">The first color compare.</param>
+		/// <param name="rhs">The second color compare.</param>
+		/// <returns>Returns true if the first color is lexicographically ordered before the second color, false otherwise.</returns>
+		/// <remarks>No checks are performed to make sure that both colors are canonical.  If this is important, ensure that you are
+		/// passing it canonical colors, or use the comparison operators which will do so for you.</remarks>
+		public static bool AreOrdered(ColorCMYK lhs, ColorCMYK rhs)
+		{
+			return Detail.OrderUtility.AreOrdered(lhs.c, lhs.m, lhs.y, lhs.k, lhs.a, rhs.c, rhs.m, rhs.y, rhs.k, rhs.a);
+		}
+
+		/// <summary>
+		/// Checks if the first color is lexicographically ordered before the second color.
+		/// </summary>
+		/// <param name="lhs">The first color compare.</param>
+		/// <param name="rhs">The second color compare.</param>
+		/// <returns>Returns true if the first color is lexicographically ordered before the second color, false otherwise.</returns>
+		/// <remarks>This operator gets the canonical representation of both colors before performing the lexicographical comparison.
+		/// If you already know that the colors are canonical, specifically want to compare non-canonical colors, or wish to avoid
+		/// excessive computations, use <see cref="AreOrdered(ColorCMYK, ColorCMYK)"/> instead.</remarks>
+		public static bool operator < (ColorCMYK lhs, ColorCMYK rhs)
+		{
+			return AreOrdered(lhs.GetCanonical(), rhs.GetCanonical());
+		}
+
+		/// <summary>
+		/// Checks if the first color is not lexicographically ordered after the second color.
+		/// </summary>
+		/// <param name="lhs">The first color compare.</param>
+		/// <param name="rhs">The second color compare.</param>
+		/// <returns>Returns true if the first color is not lexicographically ordered after the second color, false otherwise.</returns>
+		/// <remarks>This operator gets the canonical representation of both colors before performing the lexicographical comparison.
+		/// If you already know that the colors are canonical, specifically want to compare non-canonical colors, or wish to avoid
+		/// excessive computations, use <see cref="AreOrdered(ColorCMYK, ColorCMYK)"/> instead.</remarks>
+		public static bool operator <= (ColorCMYK lhs, ColorCMYK rhs)
+		{
+			return !AreOrdered(rhs.GetCanonical(), lhs.GetCanonical());
+		}
+
+		/// <summary>
+		/// Checks if the first color is lexicographically ordered after the second color.
+		/// </summary>
+		/// <param name="lhs">The first color compare.</param>
+		/// <param name="rhs">The second color compare.</param>
+		/// <returns>Returns true if the first color is lexicographically ordered after the second color, false otherwise.</returns>
+		/// <remarks>This operator gets the canonical representation of both colors before performing the lexicographical comparison.
+		/// If you already know that the colors are canonical, specifically want to compare non-canonical colors, or wish to avoid
+		/// excessive computations, use <see cref="AreOrdered(ColorCMYK, ColorCMYK)"/> instead.</remarks>
+		public static bool operator > (ColorCMYK lhs, ColorCMYK rhs)
+		{
+			return AreOrdered(rhs.GetCanonical(), lhs.GetCanonical());
+		}
+
+		/// <summary>
+		/// Checks if the first color is not lexicographically ordered before the second color.
+		/// </summary>
+		/// <param name="lhs">The first color compare.</param>
+		/// <param name="rhs">The second color compare.</param>
+		/// <returns>Returns true if the first color is not lexicographically ordered before the second color, false otherwise.</returns>
+		/// <remarks>This operator gets the canonical representation of both colors before performing the lexicographical comparison.
+		/// If you already know that the colors are canonical, specifically want to compare non-canonical colors, or wish to avoid
+		/// excessive computations, use <see cref="AreOrdered(ColorCMYK, ColorCMYK)"/> instead.</remarks>
+		public static bool operator >= (ColorCMYK lhs, ColorCMYK rhs)
+		{
+			return !AreOrdered(lhs.GetCanonical(), rhs.GetCanonical());
 		}
 
 		#endregion
@@ -846,6 +971,135 @@ namespace Experilous.MakeItColorful
 			if (min > 0f) return (ColorCMYK)((ColorCMY)this);
 			return this;
 		}
+
+		#endregion
+
+		#region Attributes
+
+		/// <summary>
+		/// Gets the hue of the color.
+		/// </summary>
+		/// <returns>The color's hue.</returns>
+		public float GetHue()
+		{
+			if (k >= 1f) return 0f;
+			float min = Mathf.Min(Mathf.Min(c, m), y);
+			float max = Mathf.Max(Mathf.Max(c, m), y);
+			return Detail.HueUtility.FromCMY(c, m, y, min, max - min);
+		}
+
+		/// <summary>
+		/// Gets the chroma of the color.
+		/// </summary>
+		/// <returns>The color's chroma.</returns>
+		public float GetChroma()
+		{
+			float min = Mathf.Min(Mathf.Min(c, m), y);
+			float max = Mathf.Max(Mathf.Max(c, m), y);
+			return max - min;
+		}
+
+		/// <summary>
+		/// Gets the intensity of the color.
+		/// </summary>
+		/// <returns>The color's intensity.</returns>
+		public float GetIntensity()
+		{
+			float kInv = 1f - k;
+			return kInv * (1f - (c - m - y) / 3f);
+		}
+
+		/// <summary>
+		/// Gets the value of the color.
+		/// </summary>
+		/// <returns>The color's value.</returns>
+		public float GetValue()
+		{
+			float kInv = 1f - k;
+			float min = Mathf.Min(Mathf.Min(c, m), y);
+			return (1f - min) * kInv;
+		}
+
+		/// <summary>
+		/// Gets the lightness of the color.
+		/// </summary>
+		/// <returns>The color's lightness.</returns>
+		public float GetLightness()
+		{
+			float kInv = 1f - k;
+			float min = Mathf.Min(Mathf.Min(c, m), y);
+			float max = Mathf.Max(Mathf.Max(c, m), y);
+			return kInv - (max + min) * kInv * 0.5f;
+		}
+
+		/// <summary>
+		/// Gets the luma (apparent brightness) of the color.
+		/// </summary>
+		/// <returns>The color's luma.</returns>
+		public float GetLuma()
+		{
+			float kInv = 1f - k;
+			return Detail.LumaUtility.FromCMY(c, m, y) * kInv;
+		}
+
+		#endregion
+
+		#region Color Constants
+
+		/// <summary>
+		/// Completely transparent black.  CMYKA is (0, 0, 0, 1, 0).
+		/// </summary>
+		public static ColorCMYK clear { get { return new ColorCMYK(0f, 0f, 0f, 1f, 0f); } }
+
+		/// <summary>
+		/// Solid black.  CMYKA is (0, 0, 0, 1, 1).
+		/// </summary>
+		public static ColorCMYK black { get { return new ColorCMYK(0f, 0f, 0f, 1f, 1f); } }
+
+		/// <summary>
+		/// Solid gray.  CMYKA is (0, 0, 0, 1/2, 1).
+		/// </summary>
+		public static ColorCMYK gray { get { return new ColorCMYK(0f, 0f, 0f, 0.5f, 1f); } }
+
+		/// <summary>
+		/// Solid gray, with English spelling.  CMYKA is (0, 0, 0, 1/2, 1).
+		/// </summary>
+		public static ColorCMYK grey { get { return new ColorCMYK(0f, 0f, 0f, 0.5f, 1f); } }
+
+		/// <summary>
+		/// Solid white.  CMYKA is (0, 0, 0, 0, 1).
+		/// </summary>
+		public static ColorCMYK white { get { return new ColorCMYK(0f, 0f, 0f, 0f, 1f); } }
+
+		/// <summary>
+		/// Solid red.  CMYKA is (0, 1, 1, 0, 1).
+		/// </summary>
+		public static ColorCMYK red { get { return new ColorCMYK(0f, 1f, 1f, 0f, 1f); } }
+
+		/// <summary>
+		/// Solid yellow.  CMYKA is (0, 0, 1, 0, 1).
+		/// </summary>
+		public static ColorCMYK yellow { get { return new ColorCMYK(0f, 0f, 1f, 0f, 1f); } }
+
+		/// <summary>
+		/// Solid green.  CMYKA is (1, 0, 1, 0, 1).
+		/// </summary>
+		public static ColorCMYK green { get { return new ColorCMYK(1f, 0f, 1f, 0f, 1f); } }
+
+		/// <summary>
+		/// Solic cyan.  CMYKA is (1, 0, 0, 0, 1).
+		/// </summary>
+		public static ColorCMYK cyan { get { return new ColorCMYK(1f, 0f, 0f, 0f, 1f); } }
+
+		/// <summary>
+		/// Solid blue.  CMYKA is (1, 1, 0, 0, 1).
+		/// </summary>
+		public static ColorCMYK blue { get { return new ColorCMYK(1f, 1f, 0f, 0f, 1f); } }
+
+		/// <summary>
+		/// Solid magenta.  CMYKA is (0, 1, 0, 0, 1).
+		/// </summary>
+		public static ColorCMYK magenta { get { return new ColorCMYK(0f, 1f, 0f, 0f, 1f); } }
 
 		#endregion
 	}

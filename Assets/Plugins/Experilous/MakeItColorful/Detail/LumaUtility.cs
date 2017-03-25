@@ -22,14 +22,14 @@ namespace Experilous.MakeItColorful.Detail
 
 		public static float GetChroma(float h, float s, float y)
 		{
-			float maxChroma = GetMaxChroma(h, y);
-			return s * maxChroma;
+			float cMax = GetMaxChroma(h, y);
+			return s * cMax;
 		}
 
 		public static float GetSaturation(float h, float c, float y)
 		{
-			float maxChroma = GetMaxChroma(h, y);
-			return (maxChroma != 0f) ? c / maxChroma : 0f;
+			float cMax = GetMaxChroma(h, y);
+			return (cMax != 0f) ? c / cMax : 0f;
 		}
 
 		public static float GetLumaAtMaxChroma(float h)

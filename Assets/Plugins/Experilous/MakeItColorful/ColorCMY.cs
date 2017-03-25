@@ -16,7 +16,7 @@ namespace Experilous.MakeItColorful
 	/// <summary>
 	/// A color struct for storing and maniputing colors in the CMY (cyan, magenta, and yellow) color space.
 	/// </summary>
-	[Serializable] public struct ColorCMY
+	[Serializable] public struct ColorCMY : IEquatable<ColorCMY>, IComparable<ColorCMY>
 	{
 		#region Fields and Direct Constructors
 
@@ -567,7 +567,7 @@ namespace Experilous.MakeItColorful
 					case 1: return m;
 					case 2: return y;
 					case 3: return a;
-					default: throw new ArgumentOutOfRangeException();
+					default: throw new ArgumentOutOfRangeException("index", index, "The index must be in the range [0, 3].");
 				}
 			}
 			set
@@ -578,10 +578,33 @@ namespace Experilous.MakeItColorful
 					case 1: m = value; break;
 					case 2: y = value; break;
 					case 3: a = value; break;
-					default: throw new ArgumentOutOfRangeException();
+					default: throw new ArgumentOutOfRangeException("index", index, "The index must be in the range [0, 3].");
 				}
 			}
 		}
+
+		#endregion
+
+		#region Opacity Operations
+
+		/// <summary>
+		/// Gets the fully opaque variant of the current color.
+		/// </summary>
+		/// <returns>Returns a copy of the current color, but with opacity set to 1.</returns>
+		public ColorCMY Opaque() { return new ColorCMY(c, m, y, 1f); }
+
+		/// <summary>
+		/// Gets a partially translucent variant of the current color.
+		/// </summary>
+		/// <param name="a">The desired opacity for the returned color.</param>
+		/// <returns>Returns a copy of the current color, but with opacity set to the provided value.</returns>
+		public ColorCMY Translucent(float a) { return new ColorCMY(c, m, y, a); }
+
+		/// <summary>
+		/// Gets the fully transparent variant of the current color.
+		/// </summary>
+		/// <returns>Returns a copy of the current color, but with opacity set to 0.</returns>
+		public ColorCMY Transparent() { return new ColorCMY(c, m, y, 0f); }
 
 		#endregion
 
@@ -702,6 +725,18 @@ namespace Experilous.MakeItColorful
 		/// <returns>Returns true if both colors are equal, false otherwise.</returns>
 		/// <remarks>This function checks for perfect bitwise equality.  If any of the channels differ by even the smallest amount,
 		/// then this function will return false.</remarks>
+		public bool Equals(ColorCMY other)
+		{
+			return this == other;
+		}
+
+		/// <summary>
+		/// Checks if the color is equal to a specified color.
+		/// </summary>
+		/// <param name="other">The other color to which the color is to be compared.</param>
+		/// <returns>Returns true if both colors are equal, false otherwise.</returns>
+		/// <remarks>This function checks for perfect bitwise equality.  If any of the channels differ by even the smallest amount,
+		/// then this function will return false.</remarks>
 		public override bool Equals(object other)
 		{
 			return other is ColorCMY && this == (ColorCMY)other;
@@ -739,6 +774,82 @@ namespace Experilous.MakeItColorful
 		public static bool operator !=(ColorCMY lhs, ColorCMY rhs)
 		{
 			return lhs.c != rhs.c || lhs.m != rhs.m || lhs.y != rhs.y || lhs.a != rhs.a;
+		}
+
+		/// <summary>
+		/// Determines the ordering of this color with the specified color.
+		/// </summary>
+		/// <param name="other">The other color to compare against this one.</param>
+		/// <returns>Returns -1 if this color is ordered before the other color, +1 if it is ordered after the other color, and 0 if neither is ordered before the other.</returns>
+		public int CompareTo(ColorCMY other)
+		{
+			return Detail.OrderUtility.Compare(c, m, y, a, other.c, other.m, other.y, other.a);
+		}
+
+		/// <summary>
+		/// Determines the ordering of the first color in relation to the second color.
+		/// </summary>
+		/// <param name="lhs">The first color compare.</param>
+		/// <param name="rhs">The second color compare.</param>
+		/// <returns>Returns -1 if the first color is ordered before the second color, +1 if it is ordered after the second color, and 0 if neither is ordered before the other.</returns>
+		public int Compare(ColorCMY lhs, ColorCMY rhs)
+		{
+			return Detail.OrderUtility.Compare(lhs.c, lhs.m, lhs.y, lhs.a, rhs.c, rhs.m, rhs.y, rhs.a);
+		}
+
+		/// <summary>
+		/// Checks if the first color is lexicographically ordered before the second color.
+		/// </summary>
+		/// <param name="lhs">The first color compare.</param>
+		/// <param name="rhs">The second color compare.</param>
+		/// <returns>Returns true if the first color is lexicographically ordered before the second color, false otherwise.</returns>
+		public static bool AreOrdered(ColorCMY lhs, ColorCMY rhs)
+		{
+			return Detail.OrderUtility.AreOrdered(lhs.c, lhs.m, lhs.y, lhs.a, rhs.c, rhs.m, rhs.y, rhs.a);
+		}
+
+		/// <summary>
+		/// Checks if the first color is lexicographically ordered before the second color.
+		/// </summary>
+		/// <param name="lhs">The first color compare.</param>
+		/// <param name="rhs">The second color compare.</param>
+		/// <returns>Returns true if the first color is lexicographically ordered before the second color, false otherwise.</returns>
+		public static bool operator < (ColorCMY lhs, ColorCMY rhs)
+		{
+			return AreOrdered(lhs, rhs);
+		}
+
+		/// <summary>
+		/// Checks if the first color is not lexicographically ordered after the second color.
+		/// </summary>
+		/// <param name="lhs">The first color compare.</param>
+		/// <param name="rhs">The second color compare.</param>
+		/// <returns>Returns true if the first color is not lexicographically ordered after the second color, false otherwise.</returns>
+		public static bool operator <= (ColorCMY lhs, ColorCMY rhs)
+		{
+			return !AreOrdered(rhs, lhs);
+		}
+
+		/// <summary>
+		/// Checks if the first color is lexicographically ordered after the second color.
+		/// </summary>
+		/// <param name="lhs">The first color compare.</param>
+		/// <param name="rhs">The second color compare.</param>
+		/// <returns>Returns true if the first color is lexicographically ordered after the second color, false otherwise.</returns>
+		public static bool operator > (ColorCMY lhs, ColorCMY rhs)
+		{
+			return AreOrdered(rhs, lhs);
+		}
+
+		/// <summary>
+		/// Checks if the first color is not lexicographically ordered before the second color.
+		/// </summary>
+		/// <param name="lhs">The first color compare.</param>
+		/// <param name="rhs">The second color compare.</param>
+		/// <returns>Returns true if the first color is not lexicographically ordered before the second color, false otherwise.</returns>
+		public static bool operator >= (ColorCMY lhs, ColorCMY rhs)
+		{
+			return !AreOrdered(lhs, rhs);
 		}
 
 		#endregion
@@ -811,6 +922,129 @@ namespace Experilous.MakeItColorful
 		{
 			return this;
 		}
+
+		#endregion
+
+		#region Attributes
+
+		/// <summary>
+		/// Gets the hue of the color.
+		/// </summary>
+		/// <returns>The color's hue.</returns>
+		public float GetHue()
+		{
+			float min = Mathf.Min(Mathf.Min(c, m), y);
+			float max = Mathf.Max(Mathf.Max(c, m), y);
+			return Detail.HueUtility.FromCMY(c, m, y, min, max - min);
+		}
+
+		/// <summary>
+		/// Gets the chroma of the color.
+		/// </summary>
+		/// <returns>The color's chroma.</returns>
+		public float GetChroma()
+		{
+			float min = Mathf.Min(Mathf.Min(c, m), y);
+			float max = Mathf.Max(Mathf.Max(c, m), y);
+			return max - min;
+		}
+
+		/// <summary>
+		/// Gets the intensity of the color.
+		/// </summary>
+		/// <returns>The color's intensity.</returns>
+		public float GetIntensity()
+		{
+			return 1f - (c + m + y) / 3f;
+		}
+
+		/// <summary>
+		/// Gets the value of the color.
+		/// </summary>
+		/// <returns>The color's value.</returns>
+		public float GetValue()
+		{
+			return 1f - Mathf.Min(Mathf.Min(c, m), y);
+		}
+
+		/// <summary>
+		/// Gets the lightness of the color.
+		/// </summary>
+		/// <returns>The color's lightness.</returns>
+		public float GetLightness()
+		{
+			float min = Mathf.Min(Mathf.Min(c, m), y);
+			float max = Mathf.Max(Mathf.Max(c, m), y);
+			return (min + max) / 2f;
+		}
+
+		/// <summary>
+		/// Gets the luma (apparent brightness) of the color.
+		/// </summary>
+		/// <returns>The color's luma.</returns>
+		public float GetLuma()
+		{
+			return Detail.LumaUtility.FromCMY(c, m, y);
+		}
+
+		#endregion
+
+		#region Color Constants
+
+		/// <summary>
+		/// Completely transparent black.  CMYA is (1, 1, 1, 0).
+		/// </summary>
+		public static ColorCMY clear { get { return new ColorCMY(1f, 1f, 1f, 0f); } }
+
+		/// <summary>
+		/// Solid black.  CMYA is (1, 1, 1, 1).
+		/// </summary>
+		public static ColorCMY black { get { return new ColorCMY(1f, 1f, 1f, 1f); } }
+
+		/// <summary>
+		/// Solid gray.  CMYA is (1/2, 1/2, 1/2, 1).
+		/// </summary>
+		public static ColorCMY gray { get { return new ColorCMY(0.5f, 0.5f, 0.5f, 1f); } }
+
+		/// <summary>
+		/// Solid gray, with English spelling.  CMYA is (1/2, 1/2, 1/2, 1).
+		/// </summary>
+		public static ColorCMY grey { get { return new ColorCMY(0.5f, 0.5f, 0.5f, 1f); } }
+
+		/// <summary>
+		/// Solid white.  CMYA is (0, 0, 0, 1).
+		/// </summary>
+		public static ColorCMY white { get { return new ColorCMY(0f, 0f, 0f, 1f); } }
+
+		/// <summary>
+		/// Solid red.  CMYA is (0, 1, 1, 1).
+		/// </summary>
+		public static ColorCMY red { get { return new ColorCMY(0f, 1f, 1f, 1f); } }
+
+		/// <summary>
+		/// Solid yellow.  CMYA is (0, 0, 1, 1).
+		/// </summary>
+		public static ColorCMY yellow { get { return new ColorCMY(0f, 0f, 1f, 1f); } }
+
+		/// <summary>
+		/// Solid green.  CMYA is (1, 0, 1, 1).
+		/// </summary>
+		public static ColorCMY green { get { return new ColorCMY(1f, 0f, 1f, 1f); } }
+
+		/// <summary>
+		/// Solic cyan.  CMYA is (1, 0, 0, 1).
+		/// </summary>
+		public static ColorCMY cyan { get { return new ColorCMY(1f, 0f, 0f, 1f); } }
+
+		/// <summary>
+		/// Solid blue.  CMYA is (1, 1, 0, 1).
+		/// </summary>
+		public static ColorCMY blue { get { return new ColorCMY(1f, 1f, 0f, 1f); } }
+
+		/// <summary>
+		/// Solid magenta.  CMYA is (0, 1, 0, 1).
+		/// </summary>
+		public static ColorCMY magenta { get { return new ColorCMY(0f, 1f, 0f, 1f); } }
 
 		#endregion
 	}

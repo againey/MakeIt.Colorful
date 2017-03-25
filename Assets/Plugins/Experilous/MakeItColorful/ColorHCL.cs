@@ -16,7 +16,7 @@ namespace Experilous.MakeItColorful
 	/// <summary>
 	/// A color struct for storing and maniputing colors in the HCL (hue, chroma, and lightness) color space.
 	/// </summary>
-	[Serializable] public struct ColorHCL
+	[Serializable] public struct ColorHCL : IEquatable<ColorHCL>, IComparable<ColorHCL>
 	{
 		#region Fields and Direct Constructors
 
@@ -596,7 +596,7 @@ namespace Experilous.MakeItColorful
 					case 1: return c;
 					case 2: return l;
 					case 3: return a;
-					default: throw new ArgumentOutOfRangeException();
+					default: throw new ArgumentOutOfRangeException("index", index, "The index must be in the range [0, 3].");
 				}
 			}
 			set
@@ -607,10 +607,33 @@ namespace Experilous.MakeItColorful
 					case 1: c = value; break;
 					case 2: l = value; break;
 					case 3: a = value; break;
-					default: throw new ArgumentOutOfRangeException();
+					default: throw new ArgumentOutOfRangeException("index", index, "The index must be in the range [0, 3].");
 				}
 			}
 		}
+
+		#endregion
+
+		#region Opacity Operations
+
+		/// <summary>
+		/// Gets the fully opaque variant of the current color.
+		/// </summary>
+		/// <returns>Returns a copy of the current color, but with opacity set to 1.</returns>
+		public ColorHCL Opaque() { return new ColorHCL(h, c, l, 1f); }
+
+		/// <summary>
+		/// Gets a partially translucent variant of the current color.
+		/// </summary>
+		/// <param name="a">The desired opacity for the returned color.</param>
+		/// <returns>Returns a copy of the current color, but with opacity set to the provided value.</returns>
+		public ColorHCL Translucent(float a) { return new ColorHCL(h, c, l, a); }
+
+		/// <summary>
+		/// Gets the fully transparent variant of the current color.
+		/// </summary>
+		/// <returns>Returns a copy of the current color, but with opacity set to 0.</returns>
+		public ColorHCL Transparent() { return new ColorHCL(h, c, l, 0f); }
 
 		#endregion
 
@@ -824,6 +847,19 @@ namespace Experilous.MakeItColorful
 		/// <remarks>This function checks for perfect bitwise equality.  If any of the channels differ by even the smallest amount,
 		/// or if the two hue values are equivalent but one or both are outside of the normal range of [0, 1), then this function
 		/// will return false.</remarks>
+		public bool Equals(ColorHCL other)
+		{
+			return this == other;
+		}
+
+		/// <summary>
+		/// Checks if the color is equal to a specified color.
+		/// </summary>
+		/// <param name="other">The other color to which the color is to be compared.</param>
+		/// <returns>Returns true if both colors are equal, false otherwise.</returns>
+		/// <remarks>This function checks for perfect bitwise equality.  If any of the channels differ by even the smallest amount,
+		/// or if the two hue values are equivalent but one or both are outside of the normal range of [0, 1), then this function
+		/// will return false.</remarks>
 		public override bool Equals(object other)
 		{
 			return other is ColorHCL && this == (ColorHCL)other;
@@ -864,6 +900,96 @@ namespace Experilous.MakeItColorful
 		public static bool operator !=(ColorHCL lhs, ColorHCL rhs)
 		{
 			return lhs.h != rhs.h || lhs.c != rhs.c || lhs.l != rhs.l || lhs.a != rhs.a;
+		}
+
+		/// <summary>
+		/// Determines the ordering of this color with the specified color.
+		/// </summary>
+		/// <param name="other">The other color to compare against this one.</param>
+		/// <returns>Returns -1 if this color is ordered before the other color, +1 if it is ordered after the other color, and 0 if neither is ordered before the other.</returns>
+		public int CompareTo(ColorHCL other)
+		{
+			return Detail.OrderUtility.Compare(h, c, l, a, other.h, other.c, other.l, other.a);
+		}
+
+		/// <summary>
+		/// Determines the ordering of the first color in relation to the second color.
+		/// </summary>
+		/// <param name="lhs">The first color compare.</param>
+		/// <param name="rhs">The second color compare.</param>
+		/// <returns>Returns -1 if the first color is ordered before the second color, +1 if it is ordered after the second color, and 0 if neither is ordered before the other.</returns>
+		public int Compare(ColorHCL lhs, ColorHCL rhs)
+		{
+			return Detail.OrderUtility.Compare(lhs.h, lhs.c, lhs.l, lhs.a, rhs.h, rhs.c, rhs.l, rhs.a);
+		}
+
+		/// <summary>
+		/// Checks if the first color is lexicographically ordered before the second color.
+		/// </summary>
+		/// <param name="lhs">The first color compare.</param>
+		/// <param name="rhs">The second color compare.</param>
+		/// <returns>Returns true if the first color is lexicographically ordered before the second color, false otherwise.</returns>
+		/// <remarks>No checks are performed to make sure that both colors are canonical.  If this is important, ensure that you are
+		/// passing it canonical colors, or use the comparison operators which will do so for you.</remarks>
+		public static bool AreOrdered(ColorHCL lhs, ColorHCL rhs)
+		{
+			return Detail.OrderUtility.AreOrdered(lhs.h, lhs.c, lhs.l, lhs.a, rhs.h, rhs.c, rhs.l, rhs.a);
+		}
+
+		/// <summary>
+		/// Checks if the first color is lexicographically ordered before the second color.
+		/// </summary>
+		/// <param name="lhs">The first color compare.</param>
+		/// <param name="rhs">The second color compare.</param>
+		/// <returns>Returns true if the first color is lexicographically ordered before the second color, false otherwise.</returns>
+		/// <remarks>This operator gets the canonical representation of both colors before performing the lexicographical comparison.
+		/// If you already know that the colors are canonical, specifically want to compare non-canonical colors, or wish to avoid
+		/// excessive computations, use <see cref="AreOrdered(ColorHCL, ColorHCL)"/> instead.</remarks>
+		public static bool operator < (ColorHCL lhs, ColorHCL rhs)
+		{
+			return AreOrdered(lhs.GetCanonical(), rhs.GetCanonical());
+		}
+
+		/// <summary>
+		/// Checks if the first color is not lexicographically ordered after the second color.
+		/// </summary>
+		/// <param name="lhs">The first color compare.</param>
+		/// <param name="rhs">The second color compare.</param>
+		/// <returns>Returns true if the first color is not lexicographically ordered after the second color, false otherwise.</returns>
+		/// <remarks>This operator gets the canonical representation of both colors before performing the lexicographical comparison.
+		/// If you already know that the colors are canonical, specifically want to compare non-canonical colors, or wish to avoid
+		/// excessive computations, use <see cref="AreOrdered(ColorHCL, ColorHCL)"/> instead.</remarks>
+		public static bool operator <= (ColorHCL lhs, ColorHCL rhs)
+		{
+			return !AreOrdered(rhs.GetCanonical(), lhs.GetCanonical());
+		}
+
+		/// <summary>
+		/// Checks if the first color is lexicographically ordered after the second color.
+		/// </summary>
+		/// <param name="lhs">The first color compare.</param>
+		/// <param name="rhs">The second color compare.</param>
+		/// <returns>Returns true if the first color is lexicographically ordered after the second color, false otherwise.</returns>
+		/// <remarks>This operator gets the canonical representation of both colors before performing the lexicographical comparison.
+		/// If you already know that the colors are canonical, specifically want to compare non-canonical colors, or wish to avoid
+		/// excessive computations, use <see cref="AreOrdered(ColorHCL, ColorHCL)"/> instead.</remarks>
+		public static bool operator > (ColorHCL lhs, ColorHCL rhs)
+		{
+			return AreOrdered(rhs.GetCanonical(), lhs.GetCanonical());
+		}
+
+		/// <summary>
+		/// Checks if the first color is not lexicographically ordered before the second color.
+		/// </summary>
+		/// <param name="lhs">The first color compare.</param>
+		/// <param name="rhs">The second color compare.</param>
+		/// <returns>Returns true if the first color is not lexicographically ordered before the second color, false otherwise.</returns>
+		/// <remarks>This operator gets the canonical representation of both colors before performing the lexicographical comparison.
+		/// If you already know that the colors are canonical, specifically want to compare non-canonical colors, or wish to avoid
+		/// excessive computations, use <see cref="AreOrdered(ColorHCL, ColorHCL)"/> instead.</remarks>
+		public static bool operator >= (ColorHCL lhs, ColorHCL rhs)
+		{
+			return !AreOrdered(lhs.GetCanonical(), rhs.GetCanonical());
 		}
 
 		#endregion
@@ -938,6 +1064,55 @@ namespace Experilous.MakeItColorful
 		}
 
 		/// <summary>
+		/// Gets an HCL color that is also valid within the RGB color space, using <paramref name="chromaBias"/> to determine how to preserve chroma or luma.
+		/// </summary>
+		/// <param name="chromaBias">The bias value for favoring the preservation of chroma over lightness.  Will be clamped to the range [0, 1].  When 0, lightness is unchanged if possible, changing only chroma.  When 1, chroma is unchanged if possible, changing only lightness.</param>
+		/// <returns>A valid HCL color with chroma and luma adjusted into the valid range if necessary, according to the weighting of <paramref name="chromaBias"/>.</returns>
+		public ColorHCL GetValid(float chromaBias = 0f)
+		{
+			if (this.l <= 0.5f)
+			{
+				float cMax = this.l / 0.5f;
+				if (this.c <= cMax)
+				{
+					return new ColorHCL(Mathf.Repeat(this.h, 1f), Mathf.Max(0f, this.c), Mathf.Max(0f, this.l), Mathf.Clamp01(a));
+				}
+				else
+				{
+					float yMin = this.c * 0.5f;
+
+					chromaBias = Mathf.Clamp01(chromaBias);
+					float lightnessBias = 1f - chromaBias;
+
+					float c = this.c * chromaBias + cMax * lightnessBias;
+					float y = yMin * chromaBias + this.l * lightnessBias;
+
+					return new ColorHCL(Mathf.Repeat(this.h, 1f), Mathf.Clamp01(c), Mathf.Clamp01(y), Mathf.Clamp01(a));
+				}
+			}
+			else
+			{
+				float cMax = (1f - this.l) / 0.5f;
+				if (this.c <= cMax)
+				{
+					return new ColorHCL(Mathf.Repeat(this.h, 1f), Mathf.Max(0f, this.c), Mathf.Min(this.l, 1f), Mathf.Clamp01(a));
+				}
+				else
+				{
+					float yMax = (1f - this.c) * 0.5f + 0.5f;
+
+					chromaBias = Mathf.Clamp01(chromaBias);
+					float lightnessBias = 1f - chromaBias;
+
+					float c = this.c * chromaBias + cMax * lightnessBias;
+					float y = yMax * chromaBias + this.l * lightnessBias;
+
+					return new ColorHCL(Mathf.Repeat(this.h, 1f), Mathf.Clamp01(c), Mathf.Clamp01(y), Mathf.Clamp01(a));
+				}
+			}
+		}
+
+		/// <summary>
 		/// Indicates if the color is canonical, or if there is a different representation of this color that is canonical.
 		/// </summary>
 		/// <returns>Returns true if the color is canonical, false if there is a different representation that is canonical.</returns>
@@ -999,6 +1174,141 @@ namespace Experilous.MakeItColorful
 		{
 			return Detail.LightnessUtility.GetMaxChroma(l);
 		}
+
+		#endregion
+
+		#region Attributes
+
+		/// <summary>
+		/// Gets the hue of the color.
+		/// </summary>
+		/// <returns>The color's hue.</returns>
+		public float GetHue()
+		{
+			return h;
+		}
+
+		/// <summary>
+		/// Gets the chroma of the color.
+		/// </summary>
+		/// <returns>The color's chroma.</returns>
+		public float GetChroma()
+		{
+			return c;
+		}
+
+		/// <summary>
+		/// Gets the intensity of the color.
+		/// </summary>
+		/// <returns>The color's intensity.</returns>
+		public float GetIntensity()
+		{
+			if (c > 0f)
+			{
+				float r, g, b;
+				Detail.HueUtility.ToRGB(Mathf.Repeat(h, 1), c, l - c * 0.5f, out r, out g, out b);
+				return (r + g + b) / 3f;
+			}
+			else
+			{
+				return l;
+			}
+		}
+
+		/// <summary>
+		/// Gets the value of the color.
+		/// </summary>
+		/// <returns>The color's value.</returns>
+		public float GetValue()
+		{
+			return l + c * 0.5f;
+		}
+
+		/// <summary>
+		/// Gets the lightness of the color.
+		/// </summary>
+		/// <returns>The color's lightness.</returns>
+		public float GetLightness()
+		{
+			return l;
+		}
+
+		/// <summary>
+		/// Gets the luma (apparent brightness) of the color.
+		/// </summary>
+		/// <returns>The color's luma.</returns>
+		public float GetLuma()
+		{
+			if (c > 0f)
+			{
+				float r, g, b;
+				Detail.HueUtility.ToRGB(Mathf.Repeat(h, 1), c, l - c * 0.5f, out r, out g, out b);
+				return Detail.LumaUtility.FromRGB(r, g, b);
+			}
+			else
+			{
+				return l;
+			}
+		}
+
+		#endregion
+
+		#region Color Constants
+
+		/// <summary>
+		/// Completely transparent black.  HCLA is (0, 0, 0, 0).
+		/// </summary>
+		public static ColorHCL clear { get { return new ColorHCL(0f, 0f, 0f, 0f); } }
+
+		/// <summary>
+		/// Solid black.  HCLA is (0, 0, 0, 1).
+		/// </summary>
+		public static ColorHCL black { get { return new ColorHCL(0f, 0f, 0f, 1f); } }
+
+		/// <summary>
+		/// Solid gray.  HCLA is (0, 0, 1/2, 1).
+		/// </summary>
+		public static ColorHCL gray { get { return new ColorHCL(0f, 0f, 0.5f, 1f); } }
+
+		/// <summary>
+		/// Solid gray, with English spelling.  HCLA is (0, 0, 1/2, 1).
+		/// </summary>
+		public static ColorHCL grey { get { return new ColorHCL(0f, 0f, 0.5f, 1f); } }
+
+		/// <summary>
+		/// Solid white.  HCLA is (0, 0, 1, 1).
+		/// </summary>
+		public static ColorHCL white { get { return new ColorHCL(0f, 0f, 1f, 1f); } }
+
+		/// <summary>
+		/// Solid red.  HCLA is (0, 1, 1/2, 1).
+		/// </summary>
+		public static ColorHCL red { get { return new ColorHCL(0f, 1f, 0.5f, 1f); } }
+
+		/// <summary>
+		/// Solid yellow.  HCLA is (1/6, 1, 1/2, 1).
+		/// </summary>
+		public static ColorHCL yellow { get { return new ColorHCL(120f / 360f, 1f, 0.5f, 1f); } }
+
+		/// <summary>
+		/// Solid green.  HCLA is (1/3, 1, 1/2, 1).
+		/// </summary>
+		public static ColorHCL green { get { return new ColorHCL(120f / 360f, 1f, 0.5f, 1f); } }
+
+		/// <summary>
+		/// Solic cyan.  HCLA is (1/2, 1, 1/2, 1).
+		/// </summary>
+		public static ColorHCL cyan { get { return new ColorHCL(240f / 360f, 1f, 0.5f, 1f); } }
+
+		/// <summary>
+		/// Solid blue.  HCLA is (2/3, 1, 1/2, 1).
+		/// </summary>
+		public static ColorHCL blue { get { return new ColorHCL(240f / 360f, 1f, 0.5f, 1f); } }
+
+		/// <summary>
+		/// Solid magenta.  HCLA is (5/6, 1, 1/2, 1).
+		/// </summary>
+		public static ColorHCL magenta { get { return new ColorHCL(300f / 360f, 1f, 0.5f, 1f); } }
 
 		#endregion
 	}

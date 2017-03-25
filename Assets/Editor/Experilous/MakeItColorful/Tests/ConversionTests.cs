@@ -209,7 +209,11 @@ namespace Experilous.MakeItColorful.Tests
 
 		private TColor[] CreateColorTestArray<TColor>(ColorFactory4<TColor> constructor, int randomColorCount)
 		{
+#if UNITY_5_4_OR_NEWER
 			URnd.InitState(23498234);
+#else
+			URnd.seed = 23498234;
+#endif
 			Func<float> rndChannel = () => URnd.Range(0, 11) * 0.1f;
 			Func<TColor> rndColor = () => constructor(rndChannel(), rndChannel(), rndChannel(), rndChannel());
 			int colorCount = 21 + randomColorCount;
@@ -244,7 +248,11 @@ namespace Experilous.MakeItColorful.Tests
 
 		private TColor[] CreateColorTestArray<TColor>(ColorFactory5<TColor> constructor, int randomColorCount)
 		{
+#if UNITY_5_4_OR_NEWER
 			URnd.InitState(23498234);
+#else
+			URnd.seed = 23498234;
+#endif
 			Func<float> rndChannel = () => URnd.Range(0, 11) * 0.1f;
 			Func<TColor> rndColor = () => constructor(rndChannel(), rndChannel(), rndChannel(), rndChannel(), rndChannel());
 			int colorCount = 31 + randomColorCount;
@@ -291,7 +299,7 @@ namespace Experilous.MakeItColorful.Tests
 
 		#region RGB Roundtrip
 
-		[Test]
+		[TestCase(Category = "Normal")]
 		public void Roundtrip_RGB_CMY_RGB()
 		{
 			ValidateConversionRoundtrips<Color, ColorCMY>(
@@ -299,7 +307,7 @@ namespace Experilous.MakeItColorful.Tests
 				CreateColorTestArray((float r, float g, float b, float a) => new Color(r, g, b, a), 100));
 		}
 
-		[Test]
+		[TestCase(Category = "Normal")]
 		public void Roundtrip_RGB_CMYK_RGB()
 		{
 			ValidateConversionRoundtrips<Color, ColorCMYK>(
@@ -307,7 +315,7 @@ namespace Experilous.MakeItColorful.Tests
 				CreateColorTestArray((float r, float g, float b, float a) => new Color(r, g, b, a), 100));
 		}
 
-		[Test]
+		[TestCase(Category = "Normal")]
 		public void Roundtrip_RGB_HSV_RGB()
 		{
 			ValidateConversionRoundtrips<Color, ColorHSV>(
@@ -315,7 +323,7 @@ namespace Experilous.MakeItColorful.Tests
 				CreateColorTestArray((float r, float g, float b, float a) => new Color(r, g, b, a), 100));
 		}
 
-		[Test]
+		[TestCase(Category = "Normal")]
 		public void Roundtrip_RGB_HCV_RGB()
 		{
 			ValidateConversionRoundtrips<Color, ColorHCV>(
@@ -323,7 +331,7 @@ namespace Experilous.MakeItColorful.Tests
 				CreateColorTestArray((float r, float g, float b, float a) => new Color(r, g, b, a), 100));
 		}
 
-		[Test]
+		[TestCase(Category = "Normal")]
 		public void Roundtrip_RGB_HSL_RGB()
 		{
 			ValidateConversionRoundtrips<Color, ColorHSL>(
@@ -331,7 +339,7 @@ namespace Experilous.MakeItColorful.Tests
 				CreateColorTestArray((float r, float g, float b, float a) => new Color(r, g, b, a), 100));
 		}
 
-		[Test]
+		[TestCase(Category = "Normal")]
 		public void Roundtrip_RGB_HCL_RGB()
 		{
 			ValidateConversionRoundtrips<Color, ColorHCL>(
@@ -339,7 +347,7 @@ namespace Experilous.MakeItColorful.Tests
 				CreateColorTestArray((float r, float g, float b, float a) => new Color(r, g, b, a), 100));
 		}
 
-		[Test]
+		[TestCase(Category = "Normal")]
 		public void Roundtrip_RGB_HSY_RGB()
 		{
 			ValidateConversionRoundtrips<Color, ColorHSY>(
@@ -347,7 +355,7 @@ namespace Experilous.MakeItColorful.Tests
 				CreateColorTestArray((float r, float g, float b, float a) => new Color(r, g, b, a), 100));
 		}
 
-		[Test]
+		[TestCase(Category = "Normal")]
 		public void Roundtrip_RGB_HCY_RGB()
 		{
 			ValidateConversionRoundtrips<Color, ColorHCY>(
@@ -355,7 +363,7 @@ namespace Experilous.MakeItColorful.Tests
 				CreateColorTestArray((float r, float g, float b, float a) => new Color(r, g, b, a), 100));
 		}
 
-		[Test]
+		[TestCase(Category = "Normal")]
 		public void Roundtrip_RGB_TwoStep_RGB()
 		{
 			var colors = CreateColorTestArray((float r, float g, float b, float a) => new Color(r, g, b, a), 100);
@@ -400,7 +408,7 @@ namespace Experilous.MakeItColorful.Tests
 
 		#region CMY Roundtrip
 
-		[Test]
+		[TestCase(Category = "Normal")]
 		public void Roundtrip_CMY_RGB_CMY()
 		{
 			ValidateConversionRoundtrips<ColorCMY, Color>(
@@ -408,7 +416,7 @@ namespace Experilous.MakeItColorful.Tests
 				CreateColorTestArray((float c, float m, float y, float a) => new ColorCMY(c, m, y, a), 100));
 		}
 
-		[Test]
+		[TestCase(Category = "Normal")]
 		public void Roundtrip_CMY_CMYK_CMY()
 		{
 			ValidateConversionRoundtrips<ColorCMY, ColorCMYK>(
@@ -416,7 +424,7 @@ namespace Experilous.MakeItColorful.Tests
 				CreateColorTestArray((float c, float m, float y, float a) => new ColorCMY(c, m, y, a), 100));
 		}
 
-		[Test]
+		[TestCase(Category = "Normal")]
 		public void Roundtrip_CMY_HSV_CMY()
 		{
 			ValidateConversionRoundtrips<ColorCMY, ColorHSV>(
@@ -424,7 +432,7 @@ namespace Experilous.MakeItColorful.Tests
 				CreateColorTestArray((float c, float m, float y, float a) => new ColorCMY(c, m, y, a), 100));
 		}
 
-		[Test]
+		[TestCase(Category = "Normal")]
 		public void Roundtrip_CMY_HCV_CMY()
 		{
 			ValidateConversionRoundtrips<ColorCMY, ColorHCV>(
@@ -432,7 +440,7 @@ namespace Experilous.MakeItColorful.Tests
 				CreateColorTestArray((float c, float m, float y, float a) => new ColorCMY(c, m, y, a), 100));
 		}
 
-		[Test]
+		[TestCase(Category = "Normal")]
 		public void Roundtrip_CMY_HSL_CMY()
 		{
 			ValidateConversionRoundtrips<ColorCMY, ColorHSL>(
@@ -440,7 +448,7 @@ namespace Experilous.MakeItColorful.Tests
 				CreateColorTestArray((float c, float m, float y, float a) => new ColorCMY(c, m, y, a), 100));
 		}
 
-		[Test]
+		[TestCase(Category = "Normal")]
 		public void Roundtrip_CMY_HCL_CMY()
 		{
 			ValidateConversionRoundtrips<ColorCMY, ColorHCL>(
@@ -448,7 +456,7 @@ namespace Experilous.MakeItColorful.Tests
 				CreateColorTestArray((float c, float m, float y, float a) => new ColorCMY(c, m, y, a), 100));
 		}
 
-		[Test]
+		[TestCase(Category = "Normal")]
 		public void Roundtrip_CMY_HSY_CMY()
 		{
 			ValidateConversionRoundtrips<ColorCMY, ColorHSY>(
@@ -456,7 +464,7 @@ namespace Experilous.MakeItColorful.Tests
 				CreateColorTestArray((float c, float m, float y, float a) => new ColorCMY(c, m, y, a), 100));
 		}
 
-		[Test]
+		[TestCase(Category = "Normal")]
 		public void Roundtrip_CMY_HCY_CMY()
 		{
 			ValidateConversionRoundtrips<ColorCMY, ColorHCY>(
@@ -464,7 +472,7 @@ namespace Experilous.MakeItColorful.Tests
 				CreateColorTestArray((float c, float m, float y, float a) => new ColorCMY(c, m, y, a), 100));
 		}
 
-		[Test]
+		[TestCase(Category = "Normal")]
 		public void Roundtrip_CMY_TwoStep_CMY()
 		{
 			var colors = CreateColorTestArray((float c, float m, float y, float a) => new ColorCMY(c, m, y, a), 100);
@@ -509,7 +517,7 @@ namespace Experilous.MakeItColorful.Tests
 
 		#region CMYK Roundtrip
 
-		[Test]
+		[TestCase(Category = "Normal")]
 		public void Roundtrip_CMYK_RGB_CMYK()
 		{
 			ValidateConversionRoundtrips<ColorCMYK, Color>(
@@ -517,7 +525,7 @@ namespace Experilous.MakeItColorful.Tests
 				CreateColorTestArray((float c, float m, float y, float k, float a) => new ColorCMYK(c, m, y, k, a).GetCanonical(), 100));
 		}
 
-		[Test]
+		[TestCase(Category = "Normal")]
 		public void Roundtrip_CMYK_CMY_CMYK()
 		{
 			ValidateConversionRoundtrips<ColorCMYK, ColorCMY>(
@@ -525,7 +533,7 @@ namespace Experilous.MakeItColorful.Tests
 				CreateColorTestArray((float c, float m, float y, float k, float a) => new ColorCMYK(c, m, y, k, a).GetCanonical(), 100));
 		}
 
-		[Test]
+		[TestCase(Category = "Normal")]
 		public void Roundtrip_CMYK_HSV_CMYK()
 		{
 			ValidateConversionRoundtrips<ColorCMYK, ColorHSV>(
@@ -533,7 +541,7 @@ namespace Experilous.MakeItColorful.Tests
 				CreateColorTestArray((float c, float m, float y, float k, float a) => new ColorCMYK(c, m, y, k, a).GetCanonical(), 100));
 		}
 
-		[Test]
+		[TestCase(Category = "Normal")]
 		public void Roundtrip_CMYK_HCV_CMYK()
 		{
 			ValidateConversionRoundtrips<ColorCMYK, ColorHCV>(
@@ -541,7 +549,7 @@ namespace Experilous.MakeItColorful.Tests
 				CreateColorTestArray((float c, float m, float y, float k, float a) => new ColorCMYK(c, m, y, k, a).GetCanonical(), 100));
 		}
 
-		[Test]
+		[TestCase(Category = "Normal")]
 		public void Roundtrip_CMYK_HSL_CMYK()
 		{
 			ValidateConversionRoundtrips<ColorCMYK, ColorHSL>(
@@ -549,7 +557,7 @@ namespace Experilous.MakeItColorful.Tests
 				CreateColorTestArray((float c, float m, float y, float k, float a) => new ColorCMYK(c, m, y, k, a).GetCanonical(), 100));
 		}
 
-		[Test]
+		[TestCase(Category = "Normal")]
 		public void Roundtrip_CMYK_HCL_CMYK()
 		{
 			ValidateConversionRoundtrips<ColorCMYK, ColorHCL>(
@@ -557,7 +565,7 @@ namespace Experilous.MakeItColorful.Tests
 				CreateColorTestArray((float c, float m, float y, float k, float a) => new ColorCMYK(c, m, y, k, a).GetCanonical(), 100));
 		}
 
-		[Test]
+		[TestCase(Category = "Normal")]
 		public void Roundtrip_CMYK_HSY_CMYK()
 		{
 			ValidateConversionRoundtrips<ColorCMYK, ColorHSY>(
@@ -565,7 +573,7 @@ namespace Experilous.MakeItColorful.Tests
 				CreateColorTestArray((float c, float m, float y, float k, float a) => new ColorCMYK(c, m, y, k, a).GetCanonical(), 100));
 		}
 
-		[Test]
+		[TestCase(Category = "Normal")]
 		public void Roundtrip_CMYK_HCY_CMYK()
 		{
 			ValidateConversionRoundtrips<ColorCMYK, ColorHCY>(
@@ -573,7 +581,7 @@ namespace Experilous.MakeItColorful.Tests
 				CreateColorTestArray((float c, float m, float y, float k, float a) => new ColorCMYK(c, m, y, k, a).GetCanonical(), 100));
 		}
 
-		[Test]
+		[TestCase(Category = "Normal")]
 		public void Roundtrip_CMYK_TwoStep_CMYK()
 		{
 			var colors = CreateColorTestArray((float c, float m, float y, float k, float a) => new ColorCMYK(c, m, y, k, a).GetCanonical(), 100);
@@ -618,7 +626,7 @@ namespace Experilous.MakeItColorful.Tests
 
 		#region HSV Roundtrip
 
-		[Test]
+		[TestCase(Category = "Normal")]
 		public void Roundtrip_HSV_RGB_HSV()
 		{
 			ValidateConversionRoundtrips<ColorHSV, Color>(
@@ -626,7 +634,7 @@ namespace Experilous.MakeItColorful.Tests
 				CreateColorTestArray((float h, float s, float v, float a) => new ColorHSV((s > 0f && v > 0f) ? h : 0f, v > 0f ? s : 0f, v, a).GetNearestValid(), 100));
 		}
 
-		[Test]
+		[TestCase(Category = "Normal")]
 		public void Roundtrip_HSV_CMY_HSV()
 		{
 			ValidateConversionRoundtrips<ColorHSV, ColorCMY>(
@@ -634,7 +642,7 @@ namespace Experilous.MakeItColorful.Tests
 				CreateColorTestArray((float h, float s, float v, float a) => new ColorHSV((s > 0f && v > 0f) ? h : 0f, v > 0f ? s : 0f, v, a).GetNearestValid(), 100));
 		}
 
-		[Test]
+		[TestCase(Category = "Normal")]
 		public void Roundtrip_HSV_CMYK_HSV()
 		{
 			ValidateConversionRoundtrips<ColorHSV, ColorCMYK>(
@@ -642,7 +650,7 @@ namespace Experilous.MakeItColorful.Tests
 				CreateColorTestArray((float h, float s, float v, float a) => new ColorHSV((s > 0f && v > 0f) ? h : 0f, v > 0f ? s : 0f, v, a).GetNearestValid(), 100));
 		}
 
-		[Test]
+		[TestCase(Category = "Normal")]
 		public void Roundtrip_HSV_HCV_HSV()
 		{
 			ValidateConversionRoundtrips<ColorHSV, ColorHCV>(
@@ -650,7 +658,7 @@ namespace Experilous.MakeItColorful.Tests
 				CreateColorTestArray((float h, float s, float v, float a) => new ColorHSV(h, v > 0f ? s : 0f, v, a).GetNearestValid(), 100));
 		}
 
-		[Test]
+		[TestCase(Category = "Normal")]
 		public void Roundtrip_HSV_HSL_HSV()
 		{
 			ValidateConversionRoundtrips<ColorHSV, ColorHSL>(
@@ -658,7 +666,7 @@ namespace Experilous.MakeItColorful.Tests
 				CreateColorTestArray((float h, float s, float v, float a) => new ColorHSV(h, v > 0f ? s : 0f, v, a).GetNearestValid(), 100));
 		}
 
-		[Test]
+		[TestCase(Category = "Normal")]
 		public void Roundtrip_HSV_HCL_HSV()
 		{
 			ValidateConversionRoundtrips<ColorHSV, ColorHCL>(
@@ -666,7 +674,7 @@ namespace Experilous.MakeItColorful.Tests
 				CreateColorTestArray((float h, float s, float v, float a) => new ColorHSV(h, v > 0f ? s : 0f, v, a).GetNearestValid(), 100));
 		}
 
-		[Test]
+		[TestCase(Category = "Normal")]
 		public void Roundtrip_HSV_HSY_HSV()
 		{
 			ValidateConversionRoundtrips<ColorHSV, ColorHSY>(
@@ -674,7 +682,7 @@ namespace Experilous.MakeItColorful.Tests
 				CreateColorTestArray((float h, float s, float v, float a) => new ColorHSV(h, v > 0f ? s : 0f, v, a).GetNearestValid(), 100));
 		}
 
-		[Test]
+		[TestCase(Category = "Normal")]
 		public void Roundtrip_HSV_HCY_HSV()
 		{
 			ValidateConversionRoundtrips<ColorHSV, ColorHCY>(
@@ -682,7 +690,7 @@ namespace Experilous.MakeItColorful.Tests
 				CreateColorTestArray((float h, float s, float v, float a) => new ColorHSV(h, v > 0f ? s : 0f, v, a).GetNearestValid(), 100));
 		}
 
-		[Test]
+		[TestCase(Category = "Normal")]
 		public void Roundtrip_HSV_TwoStep_HSV()
 		{
 			var colors = CreateColorTestArray((float h, float s, float v, float a) => new ColorHSV(h, s, v, a).GetCanonical(), 100);
@@ -727,7 +735,7 @@ namespace Experilous.MakeItColorful.Tests
 
 		#region HCV Roundtrip
 
-		[Test]
+		[TestCase(Category = "Normal")]
 		public void Roundtrip_HCV_RGB_HCV()
 		{
 			ValidateConversionRoundtrips<ColorHCV, Color>(
@@ -735,7 +743,7 @@ namespace Experilous.MakeItColorful.Tests
 				CreateColorTestArray((float h, float c, float v, float a) => new ColorHCV(c > 0f ? h : 0f, c, v, a).GetNearestValid(), 100));
 		}
 
-		[Test]
+		[TestCase(Category = "Normal")]
 		public void Roundtrip_HCV_CMY_HCV()
 		{
 			ValidateConversionRoundtrips<ColorHCV, ColorCMY>(
@@ -743,7 +751,7 @@ namespace Experilous.MakeItColorful.Tests
 				CreateColorTestArray((float h, float c, float v, float a) => new ColorHCV(c > 0f ? h : 0f, c, v, a).GetNearestValid(), 100));
 		}
 
-		[Test]
+		[TestCase(Category = "Normal")]
 		public void Roundtrip_HCV_CMYK_HCV()
 		{
 			ValidateConversionRoundtrips<ColorHCV, ColorCMYK>(
@@ -751,7 +759,7 @@ namespace Experilous.MakeItColorful.Tests
 				CreateColorTestArray((float h, float c, float v, float a) => new ColorHCV(c > 0f ? h : 0f, c, v, a).GetNearestValid(), 100));
 		}
 
-		[Test]
+		[TestCase(Category = "Normal")]
 		public void Roundtrip_HCV_HSV_HCV()
 		{
 			ValidateConversionRoundtrips<ColorHCV, ColorHSV>(
@@ -759,7 +767,7 @@ namespace Experilous.MakeItColorful.Tests
 				CreateColorTestArray((float h, float c, float v, float a) => new ColorHCV(h, c, v, a).GetNearestValid(), 100));
 		}
 
-		[Test]
+		[TestCase(Category = "Normal")]
 		public void Roundtrip_HCV_HSL_HCV()
 		{
 			ValidateConversionRoundtrips<ColorHCV, ColorHSL>(
@@ -767,7 +775,7 @@ namespace Experilous.MakeItColorful.Tests
 				CreateColorTestArray((float h, float c, float v, float a) => new ColorHCV(h, c, v, a).GetNearestValid(), 100));
 		}
 
-		[Test]
+		[TestCase(Category = "Normal")]
 		public void Roundtrip_HCV_HCL_HCV()
 		{
 			ValidateConversionRoundtrips<ColorHCV, ColorHCL>(
@@ -775,7 +783,7 @@ namespace Experilous.MakeItColorful.Tests
 				CreateColorTestArray((float h, float c, float v, float a) => new ColorHCV(h, c, v, a).GetNearestValid(), 100));
 		}
 
-		[Test]
+		[TestCase(Category = "Normal")]
 		public void Roundtrip_HCV_HSY_HCV()
 		{
 			ValidateConversionRoundtrips<ColorHCV, ColorHSY>(
@@ -783,7 +791,7 @@ namespace Experilous.MakeItColorful.Tests
 				CreateColorTestArray((float h, float c, float v, float a) => new ColorHCV(h, c, v, a).GetNearestValid(), 100));
 		}
 
-		[Test]
+		[TestCase(Category = "Normal")]
 		public void Roundtrip_HCV_HCY_HCV()
 		{
 			ValidateConversionRoundtrips<ColorHCV, ColorHCY>(
@@ -791,7 +799,7 @@ namespace Experilous.MakeItColorful.Tests
 				CreateColorTestArray((float h, float c, float v, float a) => new ColorHCV(h, c, v, a).GetNearestValid(), 100));
 		}
 
-		[Test]
+		[TestCase(Category = "Normal")]
 		public void Roundtrip_HCV_TwoStep_HCV()
 		{
 			var colors = CreateColorTestArray((float h, float c, float v, float a) => new ColorHCV(h, c, v, a).GetNearestValid().GetCanonical(), 100);
@@ -836,7 +844,7 @@ namespace Experilous.MakeItColorful.Tests
 
 		#region HSL Roundtrip
 
-		[Test]
+		[TestCase(Category = "Normal")]
 		public void Roundtrip_HSL_RGB_HSL()
 		{
 			ValidateConversionRoundtrips<ColorHSL, Color>(
@@ -844,7 +852,7 @@ namespace Experilous.MakeItColorful.Tests
 				CreateColorTestArray((float h, float s, float l, float a) => new ColorHSL((s > 0f && l > 0f && l < 1f) ? h : 0f, (l > 0f && l < 1f) ? s : 0f, l, a).GetNearestValid(), 100));
 		}
 
-		[Test]
+		[TestCase(Category = "Normal")]
 		public void Roundtrip_HSL_CMY_HSL()
 		{
 			ValidateConversionRoundtrips<ColorHSL, ColorCMY>(
@@ -852,7 +860,7 @@ namespace Experilous.MakeItColorful.Tests
 				CreateColorTestArray((float h, float s, float l, float a) => new ColorHSL((s > 0f && l > 0f && l < 1f) ? h : 0f, (l > 0f && l < 1f) ? s : 0f, l, a).GetNearestValid(), 100));
 		}
 
-		[Test]
+		[TestCase(Category = "Normal")]
 		public void Roundtrip_HSL_CMYK_HSL()
 		{
 			ValidateConversionRoundtrips<ColorHSL, ColorCMYK>(
@@ -860,7 +868,7 @@ namespace Experilous.MakeItColorful.Tests
 				CreateColorTestArray((float h, float s, float l, float a) => new ColorHSL((s > 0f && l > 0f && l < 1f) ? h : 0f, (l > 0f && l < 1f) ? s : 0f, l, a).GetNearestValid(), 100));
 		}
 
-		[Test]
+		[TestCase(Category = "Normal")]
 		public void Roundtrip_HSL_HSV_HSL()
 		{
 			ValidateConversionRoundtrips<ColorHSL, ColorHSV>(
@@ -868,7 +876,7 @@ namespace Experilous.MakeItColorful.Tests
 				CreateColorTestArray((float h, float s, float l, float a) => new ColorHSL(h, s, l, a).GetNearestValid().GetCanonical(), 100));
 		}
 
-		[Test]
+		[TestCase(Category = "Normal")]
 		public void Roundtrip_HSL_HCV_HSL()
 		{
 			ValidateConversionRoundtrips<ColorHSL, ColorHCV>(
@@ -876,7 +884,7 @@ namespace Experilous.MakeItColorful.Tests
 				CreateColorTestArray((float h, float s, float l, float a) => new ColorHSL(h, s, l, a).GetNearestValid().GetCanonical(), 100));
 		}
 
-		[Test]
+		[TestCase(Category = "Normal")]
 		public void Roundtrip_HSL_HCL_HSL()
 		{
 			ValidateConversionRoundtrips<ColorHSL, ColorHCL>(
@@ -884,7 +892,7 @@ namespace Experilous.MakeItColorful.Tests
 				CreateColorTestArray((float h, float s, float l, float a) => new ColorHSL(h, s, l, a).GetNearestValid().GetCanonical(), 100));
 		}
 
-		[Test]
+		[TestCase(Category = "Normal")]
 		public void Roundtrip_HSL_HSY_HSL()
 		{
 			ValidateConversionRoundtrips<ColorHSL, ColorHSY>(
@@ -892,7 +900,7 @@ namespace Experilous.MakeItColorful.Tests
 				CreateColorTestArray((float h, float s, float l, float a) => new ColorHSL(h, s, l, a).GetNearestValid().GetCanonical(), 100));
 		}
 
-		[Test]
+		[TestCase(Category = "Normal")]
 		public void Roundtrip_HSL_HCY_HSL()
 		{
 			ValidateConversionRoundtrips<ColorHSL, ColorHCY>(
@@ -900,7 +908,7 @@ namespace Experilous.MakeItColorful.Tests
 				CreateColorTestArray((float h, float s, float l, float a) => new ColorHSL(h, s, l, a).GetNearestValid().GetCanonical(), 100));
 		}
 
-		[Test]
+		[TestCase(Category = "Normal")]
 		public void Roundtrip_HSL_TwoStep_HSL()
 		{
 			var colors = CreateColorTestArray((float h, float s, float l, float a) => new ColorHSL(h, s, l, a).GetCanonical(), 100);
@@ -945,7 +953,7 @@ namespace Experilous.MakeItColorful.Tests
 
 		#region HCL Roundtrip
 
-		[Test]
+		[TestCase(Category = "Normal")]
 		public void Roundtrip_HCL_RGB_HCL()
 		{
 			ValidateConversionRoundtrips<ColorHCL, Color>(
@@ -953,7 +961,7 @@ namespace Experilous.MakeItColorful.Tests
 				CreateColorTestArray((float h, float c, float l, float a) => new ColorHCL(c > 0f ? h : 0f, c, l, a).GetNearestValid(), 100));
 		}
 
-		[Test]
+		[TestCase(Category = "Normal")]
 		public void Roundtrip_HCL_CMY_HCL()
 		{
 			ValidateConversionRoundtrips<ColorHCL, ColorCMY>(
@@ -961,7 +969,7 @@ namespace Experilous.MakeItColorful.Tests
 				CreateColorTestArray((float h, float c, float l, float a) => new ColorHCL(c > 0f ? h : 0f, c, l, a).GetNearestValid(), 100));
 		}
 
-		[Test]
+		[TestCase(Category = "Normal")]
 		public void Roundtrip_HCL_CMYK_HCL()
 		{
 			ValidateConversionRoundtrips<ColorHCL, ColorCMYK>(
@@ -969,7 +977,7 @@ namespace Experilous.MakeItColorful.Tests
 				CreateColorTestArray((float h, float c, float l, float a) => new ColorHCL(c > 0f ? h : 0f, c, l, a).GetNearestValid(), 100));
 		}
 
-		[Test]
+		[TestCase(Category = "Normal")]
 		public void Roundtrip_HCL_HSV_HCL()
 		{
 			ValidateConversionRoundtrips<ColorHCL, ColorHSV>(
@@ -977,7 +985,7 @@ namespace Experilous.MakeItColorful.Tests
 				CreateColorTestArray((float h, float c, float l, float a) => new ColorHCL(h, c, l, a).GetNearestValid(), 100));
 		}
 
-		[Test]
+		[TestCase(Category = "Normal")]
 		public void Roundtrip_HCL_HCV_HCL()
 		{
 			ValidateConversionRoundtrips<ColorHCL, ColorHCV>(
@@ -985,7 +993,7 @@ namespace Experilous.MakeItColorful.Tests
 				CreateColorTestArray((float h, float c, float l, float a) => new ColorHCL(h, c, l, a).GetNearestValid(), 100));
 		}
 
-		[Test]
+		[TestCase(Category = "Normal")]
 		public void Roundtrip_HCL_HSL_HCL()
 		{
 			ValidateConversionRoundtrips<ColorHCL, ColorHSL>(
@@ -993,7 +1001,7 @@ namespace Experilous.MakeItColorful.Tests
 				CreateColorTestArray((float h, float c, float l, float a) => new ColorHCL(h, c, l, a).GetNearestValid(), 100));
 		}
 
-		[Test]
+		[TestCase(Category = "Normal")]
 		public void Roundtrip_HCL_HSY_HCL()
 		{
 			ValidateConversionRoundtrips<ColorHCL, ColorHSY>(
@@ -1001,7 +1009,7 @@ namespace Experilous.MakeItColorful.Tests
 				CreateColorTestArray((float h, float c, float l, float a) => new ColorHCL(h, c, l, a).GetNearestValid(), 100));
 		}
 
-		[Test]
+		[TestCase(Category = "Normal")]
 		public void Roundtrip_HCL_HCY_HCL()
 		{
 			ValidateConversionRoundtrips<ColorHCL, ColorHCY>(
@@ -1009,7 +1017,7 @@ namespace Experilous.MakeItColorful.Tests
 				CreateColorTestArray((float h, float c, float l, float a) => new ColorHCL(h, c, l, a).GetNearestValid(), 100));
 		}
 
-		[Test]
+		[TestCase(Category = "Normal")]
 		public void Roundtrip_HCL_TwoStep_HCL()
 		{
 			var colors = CreateColorTestArray((float h, float c, float l, float a) => new ColorHCL(h, c, l, a).GetNearestValid().GetCanonical(), 100);
@@ -1054,7 +1062,7 @@ namespace Experilous.MakeItColorful.Tests
 
 		#region HSY Roundtrip
 
-		[Test]
+		[TestCase(Category = "Normal")]
 		public void Roundtrip_HSY_RGB_HSY()
 		{
 			ValidateConversionRoundtrips<ColorHSY, Color>(
@@ -1062,7 +1070,7 @@ namespace Experilous.MakeItColorful.Tests
 				CreateColorTestArray((float h, float s, float y, float a) => new ColorHSY((s > 0f && y > 0f && y < 1f) ? h : 0f, (y > 0f && y < 1f) ? s : 0f, y, a).GetNearestValid(), 100));
 		}
 
-		[Test]
+		[TestCase(Category = "Normal")]
 		public void Roundtrip_HSY_CMY_HSY()
 		{
 			ValidateConversionRoundtrips<ColorHSY, ColorCMY>(
@@ -1070,7 +1078,7 @@ namespace Experilous.MakeItColorful.Tests
 				CreateColorTestArray((float h, float s, float y, float a) => new ColorHSY((s > 0f && y > 0f && y < 1f) ? h : 0f, (y > 0f && y < 1f) ? s : 0f, y, a).GetNearestValid(), 100));
 		}
 
-		[Test]
+		[TestCase(Category = "Normal")]
 		public void Roundtrip_HSY_CMYK_HSY()
 		{
 			ValidateConversionRoundtrips<ColorHSY, ColorCMYK>(
@@ -1078,7 +1086,7 @@ namespace Experilous.MakeItColorful.Tests
 				CreateColorTestArray((float h, float s, float y, float a) => new ColorHSY((s > 0f && y > 0f && y < 1f) ? h : 0f, (y > 0f && y < 1f) ? s : 0f, y, a).GetNearestValid(), 100));
 		}
 
-		[Test]
+		[TestCase(Category = "Normal")]
 		public void Roundtrip_HSY_HSV_HSY()
 		{
 			ValidateConversionRoundtrips<ColorHSY, ColorHSV>(
@@ -1086,7 +1094,7 @@ namespace Experilous.MakeItColorful.Tests
 				CreateColorTestArray((float h, float s, float y, float a) => new ColorHSY(h, (y > 0f && y < 1f) ? s : 0f, y, a).GetNearestValid(), 100));
 		}
 
-		[Test]
+		[TestCase(Category = "Normal")]
 		public void Roundtrip_HSY_HCV_HSY()
 		{
 			ValidateConversionRoundtrips<ColorHSY, ColorHCV>(
@@ -1094,7 +1102,7 @@ namespace Experilous.MakeItColorful.Tests
 				CreateColorTestArray((float h, float s, float y, float a) => new ColorHSY(h, (y > 0f && y < 1f) ? s : 0f, y, a).GetNearestValid(), 100));
 		}
 
-		[Test]
+		[TestCase(Category = "Normal")]
 		public void Roundtrip_HSY_HSL_HSY()
 		{
 			ValidateConversionRoundtrips<ColorHSY, ColorHSL>(
@@ -1102,7 +1110,7 @@ namespace Experilous.MakeItColorful.Tests
 				CreateColorTestArray((float h, float s, float y, float a) => new ColorHSY(h, s, y, a).GetNearestValid().GetCanonical(), 100));
 		}
 
-		[Test]
+		[TestCase(Category = "Normal")]
 		public void Roundtrip_HSY_HCL_HSY()
 		{
 			ValidateConversionRoundtrips<ColorHSY, ColorHCL>(
@@ -1110,7 +1118,7 @@ namespace Experilous.MakeItColorful.Tests
 				CreateColorTestArray((float h, float s, float y, float a) => new ColorHSY(h, (y > 0f && y < 1f) ? s : 0f, y, a).GetNearestValid(), 100));
 		}
 
-		[Test]
+		[TestCase(Category = "Normal")]
 		public void Roundtrip_HSY_HCY_HSY()
 		{
 			ValidateConversionRoundtrips<ColorHSY, ColorHCY>(
@@ -1118,7 +1126,7 @@ namespace Experilous.MakeItColorful.Tests
 				CreateColorTestArray((float h, float s, float y, float a) => new ColorHSY(h, (y > 0f && y < 1f) ? s : 0f, y, a).GetNearestValid(), 100));
 		}
 
-		[Test]
+		[TestCase(Category = "Normal")]
 		public void Roundtrip_HSY_TwoStep_HSY()
 		{
 			var colors = CreateColorTestArray((float h, float s, float y, float a) => new ColorHSY(h, s, y, a).GetCanonical(), 100);
@@ -1163,7 +1171,7 @@ namespace Experilous.MakeItColorful.Tests
 
 		#region HCY Roundtrip
 
-		[Test]
+		[TestCase(Category = "Normal")]
 		public void Roundtrip_HCY_RGB_HCY()
 		{
 			ValidateConversionRoundtrips<ColorHCY, Color>(
@@ -1171,7 +1179,7 @@ namespace Experilous.MakeItColorful.Tests
 				CreateColorTestArray((float h, float c, float y, float a) => new ColorHCY(c > 0f ? h : 0f, c, y, a).GetNearestValid(), 100));
 		}
 
-		[Test]
+		[TestCase(Category = "Normal")]
 		public void Roundtrip_HCY_CMY_HCY()
 		{
 			ValidateConversionRoundtrips<ColorHCY, ColorCMY>(
@@ -1179,7 +1187,7 @@ namespace Experilous.MakeItColorful.Tests
 				CreateColorTestArray((float h, float c, float y, float a) => new ColorHCY(c > 0f ? h : 0f, c, y, a).GetNearestValid(), 100));
 		}
 
-		[Test]
+		[TestCase(Category = "Normal")]
 		public void Roundtrip_HCY_CMYK_HCY()
 		{
 			ValidateConversionRoundtrips<ColorHCY, ColorCMYK>(
@@ -1187,7 +1195,7 @@ namespace Experilous.MakeItColorful.Tests
 				CreateColorTestArray((float h, float c, float y, float a) => new ColorHCY(c > 0f ? h : 0f, c, y, a).GetNearestValid(), 100));
 		}
 
-		[Test]
+		[TestCase(Category = "Normal")]
 		public void Roundtrip_HCY_HSV_HCY()
 		{
 			ValidateConversionRoundtrips<ColorHCY, ColorHSV>(
@@ -1195,7 +1203,7 @@ namespace Experilous.MakeItColorful.Tests
 				CreateColorTestArray((float h, float c, float y, float a) => new ColorHCY(h, c, y, a).GetNearestValid(), 100));
 		}
 
-		[Test]
+		[TestCase(Category = "Normal")]
 		public void Roundtrip_HCY_HCV_HCY()
 		{
 			ValidateConversionRoundtrips<ColorHCY, ColorHCV>(
@@ -1203,7 +1211,7 @@ namespace Experilous.MakeItColorful.Tests
 				CreateColorTestArray((float h, float c, float y, float a) => new ColorHCY(h, c, y, a).GetNearestValid(), 100));
 		}
 
-		[Test]
+		[TestCase(Category = "Normal")]
 		public void Roundtrip_HCY_HSL_HCY()
 		{
 			ValidateConversionRoundtrips<ColorHCY, ColorHSL>(
@@ -1211,7 +1219,7 @@ namespace Experilous.MakeItColorful.Tests
 				CreateColorTestArray((float h, float c, float y, float a) => new ColorHCY(h, c, y, a).GetNearestValid(), 100));
 		}
 
-		[Test]
+		[TestCase(Category = "Normal")]
 		public void Roundtrip_HCY_HCL_HCY()
 		{
 			ValidateConversionRoundtrips<ColorHCY, ColorHCL>(
@@ -1219,7 +1227,7 @@ namespace Experilous.MakeItColorful.Tests
 				CreateColorTestArray((float h, float c, float y, float a) => new ColorHCY(h, c, y, a).GetNearestValid(), 100));
 		}
 
-		[Test]
+		[TestCase(Category = "Normal")]
 		public void Roundtrip_HCY_HSY_HCY()
 		{
 			ValidateConversionRoundtrips<ColorHCY, ColorHSY>(
@@ -1227,7 +1235,7 @@ namespace Experilous.MakeItColorful.Tests
 				CreateColorTestArray((float h, float c, float y, float a) => new ColorHCY(h, c, y, a).GetNearestValid(), 100));
 		}
 
-		[Test]
+		[TestCase(Category = "Normal")]
 		public void Roundtrip_HCY_TwoStep_HCY()
 		{
 			var colors = CreateColorTestArray((float h, float c, float y, float a) => new ColorHCY(h, c, y, a).GetNearestValid().GetCanonical(), 100);
