@@ -1,0 +1,66 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<topic id="04f81f23-5976-42c4-be55-8d7c01831111" revisionNumber="1">
+	<developerConceptualDocument xmlns="http://ddue.schemas.microsoft.com/authoring/2003/5" xmlns:xlink="http://www.w3.org/1999/xlink">
+		<introduction>
+			<para>
+				Most color spaces are additive or otherwise positively oriented;
+				they treat black as a sort of default color when the relevant components
+				are at 0, and white only when the relevant components are at their
+				maximum.  Some however are subtractive, such that white is the default,
+				and as you increase the influence from each of the relevant components
+				the resulting color gets darker, culminating in black when the relevant
+				components are at their maximum.  This corresponds to physical media
+				such as inks and paint, where the role of the pigment is to
+				<legacyItalic>absorb</legacyItalic> light, not produce it.
+			</para>
+			<para>
+				MakeIt.Colorful supports two such color spaces, CMY and CMYK.
+			</para>
+		</introduction>
+		<section address="cmy">
+			<title>CMY (Cyan, Magenta, Yellow)</title>
+			<content>
+				<para>
+					The CMY color space is essentially the exact inverse of the RGB
+					color space.  In RGB, the set of red, green, and blue component
+					values (1, 0.25, 0) creates a reddish orange color, while to get
+					the same color in CMY, you would use (0, 0.75, 1) for the cyan,
+					magenta, and yellow components.  Conversion between RGB and CMY
+					is thus as simple as subracting each component from 1.
+				</para>
+				<para>
+					Likewise, whereas RGB is black when all components are 0 and
+					white when they are all 1, it is the inverse with CMY where all
+					components need to be 1 to produce black, and 0 results in
+					white.
+				</para>
+			</content>
+		</section>
+		<section address="cmyk">
+			<title>CMYK (Cyan, Magenta, Yellow, Key)</title>
+			<content>
+				<para>
+					The CMYK color space is very similar, except that it adds an
+					extra component, the key, which basically operates as a pure
+					black component.  A CMYK color with a key of 0.25 is like
+					starting with a CMY color with each of the three colors already
+					set to 0.25.  It is essentially a light gray base that darkens
+					any additional coloration that is added.
+				</para>
+				<para>
+					Ideally, at least one of the first three channels of a CMYK color
+					is set to 0.  If not, then that representation of the color is
+					not canonical, because there's some darkness contributed by those
+					three channels that could be moved to the key channel instead.
+					This parallels the origin of the CMYK color space, color printing,
+					where it was more economical to maximize the use of cheap black
+					ink and be as conservative as possible with colored inks.
+				</para>
+			</content>
+		</section>
+		<relatedTopics>
+			<codeEntityReference>T:MakeIt.Colorful.ColorCMY</codeEntityReference>
+			<codeEntityReference>T:MakeIt.Colorful.ColorCMYK</codeEntityReference>
+		</relatedTopics>
+	</developerConceptualDocument>
+</topic>
