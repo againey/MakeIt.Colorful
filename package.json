@@ -26,7 +26,8 @@
     "cmyk"
   ],
   "author": {
-    "name": "Andy Gainey"
+    "name": "Andy Gainey",
+    "url": "https://github.com/againey"
   },
   "dependencies": {
     "com.unity.test-framework": "1.1.11"
