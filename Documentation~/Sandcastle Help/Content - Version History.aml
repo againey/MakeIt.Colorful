@@ -1,0 +1,94 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<topic id="913e8743-a822-4460-b98e-5c864f9a312e" revisionNumber="1">
+	<developerConceptualDocument xmlns="http://ddue.schemas.microsoft.com/authoring/2003/5" xmlns:xlink="http://www.w3.org/1999/xlink">
+		<introduction>
+			<autoOutline lead="none">2</autoOutline>
+		</introduction>
+		<section address="v1-1">
+			<title>Version 1.1</title>
+			<sections>
+				<section>
+					<content>
+						<para>
+							A minor update with miscellaneous additions to improve overall utility.
+						</para>
+					</content>
+				</section>
+				<section address="v1-1-improvements">
+					<title>Improvements</title>
+					<content>
+						<list class="bullet">
+							<listItem>Added common color constants for each color space.</listItem>
+							<listItem>Added opacity functions to easily get opacity-altered variants of a color.</listItem>
+							<listItem>Implemented <codeEntityReference>T:System.IEquatable`1</codeEntityReference>.</listItem>
+							<listItem>Implemented <codeEntityReference>T:System.IComparable`1</codeEntityReference>, using a lexicographic ordering.</listItem>
+							<listItem>Added less, greater, and the -or-equal operators, using a lexicographic ordering.</listItem>
+							<listItem>Added functions to compute common color attributes for all color types:
+								<list class="bullet">
+									<listItem>hue</listItem>
+									<listItem>intensity</listItem>
+									<listItem>value</listItem>
+									<listItem>lightness</listItem>
+									<listItem>luma (apparent brightness)</listItem>
+								</list>
+							</listItem>
+							<listItem>Added GetValid(chromaBias) for chroma-based color types, to choose the degree to which chroma or luminance is preserved when correcting invalid colors.</listItem>
+						</list>
+					</content>
+				</section>
+			</sections>
+		</section>
+		<section address="v1-0">
+			<title>Version 1.0</title>
+			<sections>
+				<section>
+					<content>
+						<para>
+							The initial release.
+						</para>
+					</content>
+				</section>
+				<section address="v1-0-color-spaces">
+					<title>Color Spaces</title>
+					<content>
+						<list class="bullet">
+							<listItem><codeEntityReference linkText="HSV">T:MakeIt.Colorful.ColorHSV</codeEntityReference> (hue, saturation, value)</listItem>
+							<listItem><codeEntityReference linkText="HCV">T:MakeIt.Colorful.ColorHCV</codeEntityReference> (hue, chroma, value)</listItem>
+							<listItem><codeEntityReference linkText="HSL">T:MakeIt.Colorful.ColorHSL</codeEntityReference> (hue, saturation, lightness)</listItem>
+							<listItem><codeEntityReference linkText="HCL">T:MakeIt.Colorful.ColorHCL</codeEntityReference> (hue, chroma, lightness)</listItem>
+							<listItem><codeEntityReference linkText="HSY">T:MakeIt.Colorful.ColorHSY</codeEntityReference> (hue, saturation, luma)</listItem>
+							<listItem><codeEntityReference linkText="HCY">T:MakeIt.Colorful.ColorHCY</codeEntityReference> (hue, chroma, luma)</listItem>
+							<listItem><codeEntityReference linkText="CMY">T:MakeIt.Colorful.ColorCMY</codeEntityReference> (cyan, magenta, yellow)</listItem>
+							<listItem><codeEntityReference linkText="CMYK">T:MakeIt.Colorful.ColorCMYK</codeEntityReference> (cyan, magenta, yellow, key)</listItem>
+						</list>
+					</content>
+				</section>
+				<section address="v1-0-features">
+					<title>Features</title>
+					<content>
+						<list class="bullet">
+							<listItem>implicit conversion to/from RGB (<codeEntityReference qualifyHint="true">T:UnityEngine.Color</codeEntityReference>)</listItem>
+							<listItem>explicit conversion to/from any other color type</listItem>
+							<listItem>explicit conversion to/from <codeEntityReference>T:UnityEngine.Vector3</codeEntityReference>/<codeEntityReference>T:UnityEngine.Vector4</codeEntityReference></listItem>
+							<listItem>color channel indexing</listItem>
+							<listItem>linear interpolation (cyclically aware for hue)</listItem>
+							<listItem>arithmetic operators</listItem>
+							<listItem>equality operators</listItem>
+							<listItem>string formattable</listItem>
+							<listItem>color space boundary validation and correction</listItem>
+							<listItem>awareness of canonical and non-canonical color representations</listItem>
+						</list>
+					</content>
+				</section>
+				<section address="v1-0-demos">
+					<title>Demos</title>
+					<content>
+						<list class="bullet">
+							<listItem><link xlink:href="6930ebf6-a198-4030-a111-b05134ed2e06#example-scene">color space volumes and linear gradients</link></listItem>
+						</list>
+					</content>
+				</section>
+			</sections>
+		</section>
+	</developerConceptualDocument>
+</topic>

@@ -1,0 +1,35 @@
+{
+  "name": "com.andygainey.makeit.colorful",
+  "version": "2.0.0",
+  "displayName": "MakeIt.Colorful",
+  "description": "Code library for working with colors and color spaces.",
+  "unity": "2019.3",
+  "unityRelease": "3f1",
+  "keywords": [
+    "color",
+    "colors",
+    "colorspace",
+    "colorspaces",
+    "hue",
+    "luma",
+    "luminance",
+    "chroma",
+    "saturation",
+    "lerp",
+    "hsv",
+    "hsl",
+    "hsy",
+    "hcv",
+    "hcl",
+    "hcy",
+    "cmy",
+    "cmyk"
+  ],
+  "author": {
+    "name": "Andy Gainey",
+    "url": "https://github.com/againey"
+  },
+  "dependencies": {
+    "com.unity.test-framework": "1.1.11"
+  }
+}
